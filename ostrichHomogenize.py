@@ -1,6 +1,7 @@
 import os
 import sys
-from Homogenize import Homogenize
+from HOMOGENIZE import Homogenize
+from OSTRICH import ostIn
 
 def writeToFile(timeHistory, stressHistory, strainHistory):
     print('Saving homogenization time history:')
@@ -23,7 +24,7 @@ def writeToFile(timeHistory, stressHistory, strainHistory):
 def createOstIn(H, parameters):
     print('Creating OstIn.txt for OSTRICH:')
     #TODO: change import format, use template, not module maybe?
-    import ostrich.ostIn
+    import OSTRICH.ostIn
     observations = ''
     numObservations = len(H.timeHistory)
     for i in range(numObservations):
@@ -50,32 +51,30 @@ def createOstIn(H, parameters):
             obsNo = i*len(parameters)+j+1
             newObservation = 'obs{} \t\t{:10f} \t1 \toutput.dat \tOST_NULL \t{} \t\t{}\n'.format(obsNo, o, l, c)
             observations += newObservation
-    with open(os.path.join('ostrich', 'OstIn.txt'), 'w') as f:
-        f.write(ostrich.ostIn.topText+observations+ostrich.ostIn.bottomText)
+    with open(os.path.join('OSTRICH', 'OstIn.tpl'), 'w') as f:
+        f.write(OSTRICH.ostIn.topText+observations+OSTRICH.ostIn.bottomText)
     print('\tDone')
             
 if __name__ == '__main__':
     os.system('cls')
+    
     clargs = sys.argv
     if len(clargs) >= 2:
         fileName = clargs[1]
     #else: error message
     #add other cl args for centre and radius
     module = __import__('UDEC.modelData.'+fileName[0:-3]+'_modelData', globals(), locals(), ['*'])
+    
     for k in dir(module):
         locals()[k] = getattr(module, k)
     revCentre = {'x':mSize/2, 'y':mSize/2}
     revRadius = mSize/2-bSize*2
     
-    H = Homogenize(revCentre, revRadius, fileName=fileName)
-
-
+    H = Homogenize.Homogenize(revCentre, revRadius, fileName=fileName)
     stressHistory = H.stress()
     strainHistory = H.strain()
     timeHistory = H.time()
+    
     writeToFile(timeHistory, stressHistory, strainHistory)
     createOstIn(H, relVars)
-
-    #following command should be moved to up-scaling script
-    os.system('python createParameters.py ' + fileName)
-
+    os.system('python createOstrichInput.py ' + fileName)

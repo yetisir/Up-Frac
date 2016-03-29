@@ -13,16 +13,7 @@ ModelSubdir model
 #Parameter Specification
 BeginParams
 #parameter	init.	low	    high	tx_in   tx_ost	tx_out
-$h          0.008   0.005   0.03    none    none    none
-$k          10e6    5e6    20e6   none    none    none
-$dd         2e6    1e6    10e6   none    none    none
-#$b          10e6    5e6     20e6   none    none    none
-$cd         0.9     0.5       0.95     none    none    none
-#$N		    3e6     1e6     10e6    none    none    none
-#$tLambda    -5e3    -10e3    -1e3   none    none    none
-#$td		    0.9     0.5       1     none    none    none
-#$E			12e9    10e9    15e9    none	none    none
-#$nu         0.3      0.2     0.4    none    none    none
+$$ostrichParameters
 EndParams
 
 #Observation Configuration
