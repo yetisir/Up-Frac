@@ -1,6 +1,4 @@
-#Configuration File for Ostrich Program
 ProgramType Levenberg-Marquardt
-#ProgramType GeneticAlgorithm
 
 BeginFilePairs    
 runAbaqus.temp.tpl	runAbaqus.py
@@ -10,24 +8,16 @@ ModelExecutable    simulationData.bat
 
 ModelSubdir model
 
-#Parameter Specification
 BeginParams
-#parameter	init.	low	    high	tx_in   tx_ost	tx_out
 $tLambda	2200.0	1000.0	5000.0	none	none	none
-#$peakYeildStrain	100	99	101	none	none	none
 $initialTensileYeild	2200000.0	1000000.0	5000000.0	none	none	none
 $elasticModulus	7500000000.0	5000000000.0	15000000000.0	none	none	none
 $poissonsRatio	0.35	0.3	0.4	none	none	none
-#$initialCompressiveYeild	3100000.0	1000000.0	5000000.0	none	none	none
-#$compressiveDamageScaling	0.5	0.4	0.6	none	none	none
 $tensileDamageScaling	0.5	0.4	0.6	none	none	none
-#$peakYeildStress	10500000.0	5000000.0	15000000.0	none	none	none
 
 EndParams
 
-#Observation Configuration
 BeginObservations
-#observation	value		weight	file		keyword		line	column
 obs1 		240460.888903 	1 	output.dat 	OST_NULL 	2 		3
 obs2 		460785.282543 	1 	output.dat 	OST_NULL 	3 		3
 obs3 		680037.687383 	1 	output.dat 	OST_NULL 	4 		3
@@ -81,7 +71,6 @@ obs50 		-381183.278704 	1 	output.dat 	OST_NULL 	51 		3
 
 EndObservations
 
-#Configuration for Levenberg-Marquardt algorithm
 BeginLevMar
 InitialLambda    10.0
 LambdaScaleFactor    1.1
@@ -97,17 +86,6 @@ BeginMathAndStats
 DiffType    forward
 DiffRelIncrement    0.01
 Default
-#AllStats
-#NoStats
-#StdDev
-#StdErr
-#CorrCoeff
-#Beale
-#Linssen
-#CooksD
-#DFBETAS
-#Confidence
-#Sensitivity
 EndMathAndStats
 
 BeginExtraFiles

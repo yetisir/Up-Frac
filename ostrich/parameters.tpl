@@ -9,7 +9,7 @@ numberOfSteps = 50
 
 confiningStress = $$confStress
 
-dilationAngle = $$dangle
+dilationAngle = $$dAngle
 density = $$rho
 crackingStrain = $$cStrain
 inelasticStrain = $$iStrain

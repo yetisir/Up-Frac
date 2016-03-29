@@ -3,6 +3,16 @@ import os
 import csv
 from OSTRICH.vectorMath import *
 
+#these arrays shhould be tied to the material definitions
+c_parameters =  ['$peakYeildStrain', 
+                        '$peakYeildStress', 
+                        '$initialCompressiveYeild', 
+                        '$compressiveDamageScaling']
+t_parameters =  ['$elasticModulus', 
+                        '$poissonsRatio', 
+                        '$initialTensileYeild', 
+                        '$tLambda', 
+                        '$tensileDamageScaling']
 
 def getMaxStrain():
     with open(os.path.join('OSTRICH', 'observationUDEC.dat')) as udecFile:
@@ -65,21 +75,41 @@ def getModelParameters():
     return parameters
                                 
 def getOstrichParameters():
-    return {'$$ostrichParameters':ostrichParameters}
+    ostrichParametersText = '' 
+    for parameter in ostrichParameters:
+        p = ostrichParameters[parameter]
+        newRecord = '$' + parameter + '\t' + str(p['init']) + '\t' + str(p['low']) + '\t' +str(p['high']) +'\tnone\tnone\tnone\n'
+        ostrichParametersText += newRecord
+    return {'$$ostrichParameters':ostrichParametersText}
     
-def getLoadingParameters():
+def getOstInVoid():
     if '(c)' in modelName:
-        parameters =  {'$elasticModulus': '#elasticModulus',
-                                '$poissonsRatio': '#poissonsRatio',
-                                '$initialTensileYeild': '#initialTensileYeild',
-                                '$tLambda': '#tLambda',
-                                '$tensileDamageScaling': '#tensileDamageScaling'}
-
+        p = t_parameters
     elif '(t)' in modelName:
-        parameters =  {'$PeakYeildStrain': '#PeakYeildStrain',
-                                '$PeakYeildStress': '#PeakYeildStress',
-                                '$InitialcompressiveYeild': '#InitialcompressiveYeild',
-                                '$compressiveDamageScaling': '#compressiveDamageScaling'}
+        p = c_parameters
+    parameters = {}
+    for parameter in p:
+        parameters[parameter] = '#'+parameter
+    return parameters
+    
+def getModelConstants():
+    if '(c)' in modelName:
+        with open(os.path.join('OSTRICH', 'OstOutput0.txt')) as ostOutputFile:
+            ostOutput = ostOutputFile.read()
+            startIndex = ostOutput.find('Optimal Parameter Set')
+            endIndex = ostOutput.find('\n\n', startIndex)
+            parameterBlock = ostOutput[startIndex:endIndex]
+            parameters = {}
+            for parameter in t_parameters:
+                paramPosition = parameterBlock.find(parameter)
+                colonPosition = parameterBlock.find(':', paramPosition)
+                eolPosition = parameterBlock.find('\n', paramPosition)
+                value = float(parameterBlock[colonPosition+1:eolPosition])
+                parameters[parameter] = value
+    elif '(t)' in modelName:
+        parameters = {}
+        for parameter in c_parameters:
+            parameters[parameter] = ostrichParameters[parameter[1:]]['init']
     return parameters
      
 def fillTemplate(template, parameters, file):
@@ -104,8 +134,8 @@ if __name__ == '__main__':
 
     fillTemplate('parameters.tpl', getModelParameters(), 'parameters.py')
     fillTemplate('ostIn.tpl', getOstrichParameters(), 'ostIn.txt')
-    fillTemplate('ostIn.txt', getLoadingParameters(), 'ostIn.txt')
-      
+    fillTemplate('ostIn.txt', getOstInVoid(), 'ostIn.txt')
+    fillTemplate('runAbaqus.tpl', getModelConstants(), 'runAbaqus.temp.tpl')
         
         
         

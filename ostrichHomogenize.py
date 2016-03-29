@@ -1,7 +1,7 @@
 import os
 import sys
+import pickle
 from HOMOGENIZE import Homogenize
-from OSTRICH import ostIn
 
 def writeToFile(timeHistory, stressHistory, strainHistory):
     print('Saving homogenization time history:')
@@ -19,6 +19,10 @@ def writeToFile(timeHistory, stressHistory, strainHistory):
             record = [time, S11, S22, S12, LE11, LE22, LE12]
             record = ' '.join(map(str, record))
             f.write(record + '\n')
+            
+    bundle = [timeHistory, stressHistory, strainHistory]
+    with open(os.path.join('HOMOGENIZE', 'binaryData', fileName+'_homogenizedData.pkl'), 'wb') as bundleFile:
+        pickle.dump(bundle, bundleFile)
     print('\tDone')
 
 def createOstIn(H, parameters):

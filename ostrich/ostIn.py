@@ -3,7 +3,7 @@ ProgramType Levenberg-Marquardt
 #ProgramType GeneticAlgorithm
 
 BeginFilePairs    
-parameters.tpl	parameters.py
+runAbaqus.temp.tpl	runAbaqus.py
 EndFilePairs
 
 ModelExecutable    simulationData.bat
@@ -54,9 +54,10 @@ Default
 EndMathAndStats
 
 BeginExtraFiles
-runAbaqus.py
+parameters.py
 interpolateData.py
 simulationData.py
+vectorMath.py
 EndExtraFiles
 
 BeginGeneticAlg

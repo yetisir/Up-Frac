@@ -34,5 +34,26 @@ def interpolateData(binaryDataFile):
             for j in range(len(strainHistory[i])):
                 f.write(str(strainHistory[i][j])+' ')
             f.write('\n')
-if __name__ == '__main__':            
+            
+    bundle = [timeHistory, stressHistory, strainHistory]
+    bundleFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'fittedHistory', mName+'_fittedHistory.pkl')
+    ostModelFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'OstModel0.txt')
+    newSet = False
+    with open(ostModelFileName, 'r') as trialsFile:
+        text = trialsFile.readlines()
+        
+        if len(text) <=2:
+            newSet = True
+    if newSet is False:
+        with open(bundleFileName, 'ab') as fittedFile:
+            pickle.dump(bundle, fittedFile)           
+    elif newSet is True:
+        with open(bundleFileName, 'wb') as fittedFile:
+             pickle.dump(bundle, fittedFile)
+           
+    
+def main():
     interpolateData(os.path.join(os.getcwd(), 'rawHistory.pkl'))
+    
+if __name__ == '__main__':            
+    main()
