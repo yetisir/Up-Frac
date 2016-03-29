@@ -216,7 +216,7 @@ class FracPlot(DataSet):
         allX = []
         allY = []
         allZ = []
-        filePath = os.path.join('binaryData', self.fileName+'_'+stressType+'.dat')
+        filePath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'binaryData', self.fileName+'_'+stressType+'.dat')
         calculate = True
         if loadData == True:
             try:
@@ -310,8 +310,7 @@ class FracPlot(DataSet):
         colorBar = colorbar.ColorbarBase(self.colorBarAxes, cmap=cmap, norm=norm)
         colorBar.set_label('MPa')      
         print('\tDone')
-
-if __name__ == '__main__':
+def main():
     os.system('cls')
     
     clargs = sys.argv
@@ -325,4 +324,6 @@ if __name__ == '__main__':
     P.plotBlocks()
     P.addLegend()
     P.animate()
-            
+
+if __name__ == '__main__':
+    main()

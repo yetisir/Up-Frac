@@ -1,0 +1,1 @@
+python C:\Python34\Scripts\pylint.exe %1

@@ -6,195 +6,9 @@ import copy
 import sys
 import pickle
 
-class DataSet(object):
-    def __init__(self, dataClass=None, fileName=None, loadBinary=True):
-        if fileName:
-            self.fileName = fileName                
-            print('-'*70)
-            print('Initalizing {} Data'.format(fileName))
-            print('-'*70)
-
-            parse = True
-            filePath = os.path.join('binaryData', self.fileName+'_binary.dat')
-            if loadBinary == True:
-                try:
-                    print('Attempting to load DEM Data from binary:')
-                    self.blockData, self.contactData, self.cornerData, self.zoneData, self.gridPointData, self.domainData = pickle.load(open(filePath, 'rb'))
-                    parse = False
-                    print('\tSuccess')
-                except:
-                    print('\tFailed')
-
-            if parse == True:
-                print('Parsing DEM data from text files:')
-            
-                blockFileName = fileName + '___block.dat'
-                contactFileName = fileName + '___contact.dat'
-                cornerFileName = fileName + '___corner.dat'
-                zoneFileName = fileName + '___zone.dat'
-                gridPointFileName = fileName + '___gridPoint.dat'
-                domainFileName = fileName + '___domain.dat'
-
-                print('\tLoading block data')
-                self.blockData = self.parseDataFile(blockFileName)
-                print('\tLoading contact data')
-                self.contactData = self.parseDataFile(contactFileName)
-                print('\tLoading corner data')
-                self.cornerData = self.parseDataFile(cornerFileName)
-                print('\tLoading zone data')
-                self.zoneData = self.parseDataFile(zoneFileName)
-                print('\tLoading gridPoint data')
-                self.gridPointData = self.parseDataFile(gridPointFileName)
-                print('\tLoading domain data')
-                self.domainData = self.parseDataFile(domainFileName)
-                print('Saving DEM data to binary:')
-                pickle.dump([self.blockData, self.contactData, self.cornerData, self.zoneData, self.gridPointData, self.domainData], open(filePath, 'wb'))
-                print('\tDone')
-        elif dataClass:
-            self.blockData = dataClass.blockData
-            self.contactData = dataClass.contactData
-            self.cornerData = dataClass.cornerData
-            self.zoneData = dataClass.zoneData
-            self.gridPointData = dataClass.gridPointData
-            self.domainData = dataClass.domainData
-            self.fileName = dataClass.fileName
-        print('')
-        
-    def parseDataFile(self, fileName):
-        file = open(os.path.join('UDEC', 'data', fileName))
-        header = file.readline()[0:-1].split(' ')
-        types = file.readline()[0:-1].split(' ')
-        data = {}
-        timeData = {}
-        firstLoop = 1
-        while 1:
-            record = file.readline()[0:].replace('\n', '').replace('  ', ' ').split(' ')
-            record.remove('')
-            if record == []: 
-                try:
-                    data[dictTime] = copy.copy(timeData)
-                except UnboundLocalError:
-                    pass
-                break
-            if firstLoop:
-                dictTime = float(record[0])
-                firstLoop = 0
-            
-            time = float(record[0])
-            if dictTime != time:
-                data[dictTime] = copy.copy(timeData)
-                dictTime = time
-            recordData = {}
-            for i in range(2, len(record)):
-                if types[i] == 'i':
-                    record[i] = int(record[i])
-                elif types[i] == 'f':
-                    record[i] = float(record[i])
-                elif types[i] == 'l':
-                    csv = record[i].split(',')
-                    for j in range(len(csv)):
-                        csv[j] = int(csv[j])
-                    record[i] = csv
-                recordData[header[i]] = record[i]
-            timeData[int(record[1])] = recordData
-            oldRecord = record
-
-        return data
-        
-    #Model Parameters
-    def limits(self):
-        time = min(self.blockData.keys())
-        corners = self.cornerData[time].keys()
-        x = self.cornerX(corners, time)
-        y = self.cornerY(corners, time)
-        return [min(x), max(x), min(y), max(y)]
-
-    #Relational Parameters
-    def cornersOnContacts(self, contacts):
-        time = min(self.contactData.keys())
-        corners = []
-        for contact in contacts: corners += self.contactData[time][contact]['corners']
-        return corners
-        
-    def zonesInBlocks(self, blocks):
-        time = min(self.blockData.keys())
-        zones = []
-        for block in blocks: zones += self.blockData[time][block]['zones']
-        return zones
-
-    def cornersOnBlocks(self, blocks):
-        time = min(self.blockData.keys())
-        corners = []
-        for block in blocks: corners += self.blockData[time][block]['corners']
-        return corners
-        
-    def contactsOnBlocks(self, blocks):
-        time = min(self.blockData.keys())
-        contacts = []
-        for block in blocks: 
-            for contact in self.contactData[time].keys():
-                if block in self.contactData[time][contact]['blocks']:
-                    contacts.append(contact)
-        return contacts
-
-    def contactsBetweenBlocks(self, blocks1, blocks2):
-        time = min(self.blockData.keys())
-        contacts1 = self.contactsOnBlocks(blocks1)
-        contacts2 = self.contactsOnBlocks(blocks2)
-        
-        contacts = listIntersection(contacts1, contacts2)
-        return contacts
-
-    def blocksWithContacts(self, blocks, contacts):
-        time = min(self.contactData.keys())
-        newBlocks = []
-        for contact in contacts:
-            for block in self.contactData[time][contact]['blocks']:
-                if block in blocks:
-                    newBlocks.append(block)
-        return list(set(newBlocks))
-        
-    def blocksWithCorners(self, blocks, corners):
-        time = min(self.cornerData.keys())
-        newBlocks = []
-        for corner in corners:
-            for block in blocks:
-                if corner in self.blockData[time][block]['corners']:
-                    newBlocks.append(block)
-        return list(set(newBlocks))
-        
-    #Corner Parameters
-    def cornerX(self, corners, time):
-        x = []
-        for corner in corners: x.append(self.gridPointData[time][self.cornerData[time][corner]['gridPoint']]['x'])
-        return x
-        
-    def cornerY(self, corners, time):
-        y = []
-        for corner in corners: y.append(self.gridPointData[time][self.cornerData[time][corner]['gridPoint']]['y'])
-        return y
-
-    #Zone Parameters
-    def zoneS11(self, zones, time):
-        S11 = []
-        for zone in zones: S11.append(self.zoneData[time][zone]['S11'])
-        return S11
-
-    def zoneS22(self, zones, time):
-        S22 = []
-        for zone in zones: S22.append(self.zoneData[time][zone]['S22'])
-        return S22
-
-    def zoneS33(self, zones, time):
-        S33 = []
-        for zone in zones: S33.append(self.zoneData[time][zone]['S33'])
-        return S33
-
-    def zoneS12(self, zones, time):
-        S12 = []
-        for zone in zones: S12.append(self.zoneData[time][zone]['S12'])
-        return S12
-   
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+import Common
+from DataSet import DataSet
 
 class Homogenize(DataSet):
     def __init__(self, centre, radius, dataClass=None, fileName=None, ):
@@ -306,11 +120,11 @@ class Homogenize(DataSet):
             j = 0
             success = 0
             while j < len(blockContacts):
-                relaventBlockContacts = listIntersection(blockContacts[j], relaventContacts)
+                relaventBlockContacts = Common.listIntersection(blockContacts[j], relaventContacts)
                 if i+1 > len(newBlockContacts):
                     i += -1
                     noSuccess += 1
-                elif listIntersection(newBlockContacts[i], relaventBlockContacts):
+                elif Common.listIntersection(newBlockContacts[i], relaventBlockContacts):
                     success += 1
                     if success > noSuccess:
                         newBlockContacts.append(blockContacts[j])
@@ -349,7 +163,7 @@ class Homogenize(DataSet):
             yVec1 = y1-y2
             xVec2 = x3-x2
             yVec2 = y3-y2
-            vecAngle = angle(xVec1, yVec1, xVec2, yVec2)
+            vecAngle = Common.angle(xVec1, yVec1, xVec2, yVec2)
             vecSign = xVec1*yVec2-xVec2*yVec1
             directionSign += vecSign
         if directionSign > 0:
@@ -361,7 +175,7 @@ class Homogenize(DataSet):
         
         for i in range(len(orderedBlocks)):
             allBlockCorners = self.blockData[time][orderedBlocks[i]]['corners']
-            blockCorners = listIntersection(corners, allBlockCorners)           
+            blockCorners = Common.listIntersection(corners, allBlockCorners)           
             orderedBlockCorners = []
             for corner in allBlockCorners:
                 if corner in blockCorners:
@@ -381,7 +195,7 @@ class Homogenize(DataSet):
                 yVec1 = y1-y2
                 xVec2 = x3-x2
                 yVec2 = y3-y2
-                vecAngle = angle(xVec1, yVec1, xVec2, yVec2)
+                vecAngle = Common.angle(xVec1, yVec1, xVec2, yVec2)
                 vecSign = xVec1*yVec2-xVec2*yVec1
                 blockDirection += vecSign
             if math.copysign(1, blockDirection) != math.copysign(1, directionSign):
@@ -457,7 +271,7 @@ class Homogenize(DataSet):
             print('\tCalculating boundary block corners')
             self.boundaryBlockCorners = self.cornersOnBlocks(self.boundaryContactBlocks)
             print('\tCalculating boundary corners')
-            self.boundaryCorners = listIntersection(self.boundaryContactCorners, self.boundaryBlockCorners)
+            self.boundaryCorners = Common.listIntersection(self.boundaryContactCorners, self.boundaryBlockCorners)
             print('\tCalculating missing boundary corners')
             self.allBoundaryCorners = self.duplicateCorners(self.boundaryCorners, self.boundaryContactBlocks)
             print('\tCalculating boundary block order')
@@ -496,13 +310,13 @@ class Homogenize(DataSet):
                     for gridPoint in gridPoints:
                         gpCoordinates = [self.gridPointData[time][gridPoint][var] for var in ['x', 'y']]
                         gp.append(gpCoordinates)
-                    zoneArea = triangleArea(gp)
+                    zoneArea = Common.triangleArea(gp)
                     sigma += numpy.multiply(zoneArea,S)
 
                 xx = self.cornerX(self.boundaryCornersOrdered, time)
                 yy = self.cornerY(self.boundaryCornersOrdered, time)
 
-                totalArea = area(list(zip(self.cornerX(self.boundaryCornersOrdered, time), self.cornerY(self.boundaryCornersOrdered, time))))
+                totalArea = Common.area(list(zip(self.cornerX(self.boundaryCornersOrdered, time), self.cornerY(self.boundaryCornersOrdered, time))))
             sigmaHistory.append(sigma/totalArea*1e6)
         print('')
         print('\tDone')
@@ -546,36 +360,8 @@ class Homogenize(DataSet):
         t = sorted(self.blockData.keys());
         self.timeHistory = t
         return t
-
-
-def triangleArea(gp):
-    distance = lambda p1,p2: math.hypot(p1[0]-p2[0], p1[1]-p2[1])
-    side_a = distance(gp[0], gp[1])
-    side_b = distance(gp[1], gp[2])
-    side_c = distance(gp[2], gp[0])
-    s = 0.5 * (side_a + side_b + side_c)
-    return math.sqrt(s * (s - side_a) * (s - side_b) * (s - side_c))
-    
-def listIntersection(a, b):
-    return list(set(a) & set(b))
-    
-def area(p):
-    return 0.5 * abs(sum(x0*y1 - x1*y0 for ((x0, y0), (x1, y1)) in segments(p)))
-
-def segments(p):
-    return zip(p, p[1:] + [p[0]])
-
-def angle(x1, y1, x2, y2):
-    inner_product = x1*x2 + y1*y2
-    len1 = math.hypot(x1, y1)
-    len2 = math.hypot(x2, y2)
-    cosine = inner_product/(len1*len2)
-    if abs(cosine) > 1:
-        cosine = math.copysign(1, cosine)
-    return math.acos(cosine)        
-
         
-if __name__ == '__main__':
+def main():
     os.system('cls')
 
     clargs = sys.argv
@@ -583,7 +369,8 @@ if __name__ == '__main__':
         fileName = clargs[1]
     #else: error message
     #add other cl args for centre and radius
-    module = __import__('modelData.'+fileName[0:-3]+'_modelData', globals(), locals(), ['*']) #add subroutine to find module in UDEC folder and copy it here if it is not already.
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)))
+    module = __import__('UDEC.modelData.'+fileName[0:-3]+'_modelData', globals(), locals(), ['*']) #add subroutine to find module in UDEC folder and copy it here if it is not already.
     
 
     for k in dir(module):
@@ -595,3 +382,7 @@ if __name__ == '__main__':
     stressHistory = H.stress()
     strainHistory = H.strain()
     timeHistory = H.time()
+
+
+if __name__ == '__main__':
+    main()

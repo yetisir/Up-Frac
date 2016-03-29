@@ -89,9 +89,7 @@ class HomoPlot(FracPlot):
         plt.plot([7.5,8.5,8.5,7.5,7.5], [7.6,7.6,8.4,8.4,7.6], 'r-')
         fig1.hold(False)
 
-
-
-if __name__ == '__main__':
+def main()
     os.system('cls')
     
     clargs = sys.argv
@@ -111,4 +109,6 @@ if __name__ == '__main__':
     P.plotZoomBox(centre=(0.75, 0.75))
     P.addLegend()
     P.animate()
-        
+
+if __name__ == '__main__':
+    main()
