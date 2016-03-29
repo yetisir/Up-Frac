@@ -12,7 +12,7 @@ jks = 1e3
 jkn = 1e7
 jFriction = 30
 jCohesion = 0.1
-jTension = 10
+jTension = 0.5
 jDilation = 10
 
 confiningStress = -5
