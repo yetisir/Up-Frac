@@ -17,7 +17,7 @@ def multiply(lista, listb):
     return [a*b for a,b in zip(lista,listb)]
 def divide(lista, listb):
     lista, listb = process2(lista, listb)
-    return [a/b if b != 0 else float('NaN') for a,b in zip(lista,listb)]
+    return [a/float(b) if b != 0 else float('NaN') for a,b in zip(lista,listb)]
 def add(lista, listb):
     lista, listb = process2(lista, listb)
     return [a+b for a,b in zip(lista,listb)]

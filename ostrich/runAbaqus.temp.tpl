@@ -20,7 +20,14 @@ def sketchPart(name, gp):
                                    type=DEFORMABLE_BODY)
     p.BaseShell(sketch=s)
     del mdb.models['Model-1'].sketches['__profile__']
- 
+    
+def tabulateVectors(vec1, vec2):
+	vecLength = min(len(vec1), len(vec2))
+	tabulatedData = []
+	for i in range(vecLength):
+		tabulatedData.append((vec1[i], vec2[i]))
+	return tabulatedData
+		
 def concreteDamage(elasticModulus, poissonsRatio, peakYeildStress, peakYeildStrain,  initialCompressiveYeild, compressiveDamageScaling, initialTensileYeild, tLambda, tensileDamageScaling):
     materialName = 'Material-1'
     #****Concrete Damage Plasticity
@@ -45,13 +52,6 @@ def concreteDamage(elasticModulus, poissonsRatio, peakYeildStress, peakYeildStra
     n[0] = elasticModulus/initialTensileYeild
     n = min(n)
     tensileDamage = subtract(1, divide(1, power(add(1, crackingStrain), n))) 
-    
-    def tablulateVectors(vec1, vec2):
-        vecLength = min(len(vec1), len(vec2))
-        tabulatedData = []
-        for i in range(vecLength):
-            tabulatedData.append((vec1[i], vec2[i]))
-        return tabulatedData
             
     mat = mdb.models['Model-1'].Material(name=materialName)
     mat.Density(table=((density, ), ))
@@ -60,14 +60,31 @@ def concreteDamage(elasticModulus, poissonsRatio, peakYeildStress, peakYeildStra
     mat.ConcreteDamagedPlasticity(table=
         ((dilationAngle, eccentricity, fb0fc0, variableK, viscousParameter), ))
     mat.concreteDamagedPlasticity.ConcreteCompressionHardening(
-        table=(tablulateVectors(compressiveYeildStress, inelasticStrain)))
+        table=(tabulateVectors(compressiveYeildStress, inelasticStrain)))
     mat.concreteDamagedPlasticity.ConcreteTensionStiffening(
-        table=(tablulateVectors(tensileYeildStress, crackingStrain)))
+        table=(tabulateVectors(tensileYeildStress, crackingStrain)))
         
     mat.concreteDamagedPlasticity.ConcreteCompressionDamage(
-        table=(tablulateVectors(compressiveDamage, inelasticStrain)))
+        table=(tabulateVectors(compressiveDamage, inelasticStrain)))
     mat.concreteDamagedPlasticity.ConcreteTensionDamage(
-        table=(tablulateVectors(tensileDamage, crackingStrain)))         
+        table=(tabulateVectors(tensileDamage, crackingStrain)))         
+
+def druckerDamage(frictionAngle, dilationAngle, hardening_A, hardening_B, hardening_n, johnson_D2, johnson_D3, failureDisplacement, initialTensileStrength, elasticModulus, poissonsRatio):
+    materialName = 'Material-1'
+    
+    compressiveYeildStress = add(hardening_A, multiply(hardening_B, power(inelasticStrain, hardening_n)))
+    triaxiality = divide(range(0, 100), 50)
+    johnson_D1 = 0
+    damageInitiationStrain = add(johnson_D1, multiply(johnson_D2, exp(multiply(johnson_D3, triaxiality))))    
+            
+    mat = mdb.models['Model-1'].Material(name=materialName)
+    mat.Density(table=((density, ), ))
+    mat.Elastic(table=((elasticModulus, poissonsRatio), ))
+
+    mat.DruckerPrager(shearCriterion=HYPERBOLIC, table=((frictionAngle, initialTensileStrength, dilationAngle), ))
+    mat.druckerPrager.DruckerPragerHardening(table=(tabulateVectors(compressiveYeildStress, inelasticStrain)))
+    mat.DuctileDamageInitiation(table=(tabulateVectors(damageInitiationStrain, triaxiality)))
+    mat.ductileDamageInitiation.DamageEvolution(type=DISPLACEMENT, table=((failureDisplacement, ), ))		
 
 def assignSection(name, part, location, material):
     mdb.models['Model-1'].HomogeneousSolidSection(name=name, material=material,
@@ -147,7 +164,8 @@ def buildModel():
 
     sketchPart(partName, gridPoints)
     
-    concreteDamage($elasticModulus, $poissonsRatio, 10500000.0, 100,  3100000.0, 0.5, $initialTensileYeild, $tLambda, $tensileDamageScaling)
+    #concreteDamage($elasticModulus, $poissonsRatio, $peakYeildStress, $peakYeildStrain,  $initialCompressiveYeild, $compressiveDamageScaling, $initialTensileYeild, $tLambda, $tensileDamageScaling)
+    druckerDamage($frictionAngle, $dilationAngle, 2000000.0, 4000000.0, 0.5, 0.001, -2, 0.0025, $initialTensileStrength, $elasticModulus, $poissonsRatio)
     assignSection(sectionName, partName, sectionLocation, materialName)
     meshPart(meshSize, partName, sectionLocation, elementType, elementShape)
     createInstance(instanceName, partName)

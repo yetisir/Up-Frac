@@ -45,13 +45,17 @@ class UpFracPlot(Plot):
             self.animationImages[i] += self.axes.plot(strain, stress, 'b.', label='FEM Approximation')
         print('\tDone')           
 
-        
     def plotCurrentFemCurve(self, handle, direction):
         femFileName = os.path.join('OSTRICH', 'fittedHistory', self.fileName+'_fittedHistory.pkl')
         with open(femFileName, 'rb') as femFile:
-            femData = pickle.load(femFile)
+            while True:
+                try:
+                    femData = pickle.load(femFile)
+                except EOFError:
+                    break
         
             stressData = femData[1]
+            print(stressData[-1])
             strainData = femData[2]
             if direction == '11':
                 dirIndex=0
@@ -59,8 +63,8 @@ class UpFracPlot(Plot):
                 dirIndex=1
             elif direction == '12':
                 dirIndex=2            
-            stress = [x[dirIndex]*random.random() for x in stressData]
-            strain = [x[dirIndex]*random.random() for x in strainData]
+            stress = [x[dirIndex] for x in stressData]
+            strain = [x[dirIndex] for x in strainData]
             handle.set_xdata(strain)
             handle.set_ydata(stress)
             
@@ -73,17 +77,16 @@ class UpFracPlot(Plot):
             plt.draw()
             plt.pause(0.5)
             
-
     def plotDemCurve(self, direction):
         print('Plotting DEM stress-strain curves:')
         stressData = self.demData[1]
         strainData = self.demData[2]
         if direction == '11':
-            dirIndex=0
+            dirIndex=(0,0)
         elif direction == '22':
-            dirIndex=1
+            dirIndex=(1,1)
         elif direction == '12':
-            dirIndex=2
+            dirIndex=(0,1)
         stress = [x[dirIndex] for x in stressData]
         strain = [x[dirIndex] for x in strainData]
 
@@ -129,10 +132,12 @@ def main():
         fileName = clargs[1]
         
     P = UpFracPlot('test', fileName)
-    P.setAxis('22')
-    P.plotDemCurve('22')
+    
+    direction = clargs[2] #'22'
+    P.setAxis(direction)
+    P.plotDemCurve(direction)
     #P.plotFemCurves('22')
-    P.interactivePlot('22')
+    P.interactivePlot(direction)
     P.animate()
     
 

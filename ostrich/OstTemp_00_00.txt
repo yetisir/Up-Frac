@@ -9,11 +9,11 @@ ModelExecutable    simulationData.bat
 ModelSubdir model
 
 BeginParams
-$tLambda	2200.0	1000.0	5000.0	none	none	none
-$initialTensileYeild	2200000.0	1000000.0	5000000.0	none	none	none
-$elasticModulus	7500000000.0	5000000000.0	15000000000.0	none	none	none
 $poissonsRatio	0.35	0.3	0.4	none	none	none
-$tensileDamageScaling	0.5	0.4	0.6	none	none	none
+$elasticModulus	7500000000.0	5000000000.0	15000000000.0	none	none	none
+$initialTensileStrength	3000000.0	1000000.0	10000000.0	none	none	none
+$frictionAngle	15	5	30	none	none	none
+$dilationAngle	10	5	15	none	none	none
 
 EndParams
 
