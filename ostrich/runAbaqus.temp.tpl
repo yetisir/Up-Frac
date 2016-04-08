@@ -69,9 +69,10 @@ def concreteDamage(elasticModulus, poissonsRatio, peakYeildStress, peakYeildStra
     mat.concreteDamagedPlasticity.ConcreteTensionDamage(
         table=(tabulateVectors(tensileDamage, crackingStrain)))         
 
-def druckerDamage(frictionAngle, dilationAngle, hardening_A, hardening_B, hardening_n, johnson_D2, johnson_D3, failureDisplacement, initialTensileStrength, elasticModulus, poissonsRatio):
+def druckerDamage(frictionAngle, dilationAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, initialTensileStrength, elasticModulus, poissonsRatio):
     materialName = 'Material-1'
     
+    hardening_n = 0.5
     compressiveYeildStress = add(hardening_A, multiply(hardening_B, power(inelasticStrain, hardening_n)))
     triaxiality = divide(range(0, 100), 50)
     johnson_D1 = 0
@@ -165,7 +166,7 @@ def buildModel():
     sketchPart(partName, gridPoints)
     
     #concreteDamage($elasticModulus, $poissonsRatio, $peakYeildStress, $peakYeildStrain,  $initialCompressiveYeild, $compressiveDamageScaling, $initialTensileYeild, $tLambda, $tensileDamageScaling)
-    druckerDamage($frictionAngle, $dilationAngle, 2000000.0, 4000000.0, 0.5, 0.001, -2, 0.0025, $initialTensileStrength, $elasticModulus, $poissonsRatio)
+    druckerDamage(15, 10, 5000000.0, 10000000.0, 0.02, -2, $failureDisplacement, $initialTensileStrength, $elasticModulus, $poissonsRatio)
     assignSection(sectionName, partName, sectionLocation, materialName)
     meshPart(meshSize, partName, sectionLocation, elementType, elementShape)
     createInstance(instanceName, partName)

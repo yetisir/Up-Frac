@@ -9,11 +9,10 @@ ModelExecutable    simulationData.bat
 ModelSubdir model
 
 BeginParams
+$failureDisplacement	5e-05	1e-05	0.0001	none	none	none
 $poissonsRatio	0.35	0.3	0.4	none	none	none
+$initialTensileStrength	100000.0	50000.0	500000.0	none	none	none
 $elasticModulus	7500000000.0	5000000000.0	15000000000.0	none	none	none
-$initialTensileStrength	3000000.0	1000000.0	10000000.0	none	none	none
-$frictionAngle	15	5	30	none	none	none
-$dilationAngle	10	5	15	none	none	none
 
 EndParams
 

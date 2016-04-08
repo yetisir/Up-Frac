@@ -6,14 +6,13 @@ from OSTRICH.vectorMath import *
 #these arrays shhould be tied to the material definitions
 c_parameters =  ['$johnson_D2', 
                 '$johnson_D3', 
-                '$failureDisplacement',
                 '$hardening_A', 
                 '$hardening_B',
-                '$hardening_n']
+                '$frictionAngle', 
+                '$dilationAngle']
 t_parameters =  ['$elasticModulus', 
                 '$poissonsRatio', 
-                '$frictionAngle', 
-                '$dilationAngle', 
+                '$failureDisplacement',
                 '$initialTensileStrength']
 
 def getMaxStrain():
