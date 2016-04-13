@@ -14,8 +14,13 @@ ModelSubdir model
 BeginParams
 #parameter	init.	low	    high	tx_in   tx_ost	tx_out
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 #$johnson_D2	0.02	0.001	0.1	none	none	none
+=======
+#$dilationAngle	10	5	15	none	none	none
+$elasticModulus	7500000000.0	5000000000.0	15000000000.0	none	none	none
+>>>>>>> Stashed changes
 =======
 #$dilationAngle	10	5	15	none	none	none
 $elasticModulus	7500000000.0	5000000000.0	15000000000.0	none	none	none
