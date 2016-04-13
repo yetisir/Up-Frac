@@ -25,13 +25,20 @@
 --------------------------------------------------------------------------
 
 Ostrich Setup
-Model                  : simulationData.bat > OstExeOut.txt
+Model                  : simulationData.py > OstExeOut.txt
 Algorithm              : Levenberg-Marquardt
 Objective Function     : WSSE
 Number of Parameters   : 4
 Number of Tied Params  : 0
 Number of Observations : 50
+<<<<<<< HEAD
 Seed for Random Nums.  : 1460130290
 
 Ostrich Run Record
 iter  obj. function  $failureDisplacement  $poissonsRatio  $initialTensileStrength  $elasticModulus  lambda
+=======
+Seed for Random Nums.  : 1459975484
+
+Ostrich Run Record
+iter  obj. function  $elasticModulus  $initialTensileStrength  $poissonsRatio  $frictionAngle  $dilationAngle  lambda
+>>>>>>> df8f1a30833feb6ea7ae26452a2a36f524534cb5

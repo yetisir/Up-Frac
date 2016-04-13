@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 import math
 def process1(lista):
     import numbers
