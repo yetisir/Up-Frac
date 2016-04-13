@@ -33,6 +33,7 @@ Number of Tied Params  : 0
 Number of Observations : 50
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 Seed for Random Nums.  : 1460130290
 
@@ -48,6 +49,11 @@ iter  obj. function  $elasticModulus  $initialTensileStrength  $poissonsRatio  $
 Seed for Random Nums.  : 1460134402
 
 Ostrich Run Record
+=======
+Seed for Random Nums.  : 1460134402
+
+Ostrich Run Record
+>>>>>>> Stashed changes
 =======
 Seed for Random Nums.  : 1460134402
 
@@ -201,6 +207,9 @@ Jacobian Evals     : 20
 Optimal Step Evals : 0
 Statistics Evals   : 1
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
