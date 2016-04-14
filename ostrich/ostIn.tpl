@@ -6,7 +6,7 @@ BeginFilePairs
 runAbaqus.temp.tpl	runAbaqus.py
 EndFilePairs
 
-ModelExecutable    simulationData.py
+ModelExecutable    simulationData.bat
 
 ModelSubdir model
 
@@ -104,8 +104,8 @@ EndMathAndStats
 BeginExtraFiles
 parameters.py
 interpolateData.py
+simulationData.py
 vectorMath.py
-abaqus.bat
 EndExtraFiles
 
 BeginGeneticAlg
