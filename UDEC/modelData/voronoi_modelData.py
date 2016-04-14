@@ -50,7 +50,7 @@ ostrichParameters = {'frictionAngle':{'init':15, 'low':10, 'high':20},
                                 'johnson_D2':{'init':20e-3, 'low':1e-3, 'high':100e-3},
                                 'johnson_D3':{'init':-2, 'low':-5, 'high':-1},
                                 'failureDisplacement':{'init':50e-6, 'low':10e-6, 'high':100e-6},
-                                'initialTensileStrength':{'init':100e3, 'low':50e3, 'high':500e3},
+                                'initialTensileStrength':{'init':10e3, 'low':5e3, 'high':50e3},
                                 'elasticModulus':{'init':7.5e9, 'low':5e9, 'high':15e9},
                                 'poissonsRatio':{'init':0.35, 'low':0.3, 'high':0.4}}
  

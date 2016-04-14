@@ -1,1 +1,1 @@
-mpirun.exe -n 1 -t 24h OstrichMPI.exe
+mpirun.exe -n 4 -t 24h OstrichMPI.exe

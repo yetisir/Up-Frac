@@ -28,6 +28,10 @@ class UpFracPlot(Plot):
         self.animationImages = [[] for _ in range(len(self.femDataList))] #num frames
         self.fileName = fileName
         
+        #an issue with matplotlib returns a depreciation warning. this suprpesses it.
+        import warnings
+        warnings.filterwarnings("ignore")
+         
     #Plotting Functions
     def plotFemCurves(self, direction):
         print('Plotting FEM stress-strain curves:')
@@ -47,15 +51,16 @@ class UpFracPlot(Plot):
 
     def plotCurrentFemCurve(self, handle, direction):
         femFileName = os.path.join('OSTRICH', 'fittedHistory', self.fileName+'_fittedHistory.pkl')
+        numFrames = 0
         with open(femFileName, 'rb') as femFile:
             while True:
                 try:
                     femData = pickle.load(femFile)
+                    numFrames += 1
                 except EOFError:
                     break
         
             stressData = femData[1]
-            print(stressData[-1])
             strainData = femData[2]
             if direction == '11':
                 dirIndex=0
@@ -67,15 +72,31 @@ class UpFracPlot(Plot):
             strain = [x[dirIndex] for x in strainData]
             handle.set_xdata(strain)
             handle.set_ydata(stress)
+        return numFrames
             
     def interactivePlot(self, direction):
         plt.ion()
         h, = self.axes.plot([],[], 'b.')
         plt.show()
+        lastNumFrames = 0
+        print('Plotting FEM stress-strain curves:')
+        print('\tChecking for new data...', end='')
         while True:
-            self.plotCurrentFemCurve(h, direction)
+            currentNumFrames = self.plotCurrentFemCurve(h, direction)
+            if currentNumFrames == lastNumFrames:
+                resultString = 'No new data found'
+            else:
+                resultString = 'Plotting new data'
+                lastNumFrames = currentNumFrames
+            print (resultString, end='')
             plt.draw()
+            sys.stdout.flush()
             plt.pause(0.5)
+            print('\b'*len(resultString)+' '*len(resultString), end='')
+            sys.stdout.flush()
+            print('\b'*len(resultString), end='')
+            plt.pause(0.5)
+            
             
     def plotDemCurve(self, direction):
         print('Plotting DEM stress-strain curves:')
@@ -89,7 +110,6 @@ class UpFracPlot(Plot):
             dirIndex=(0,1)
         stress = [x[dirIndex] for x in stressData]
         strain = [x[dirIndex] for x in strainData]
-
         for i in range(len(self.femDataList)):
             self.animationImages[i] += self.axes.plot(strain, stress, 'r*', label='DEM Simulation')
         print('\tDone')        

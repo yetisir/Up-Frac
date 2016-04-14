@@ -40,11 +40,13 @@ def interpolateData(binaryDataFile):
     bundleFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'fittedHistory', mName+'_fittedHistory.pkl')
     ostModelFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'OstModel0.txt')
     newSet = False
-    with open(ostModelFileName, 'r') as trialsFile:
-        text = trialsFile.readlines()
-        
-        if len(text) <=2:
-            newSet = True
+    try:
+        with open(ostModelFileName, 'r') as trialsFile:
+            text = trialsFile.readlines()
+            if len(text) <=2:
+                newSet = True
+    except FileNotFoundError:
+        newSet = True
     if newSet is False:
         with open(bundleFileName, 'ab') as fittedFile:
             pickle.dump(bundle, fittedFile)           

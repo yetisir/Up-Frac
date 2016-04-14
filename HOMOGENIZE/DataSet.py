@@ -65,7 +65,7 @@ class DataSet(object):
         print('')
 
     def parseDataFile(self, fileName):
-        file = open(os.path.join('UDEC', 'data', fileName))
+        file = open(os.path.join('UDEC', 'UpFracDEMData', fileName))
         header = file.readline()[0:-1].split(' ')
         types = file.readline()[0:-1].split(' ')
         data = {}

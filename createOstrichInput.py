@@ -6,13 +6,13 @@ import csv
 from OSTRICH.vectorMath import *
 
 #these arrays shhould be tied to the material definitions
-c_parameters =  ['$johnson_D2', 
-                '$johnson_D3', 
-                '$hardening_A', 
+c_parameters =  ['$hardening_A', 
                 '$hardening_B',
                 '$frictionAngle', 
                 '$dilationAngle']
-t_parameters =  ['$elasticModulus', 
+t_parameters =  ['$johnson_D2', 
+                '$johnson_D3', 
+                '$elasticModulus', 
                 '$poissonsRatio', 
                 '$failureDisplacement',
                 '$initialTensileStrength']
