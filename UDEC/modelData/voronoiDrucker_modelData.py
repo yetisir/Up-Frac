@@ -1,8 +1,10 @@
 #Add cmd output and error handling
-mName = 'voronoi'
+import os.path
+mName = os.path.basename(__file__[:__file__.find('_')])
 
 mSize = 10
-bSize = 5
+bSize = 0.5
+meshSize = 0.5
 vorSeed = 1
 rho = 2.7e-3
 E = 12e3
@@ -15,25 +17,25 @@ jCohesion = 0.1
 jTension = 10
 jDilation = 10
 
-confiningStress = [0, 5, 10, 15]
+confiningStress = [0, 5, 10, 20]
 
 units = 'm-MPa-Gg-s'
-testMode = 't' #c, t, or all
-relVars = ['S22']
+# testMode = 't' #c, t, or all
+# relVars = ['S22']
 
-#tensileTest
-sTime_t = 10
-velTable_t = [5, sTime_t]
-vel_t = -0.001
+# #tensileTest
+# sTime_t = 10
+# velTable_t = [5, sTime_t]
+# vel_t = -0.001
 
-#compressionTest
-sTime_c = 20
-velTable_c = [10, sTime_c]
-vel_c = 0.01
+# #compressionTest
+# sTime_c = 20
+# velTable_c = [10, sTime_c]
+# vel_c = 0.01
 
-sTime = [10, 20]
-velTable = [[5, sTime[0]], [10, sTime[1]]]
-vel = [-0.001, 0.01]
+sTime = [20]
+velTable = [[sTime[0]/2, sTime[0]]]
+vel = [0.01]
 
 # abaqusMaterial = 'concreteDamage'
 # ostrichParameters = {'peakYeildStrain':{'init':100, 'low':99, 'high':101}, #should be e-3
@@ -47,6 +49,7 @@ vel = [-0.001, 0.01]
                                 # 'poissonsRatio':{'init':0.35, 'low':0.3, 'high':0.4}}
                                 
 abaqusMaterial = 'druckerDamage'
+parameterizationSplits = [[0.05, sTime[0]]]
 ostrichParameters = {'frictionAngle':{'init':15, 'low':10, 'high':20}, 
                                 'dilationAngle':{'init':10, 'low':5, 'high':15},
                                 'hardening_A':{'init':5e6, 'low':1e6, 'high':10e6},

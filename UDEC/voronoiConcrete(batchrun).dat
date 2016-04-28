@@ -1,0 +1,16 @@
+new
+call 'C:\Users\mmyetisi\Documents\GitHub\UpFrac2\UDEC\voronoiConcrete(0.0)_Model.dat'
+new
+call 'C:\Users\mmyetisi\Documents\GitHub\UpFrac2\UDEC\voronoiConcrete(0.5)_Model.dat'
+new
+call 'C:\Users\mmyetisi\Documents\GitHub\UpFrac2\UDEC\voronoiConcrete(0.10)_Model.dat'
+new
+call 'C:\Users\mmyetisi\Documents\GitHub\UpFrac2\UDEC\voronoiConcrete(0.15)_Model.dat'
+new
+call 'C:\Users\mmyetisi\Documents\GitHub\UpFrac2\UDEC\voronoiConcrete(1.0)_Model.dat'
+new
+call 'C:\Users\mmyetisi\Documents\GitHub\UpFrac2\UDEC\voronoiConcrete(1.5)_Model.dat'
+new
+call 'C:\Users\mmyetisi\Documents\GitHub\UpFrac2\UDEC\voronoiConcrete(1.10)_Model.dat'
+new
+call 'C:\Users\mmyetisi\Documents\GitHub\UpFrac2\UDEC\voronoiConcrete(1.15)_Model.dat'

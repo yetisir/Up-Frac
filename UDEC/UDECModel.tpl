@@ -11,7 +11,7 @@ edge $edge
 block 0,0 0,$mSize $mSize,$mSize $mSize,0
 vor edge $bSize round $round seed $vSeed
  jdelete
-gen edge $bSize
+gen edge $meshSize
 zone model elastic density $rho bulk $bulk shear $shear
 group joint 'User:ID75'
 joint model area jks $jks jkn $jkn jfriction $jFriction jcohesion $jCohesion jtension $jTension jdilation $jDilation range group 'User:ID75'
