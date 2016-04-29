@@ -3,7 +3,7 @@ import sys
 import pickle
 from HOMOGENIZE import Homogenize
 
-def writeToFile(timeHistory, stressHistory, strainHistory):
+def writeToFile(timeHistory, stressHistory, strainHistory, fileName):
     print('Saving homogenization time history:')
     with open(os.path.join('ostrich', 'observationUDEC.dat'), 'w') as f:
         f.write('time S11 S22 S12 LE11 LE22 LE12\n')
@@ -24,42 +24,8 @@ def writeToFile(timeHistory, stressHistory, strainHistory):
     with open(os.path.join('HOMOGENIZE', 'binaryData', fileName+'_homogenizedData.pkl'), 'wb') as bundleFile:
         pickle.dump(bundle, bundleFile)
     print('\tDone')
-
-def createOstIn(H, parameters):
-    print('Creating OstIn.txt for OSTRICH:')
-    #TODO: change import format, use template, not module maybe?
-    import OSTRICH.ostIn
-    observations = ''
-    numObservations = len(H.timeHistory)
-    for i in range(numObservations):
-        for j in range(len(parameters)):
-            if parameters[j] == 'S11':
-                o = H.stressHistory[i][0, 0]
-                c = 2
-            elif parameters[j] == 'S22':
-                o = H.stressHistory[i][1, 1]
-                c = 3
-            elif parameters[j] == 'S12':
-                o = H.stressHistory[i][0, 1]
-                c = 4
-            elif parameters[j] == 'LE11':
-                o = H.strainHistory[i][0, 0]
-                c = 5
-            elif parameters[j] == 'LE22':
-                o = H.strainHistory[i][1, 1]
-                c = 6
-            elif parameters[j] == 'LE12':
-                o = H.strainHistory[i][0, 1]
-                c = 7
-            l = i+2
-            obsNo = i*len(parameters)+j+1
-            newObservation = 'obs{} \t\t{:10f} \t1 \toutput.dat \tOST_NULL \t{} \t\t{}\n'.format(obsNo, o, l, c)
-            observations += newObservation
-    with open(os.path.join('OSTRICH', 'OstIn.tpl'), 'w') as f:
-        f.write(OSTRICH.ostIn.topText+observations+OSTRICH.ostIn.bottomText)
-    print('\tDone')
             
-if __name__ == '__main__':
+def main():
     os.system('cls')
     
     clargs = sys.argv
@@ -67,18 +33,22 @@ if __name__ == '__main__':
         fileName = clargs[1]
     #else: error message
     #add other cl args for centre and radius
-    module = __import__('UDEC.modelData.'+fileName[0:-3]+'_modelData', globals(), locals(), ['*'])
-    
+    module = __import__('UDEC.modelData.'+fileName[0:]+'_modelData', globals(), locals(), ['*'])
     for k in dir(module):
         locals()[k] = getattr(module, k)
+        
     revCentre = {'x':mSize/2, 'y':mSize/2}
     revRadius = mSize/2-bSize*2
-    
-    H = Homogenize.Homogenize(revCentre, revRadius, fileName=fileName)
-    stressHistory = H.stress()
-    strainHistory = H.strain()
-    timeHistory = H.time()
-    
-    writeToFile(timeHistory, stressHistory, strainHistory)
-    createOstIn(H, relVars)
-    os.system('python createOstrichInput.py ' + fileName)
+
+    for i in range(len(sTime)):
+        for j in range(len(confiningStress)):
+            f = '{0}({1}.{2})'.format(mName, i, confiningStress[j])
+            H = Homogenize.Homogenize(revCentre, revRadius, fileName=f)
+            stressHistory = H.stress()
+            strainHistory = H.strain()
+            timeHistory = H.time()
+            
+            writeToFile(timeHistory, stressHistory, strainHistory, f)
+            
+if __name__ == '__main__':
+    main()

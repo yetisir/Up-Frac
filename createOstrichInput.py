@@ -5,18 +5,6 @@ import os
 import csv
 from OSTRICH.vectorMath import *
 
-#these arrays shhould be tied to the material definitions
-c_parameters =  ['$hardening_A', 
-                '$hardening_B',
-                '$frictionAngle', 
-                '$dilationAngle']
-t_parameters =  ['$johnson_D2', 
-                '$johnson_D3', 
-                '$elasticModulus', 
-                '$poissonsRatio', 
-                '$failureDisplacement',
-                '$initialTensileStrength']
-
 def getMaxStrain():
     with open(os.path.join('OSTRICH', 'observationUDEC.dat')) as udecFile:
         udecData = csv.reader(udecFile, delimiter=' ')
@@ -34,12 +22,12 @@ def getVelocityString(velTable):
     vString += '({0}, {1}))'.format(velTable[-1], amp)
     return vString
     
-def getCrackingStrain(numStrainPoints = 100):
-    if '(t)' in modelName:
-        crackingStrain = divide(range(0, numStrainPoints+1), numStrainPoints/getMaxStrain())
-    elif '(c)' in modelName:
-        crackingStrain = divide(range(0, numStrainPoints+1), numStrainPoints/maxTensileStrainIO('r'))
-    return crackingStrain
+# def getCrackingStrain(numStrainPoints = 100):
+    # if '(t)' in modelName:
+        # crackingStrain = divide(range(0, numStrainPoints+1), numStrainPoints/getMaxStrain())
+    # elif '(c)' in modelName:
+        # crackingStrain = divide(range(0, numStrainPoints+1), numStrainPoints/maxTensileStrainIO('r'))
+    # return crackingStrain
     
 def getInelasticStrain(numStrainPoints = 100):
     inelasticStrain = divide(range(0, numStrainPoints+1), numStrainPoints/getMaxStrain())
@@ -57,47 +45,52 @@ def maxTensileStrainIO(mode):
         return 1
         
 def getModelParameters():
+    #TODO: cleanup, make more general, maybe move to material definitions since not consistant
     parameters =  {'$$mSize': mSize,
                             '$$mName': '\''+modelName+'\'',
                             '$$rho': rho*1e9,
                             '$$dAngle': jDilation,
                             '$$confStress': confiningStress*1e6,
-                            '$$maxStrain': getMaxStrain(),
-                            '$$cStrain': getCrackingStrain(),
-                            '$$iStrain': getCrackingStrain()}
-    if '(c)' in modelName:
-        parameters .update({ '$$maxTS':maxTensileStrainIO('r'),
-                                '$$sTime':sTime_c,
-                                '$$vel':vel_c,
-                                '$$vString':getVelocityString(velTable_c) })
-    elif '(t)' in modelName:
-        parameters.update({ '$$maxTS':maxTensileStrainIO('w'),
-                                '$$sTime':sTime_t,
-                                '$$vel':vel_t,
-                                '$$vString':getVelocityString(velTable_t) })
+                            '$$cStrain': getInelasticStrain(), #fix for concrete plasticity
+                            '$$iStrain': getInelasticStrain(),
+                            '$$vel':vel[],
+                            '$$sTime':sTime[]}
+    # if '(c)' in modelName:
+        # parameters .update({ '$$maxTS':maxTensileStrainIO('r'),
+                                # '$$sTime':sTime_c,
+                                # '$$vel':vel_c,
+                                # '$$vString':getVelocityString(velTable_c) })
+    # elif '(t)' in modelName:
+        # parameters.update({ '$$maxTS':maxTensileStrainIO('w'),
+                                # '$$sTime':sTime_t,
+                                # '$$vel':vel_t,
+                                # '$$vString':getVelocityString(velTable_t) })
     return parameters
                                 
-def getOstrichParameters():
+def getOstrichParameters(parameterizationRun):
     ostrichParametersText = '' 
     for parameter in ostrichParameters:
-        p = ostrichParameters[parameter]
-        newRecord = '$' + parameter + '\t' + str(p['init']) + '\t' + str(p['low']) + '\t' +str(p['high']) +'\tnone\tnone\tnone\n'
-        ostrichParametersText += newRecord
+        if parameter in materialParameters[parameterizationRun-1]:
+            p = ostrichParameters[parameter]
+            newRecord = '$' + parameter + '\t' + str(p['init']) + '\t' + str(p['low']) + '\t' +str(p['high']) +'\tnone\tnone\tnone\n'
+            ostrichParametersText += newRecord
     return {'$$ostrichParameters':ostrichParametersText}
     
-def getOstInVoid():
-    if '(c)' in modelName:
-        p = t_parameters
-    elif '(t)' in modelName:
-        p = c_parameters
-    parameters = {}
-    for parameter in p:
-        parameters[parameter] = '#'+parameter
-    return parameters
+# def getOstInVoid(parameterizationRun):
+    # parameters = {}
+    # for parameter in materialParameters[parameterizationRun-1]:
+        # parameters[parameter] = '#'+parameter
+    # return parameters
     
-def getModelConstants():
-    if '(c)' in modelName:
-        with open(os.path.join('OSTRICH', 'OstOutput0.txt')) as ostOutputFile:
+def getModelConstants(modelName, parameterizationRun):
+    parameters = {}
+    for parameter in ostrichParameters:
+        parameters['$'+parameter] = ostrichParameters[parameter]['init']
+    for parameter in materialParameters[paramaterizationRun-1]:
+        parameters[parameter] = parameter
+        
+    for i in range(parameterizationRun-1):
+        with open(os.path.join('OSTRICH', 'OstOutput_{0}_{1}.txt'.format(modelName, parameterizationRun))) as ostOutputFile:
             ostOutput = ostOutputFile.read()
             startIndex = ostOutput.find('Optimal Parameter Set')
             endIndex = ostOutput.find('\n\n', startIndex)
@@ -109,14 +102,9 @@ def getModelConstants():
                 eolPosition = parameterBlock.find('\n', paramPosition)
                 value = float(parameterBlock[colonPosition+1:eolPosition])
                 parameters[parameter] = value
-    elif '(t)' in modelName:
-        parameters = {}
-        for parameter in c_parameters:
-            parameters[parameter] = ostrichParameters[parameter[1:]]['init']
     return parameters
      
 def fillTemplate(template, parameters, file):
-    
     with open(os.path.join('OSTRICH', template), 'r') as templateFile:
         t = templateFile.read()
         for i in parameters.keys():
@@ -124,23 +112,29 @@ def fillTemplate(template, parameters, file):
         with open(os.path.join('OSTRICH', file), 'w') as modelFile:
             modelFile.write(t)
             
-            
-if __name__ == '__main__':
+def main():
+    #use argparse
     clargs = sys.argv
     if len(clargs) >= 2:
         modelName = clargs[1]
-    #else: error message
-    module = __import__('UDEC.modelData.'+modelName[0:-3]+'_modelData', globals(), locals(), ['*'])
+        parameterizationRun = clargs[2]
+     #else: error message
+    module = __import__('UDEC.modelData.'+modelName+'_modelData', globals(), locals(), ['*'])
     for k in dir(module):
         locals()[k] = getattr(module, k)
 
 
     fillTemplate('parameters.tpl', getModelParameters(), 'parameters.py')
     fillTemplate('ostIn.tpl', getOstrichParameters(), 'ostIn.txt')
-    fillTemplate('ostIn.txt', getOstInVoid(), 'ostIn.txt')
+    # fillTemplate('ostIn.txt', getOstInVoid(), 'ostIn.txt')
     fillTemplate('runAbaqus.tpl', getModelConstants(), 'runAbaqus.temp.tpl')
         
-        
+                    
+            
+if __name__ == '__main__':
+    main()
+    
+
         
         
         
