@@ -315,32 +315,32 @@ def cycleModel
 	dCounter = dCounter - 1
 
 	;Write data array to file
-	fName = 'data\'+modelName+'___contact.dat'
+	fName = 'UpFracDEMData\'+modelName+'___contact.dat'
 	status = open(fName, 1, 1)
 	status = write(contactData, cCounter)
 	status = close
 
-	fName = 'data\'+modelName+'___block.dat'
+	fName = 'UpFracDEMData\'+modelName+'___block.dat'
 	status = open(fName, 1, 1)
 	status = write(blockData, numBlockArray)
 	status = close
 
-	fName = 'data\'+modelName+'___corner.dat'
+	fName = 'UpFracDEMData\'+modelName+'___corner.dat'
 	status = open(fName, 1, 1)
 	status = write(cornerData, numCornerArray)
 	status = close
 	
-	fName = 'data\'+modelName+'___gridPoint.dat'
+	fName = 'UpFracDEMData\'+modelName+'___gridPoint.dat'
 	status = open(fName, 1, 1)
 	status = write(gridPointData, numGridPointArray)
 	status = close
 	
-	fName = 'data\'+modelName+'___zone.dat'
+	fName = 'UpFracDEMData\'+modelName+'___zone.dat'
 	status = open(fName, 1, 1)
 	status = write(zoneData, numZoneArray)
 	status = close
 	
-	fName = 'data\'+modelName+'___domain.dat'
+	fName = 'UpFracDEMData\'+modelName+'___domain.dat'
 	status = open(fName, 1, 1)
 	status = write(domainData, dCounter)
 	status = close
