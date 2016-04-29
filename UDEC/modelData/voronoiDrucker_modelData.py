@@ -21,7 +21,7 @@ confiningStress = [0, 5, 10, 20]
 
 units = 'm-MPa-Gg-s'
 # testMode = 't' #c, t, or all
-# relVars = ['S22']
+relVars = ['S22', 'LE11']
 
 # #tensileTest
 # sTime_t = 10
