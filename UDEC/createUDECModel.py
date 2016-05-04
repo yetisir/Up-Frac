@@ -54,7 +54,7 @@ for i in range(len(sTime)):
     UDECParameters['$vTable'] = vString[i]
     UDECParameters['$vel'] = vel[i]
     for j in range(len(confiningStress)):
-        UDECParameters['$cStress'] = confiningStress[j]
+        UDECParameters['$cStress'] = -confiningStress[j]
         UDECParameters['$mName'] = '\''+mName+'('+str(i)+'.'+str(confiningStress[j])+')'+'\''      
         with open('UDECModel.tpl', 'r') as templateFile:
             template = templateFile.read()
