@@ -6,9 +6,8 @@ import shutil
 
 def createOstIn(fileName, parameters, startTime, endTime):
     print('Creating OstIn.txt for OSTRICH:')
-    with open(os.path.join('HOMOGENIZE', 'binaryData', fileName+'_homogenizedData.pkl'), 'wb') as bundleFile:
-        pickle.dump(bundle, bundleFile)
-        bundle = pickle.load()
+    with open(os.path.join('HOMOGENIZE', 'binaryData', fileName+'_homogenizedData.pkl'), 'rb') as bundleFile:
+        bundle = pickle.load(bundleFile)
         timeHistory = bundle[0]
         stressHistory = bundle[1]
         strainHistory = bundle[2]
@@ -19,12 +18,13 @@ def createOstIn(fileName, parameters, startTime, endTime):
     endIndex = 0
     for i in range(len(timeHistory)):
         if timeHistory[i] <= startTime:
-            startIndex i
+            startIndex = i
         if timeHistory[i] <= endTime:
             endIndex = i
-    timeHistory = timeHistory[startIndex:endIndex]
-    stressHistory = stressHistory[startIndex:endIndex]
-    strainHistory = strainHistory[startIndex:endIndex]
+    th = timeHistory
+    timeHistory = timeHistory[startIndex:endIndex+1]
+    stressHistory = stressHistory[startIndex:endIndex+1]
+    strainHistory = strainHistory[startIndex:endIndex+1]
     numObservations = len(timeHistory)
     
     #TODO: add weightings so strain and stress can be used together
@@ -55,10 +55,14 @@ def createOstIn(fileName, parameters, startTime, endTime):
     with open(os.path.join('OSTRICH', 'OstIn.tpl'), 'w') as f:
         f.write(OSTRICH.ostIn.topText+observations+OSTRICH.ostIn.bottomText)
     print('\tDone')
+    dt = timeHistory[1]-timeHistory[0]
+    return [len(th[0:endIndex+1] ), dt]#this is soooooooo wrong , fix ASAP. should be retruned from a seperate function
 
 
+# def main():
 
-def main():
+
+if __name__ == '__main__':
     os.system('cls')
     
     clargs = sys.argv
@@ -69,35 +73,25 @@ def main():
     for k in dir(module):
         locals()[k] = getattr(module, k)
 
-    os.system('python ostrichHomogenize.py' + fileName)
+    # os.system('python ostrichHomogenize.py' + fileName)
     parameterizationRun = 1
     for i in range(len(parameterizationSplits)):
         startTime = 0
-        for j in range(len(parameterizationSplits[i])+1):  
-            homoFileName = '{0}({1}.{2})'.format(mName, i, confiningStress[j])
-            if len(parameterizationSplits[i]) > j:
-                endTime = parameterizationSplits[i][j+1]
-            else:
-                endTime = parameterizationSplits[i][-1]
-            createOstIn(homoFileName, relVars, startTime, endTime)
-            os.system('python createOstrichInput.py ' + homoFileName + '  ' + parameterizationRun)
-            os.system('OSTRICH\ostrich.exe')
+        splitTimes = parameterizationSplits[i] + [sTime[i]]
+        for j in range(len(splitTimes)):  
+            homoFileName = '{0}({1}.{2})'.format(mName, i, 0)
+            endTime = splitTimes[j]
 
-def copy_rename(old_file_name, new_file_name):
-        src_dir= os.curdir
-        dst_dir= os.path.join(os.curdir , "subfolder")
-        src_file = os.path.join(src_dir, old_file_name)
-        shutil.copy(src_file,dst_dir)
-        
-        dst_file = os.path.join(dst_dir, old_file_name)
-        new_dst_file_name = os.path.join(dst_dir, new_file_name)
-        os.rename(dst_file, new_dst_file_name)
+            numObs, dt = createOstIn(homoFileName, relVars, startTime, endTime) #please fix, this fucntion should not return this value
+            os.system('python createOstrichInput.py ' + homoFileName + '  ' + str(parameterizationRun) + ' ' + str(numObs)+' '+str(dt))
+            os.chdir(os.path.join(os.getcwd(), 'OSTRICH'))
+            os.system('cleanup.bat')
+            os.system('ostrich.exe')
+            os.chdir(os.pardir)
+            
+            shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}.txt'.format(fileName, parameterizationRun)))
+
             parameterizationRun +=1
             startTime = endTime
-
-
-
-
-if __name__ == '__main__':
-    main()
+            # main()
     

@@ -37,23 +37,23 @@ def interpolateData(binaryDataFile):
             f.write('\n')
             
     bundle = [timeHistory, stressHistory, strainHistory]
-    bundleFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'fittedHistory', mName+'_fittedHistory.pkl')
-    ostModelFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'OstModel0.txt')
-    newSet = False
-    try:
-        with open(ostModelFileName, 'r') as trialsFile:
-            text = trialsFile.readlines()
-            if len(text) <=2:
-                newSet = True
-    except FileNotFoundError:
-        newSet = True
-    if newSet is False:
-        with open(bundleFileName, 'ab') as fittedFile:
-            pickle.dump(bundle, fittedFile)           
-    elif newSet is True:
-        with open(bundleFileName, 'wb') as fittedFile:
-             pickle.dump(bundle, fittedFile)
-           
+    bundleFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'fittedHistory', sName+'_fittedHistory.pkl')
+    # ostModelFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'OstModel0.txt')
+    # newSet = False
+    # try:
+        # with open(ostModelFileName, 'r') as trialsFile:
+            # text = trialsFile.readlines()
+            # if len(text) <=2:
+                # newSet = True
+    # except FileNotFoundError:
+        # newSet = True
+    # if newSet is False:
+    # elif newSet is True:
+        # with open(bundleFileName, 'wb') as fittedFile:
+             # pickle.dump(bundle, fittedFile)
+    with open(bundleFileName, 'ab') as fittedFile:
+        pickle.dump(bundle, fittedFile)           
+       
     
 def main():
     interpolateData(os.path.join(os.getcwd(), 'rawHistory.pkl'))

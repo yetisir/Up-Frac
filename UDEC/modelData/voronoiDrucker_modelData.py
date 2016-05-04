@@ -49,7 +49,7 @@ vel = [0.01]
                                 # 'poissonsRatio':{'init':0.35, 'low':0.3, 'high':0.4}}
                                 
 abaqusMaterial = 'druckerDamage'
-parameterizationSplits = [[0.05, sTime[0]]]
+parameterizationSplits = [[1, sTime[0]/2]]
 ostrichParameters = {'frictionAngle':{'init':15, 'low':10, 'high':20}, 
                                 'dilationAngle':{'init':10, 'low':5, 'high':15},
                                 'hardening_A':{'init':5e6, 'low':1e6, 'high':10e6},

@@ -1,0 +1,120 @@
+--------------------------------------------------------------------------
+ OSTRICH version 16.02.10 (Built Feb 10 2016 @ 10:08:27)
+
+ A computer program for model-independent calibration and optimization.
+
+ Author             L. Shawn Matott
+ Copyright (C) 2007 L. Shawn Matott
+
+ This program is free software; you can redistribute 
+ it and/or modify it under the terms of the GNU  
+ General Public License as published by the Free 
+ Software Foundation; either version 2 of the 
+ License, or(at your option) any later version. 
+
+ This program is distributed in the hope that it will 
+ be useful, but WITHOUT ANY WARRANTY; without even 
+ the implied warranty of MERCHANTABILITY or FITNESS 
+ FOR A PARTICULAR PURPOSE. See the GNU General Public 
+ License for more details. 
+
+ You should have received a copy of the GNU General 
+ Public License along with this program; if not, 
+ write to the Free Software Foundation, Inc., 59 
+ Temple Place, Suite 330, Boston, MA 02111-1307 USA 
+--------------------------------------------------------------------------
+
+Ostrich Setup
+Model                  : simulationData.bat > OstExeOut.txt
+Algorithm              : Levenberg-Marquardt
+Objective Function     : WSSE
+Number of Parameters   : 2
+Number of Tied Params  : 0
+Number of Observations : 12
+Seed for Random Nums.  : 1461966921
+
+Ostrich Run Record
+iter  obj. function  $elasticModulus  $poissonsRatio  lambda
+0     1.618028E+13  7.500000E+09  3.500000E-01  1.000000E+01
+1     7.583657E+12  6.675458E+09  3.006250E-01  4.665074E+00
+2     7.583657E+12  6.675458E+09  3.006250E-01  4.240976E+00
+
+Optimal Parameter Set
+Objective Function : 7.583657E+12
+$elasticModulus    : 6.675458E+09
+$poissonsRatio     : 3.006250E-01
+
+Statistical Output
+
+Untransformed WSSE : 7.583657E+12
+
+Observation Residuals
+Observation    Measured       Simulated      Weight          Residual(Transformed and Weighted)   Sensitive?
+obs1          -4.239066E+06  -3.715220E+06  1.000000E+00  -5.238459E+05      YES
+obs2          1.970000E-04  2.033799E-04  1.000000E+00  -6.379916E-06      YES
+obs3          -6.409183E+06  -7.412333E+06  1.000000E+00  +1.003150E+06      YES
+obs4          6.920000E-04  4.119736E-04  1.000000E+00  +2.800264E-04      YES
+obs5          -7.586702E+06  -9.369901E+06  1.000000E+00  +1.783198E+06      YES
+obs6          1.386000E-03  8.693211E-04  1.000000E+00  +5.166789E-04      YES
+obs7          -8.767814E+06  -1.007776E+07  1.000000E+00  +1.309948E+06      YES
+obs8          2.083000E-03  1.507819E-03  1.000000E+00  +5.751808E-04      YES
+obs9          -9.639833E+06  -1.058537E+07  1.000000E+00  +9.455354E+05      YES
+obs10         2.906000E-03  2.177418E-03  1.000000E+00  +7.285822E-04      YES
+obs11         -1.013927E+07  -1.085561E+07  1.000000E+00  +7.163348E+05      YES
+obs12         3.896000E-03  2.892836E-03  1.000000E+00  +1.003164E-03      YES
+
+Correlation between raw measured and simulated observations (no transformation or weighting)
+Ry         :  0.996
+Ry-squared :  0.991
+
+Correlation between measured and simulated observations (with transformation and weighting)
+Rw         :  0.996
+Rw-squared :  0.991
+
+Error Variance and Standard Error of the Regression
+S^2 : 7.583657E+11
+S   : 8.708419E+05
+
+Parameter Variance-Covariance
+               $elasticModulus   $poissonsRatio   
+$elasticModulus  +9.359251E+17  -1.011160E+08  
+$poissonsRatio  -1.011160E+08  +1.728101E-02  
+
+Parameter Standard Error
+$elasticModulus   : 9.674322E+08 
+$poissonsRatio   : 1.314572E-01 
+
+Parameter Correlation
+               $elasticModulus  $poissonsRatio  
+$elasticModulus  +1.000         -0.795         
+$poissonsRatio  -0.795         +1.000         
+
+Algorithm Metrics
+Algorithm         : Levenberg-Marquardt
+Max Iterations    : 20
+Actual Iterations : 2
+Convergence Val   : 0.000100
+LPRCV             : 0.300000
+LRRCV             : 0.010000
+Max Lambda Trials : 10
+Move Limit        : 0.100000
+Total Alg Evals   : 14
+Total Evals       : 21
+Upper Violations  : 0
+Lower Violations  : 7
+Move Limit Viols  : 13
+LPRCV : Lambda-Phi Ratio Convergence Value
+LRRCV : Lambda Relative Reduction Convergence Value
+Total Evals             : 21
+Telescoping Strategy    : none
+
+Finite Difference Metrics
+Difference Type    : Forward
+Increment Type    : Range-Relative
+Finite Difference Increments
+$elasticModulus : 0.010000
+$poissonsRatio : 0.010000
+Finite Difference Mimumum Increment : 1.000000E-10
+Jacobian Evals     : 6
+Optimal Step Evals : 0
+Statistics Evals   : 1

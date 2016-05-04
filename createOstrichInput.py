@@ -4,6 +4,7 @@ import sys
 import os
 import csv
 from OSTRICH.vectorMath import *
+import math
 
 def getMaxStrain():
     with open(os.path.join('OSTRICH', 'observationUDEC.dat')) as udecFile:
@@ -31,6 +32,7 @@ def getVelocityString(velTable):
     
 def getInelasticStrain(numStrainPoints = 100):
     inelasticStrain = divide(range(0, numStrainPoints+1), numStrainPoints/getMaxStrain())
+    return inelasticStrain
 
                                 
 def maxTensileStrainIO(mode):
@@ -44,17 +46,26 @@ def maxTensileStrainIO(mode):
             file.write(str(getMaxStrain())) 
         return 1
         
-def getModelParameters():
+def getModelParameters(modelNumber, endTime, numObservations):
     #TODO: cleanup, make more general, maybe move to material definitions since not consistant
+    # print(math.floor((numObservations)*(endTime/sTime[modelNumber])))
+    # print((numObservations)*(endTime/sTime[modelNumber]))
+    # print(numObservations)
+    # print(endTime)
+    # print(sTime[modelNumber])
+    
     parameters =  {'$$mSize': mSize,
                             '$$mName': '\''+modelName+'\'',
+                            '$$sName': '\''+fileName+'\'',
+                            '$$nObs': numObservations,
                             '$$rho': rho*1e9,
                             '$$dAngle': jDilation,
-                            '$$confStress': confiningStress*1e6,
+                            '$$confStress': confiningStress[0]*1e6, #***********************************************************fix for different confining stresses!!!!!
                             '$$cStrain': getInelasticStrain(), #fix for concrete plasticity
                             '$$iStrain': getInelasticStrain(),
-                            '$$vel':vel[],
-                            '$$sTime':sTime[]}
+                            '$$vel':vel[modelNumber],
+                            '$$sTime':endTime,
+                            '$$vString':getVelocityString(velTable[modelNumber])}
     # if '(c)' in modelName:
         # parameters .update({ '$$maxTS':maxTensileStrainIO('r'),
                                 # '$$sTime':sTime_c,
@@ -70,7 +81,7 @@ def getModelParameters():
 def getOstrichParameters(parameterizationRun):
     ostrichParametersText = '' 
     for parameter in ostrichParameters:
-        if parameter in materialParameters[parameterizationRun-1]:
+        if '$' + parameter in materialParameters[parameterizationRun-1]:
             p = ostrichParameters[parameter]
             newRecord = '$' + parameter + '\t' + str(p['init']) + '\t' + str(p['low']) + '\t' +str(p['high']) +'\tnone\tnone\tnone\n'
             ostrichParametersText += newRecord
@@ -86,17 +97,15 @@ def getModelConstants(modelName, parameterizationRun):
     parameters = {}
     for parameter in ostrichParameters:
         parameters['$'+parameter] = ostrichParameters[parameter]['init']
-    for parameter in materialParameters[paramaterizationRun-1]:
+    for parameter in materialParameters[parameterizationRun-1]:
         parameters[parameter] = parameter
-        
     for i in range(parameterizationRun-1):
-        with open(os.path.join('OSTRICH', 'OstOutput_{0}_{1}.txt'.format(modelName, parameterizationRun))) as ostOutputFile:
+         with open(os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}.txt'.format(modelName, i+1))) as ostOutputFile:
             ostOutput = ostOutputFile.read()
             startIndex = ostOutput.find('Optimal Parameter Set')
             endIndex = ostOutput.find('\n\n', startIndex)
-            parameterBlock = ostOutput[startIndex:endIndex]
-            parameters = {}
-            for parameter in t_parameters:
+            parameterBlock = ostOutput[startIndex:endIndex+1]
+            for parameter in materialParameters[i]:
                 paramPosition = parameterBlock.find(parameter)
                 colonPosition = parameterBlock.find(':', paramPosition)
                 eolPosition = parameterBlock.find('\n', paramPosition)
@@ -112,29 +121,47 @@ def fillTemplate(template, parameters, file):
         with open(os.path.join('OSTRICH', file), 'w') as modelFile:
             modelFile.write(t)
             
-def main():
+# def main():
     #use argparse
+               
+            
+if __name__ == '__main__':
+    # main()
+    
     clargs = sys.argv
     if len(clargs) >= 2:
-        modelName = clargs[1]
-        parameterizationRun = clargs[2]
+        fileName = clargs[1]
+        parameterizationRun = int(clargs[2])
+        numObservations = int(clargs[3])
+        dt = float(clargs[4])
      #else: error message
+    modelName = fileName[:fileName.find('(')]
     module = __import__('UDEC.modelData.'+modelName+'_modelData', globals(), locals(), ['*'])
     for k in dir(module):
         locals()[k] = getattr(module, k)
-
-
-    fillTemplate('parameters.tpl', getModelParameters(), 'parameters.py')
-    fillTemplate('ostIn.tpl', getOstrichParameters(), 'ostIn.txt')
-    # fillTemplate('ostIn.txt', getOstInVoid(), 'ostIn.txt')
-    fillTemplate('runAbaqus.tpl', getModelConstants(), 'runAbaqus.temp.tpl')
+    module = __import__('OSTRICH.materials.'+abaqusMaterial, globals(), locals(), ['*'])
+    for k in dir(module):
+        locals()[k] = getattr(module, k)
         
-                    
-            
-if __name__ == '__main__':
-    main()
+    counter = 0
+    for i in range(len(parameterizationSplits)):
+        for j in range(len(parameterizationSplits[i])+1):
+            counter += 1
+            if counter == parameterizationRun:
+                modelNumber = i
+                # if j < len(parameterizationSplits[i]):
+                    # endTime = parameterizationSplits[i][j]
+                # else:
+                    # endTime = sTime
     
-
+    
+    endTime = dt*numObservations
+    fillTemplate('parameters.tpl', getModelParameters(modelNumber, endTime, numObservations), 'parameters.py')
+    fillTemplate('ostIn.tpl', getOstrichParameters(parameterizationRun), 'ostIn.txt')
+    # fillTemplate('ostIn.txt', getOstInVoid(), 'ostIn.txt')
+    fillTemplate('runAbaqus.tpl', getModelConstants(modelName, parameterizationRun), 'runAbaqus.temp.tpl')
+        
+        
         
         
         

@@ -197,7 +197,7 @@ def buildModel():
     sketchPart(partName, gridPoints)
     
     #concreteDamage(7600000000.0, 0.35, $peakYeildStress, $peakYeildStrain,  $initialCompressiveYeild, $compressiveDamageScaling, $initialTensileYeild, $tLambda, $tensileDamageScaling)
-    druckerDamage(12.0169, 8.749553, 5612301.0, 11551390.0, $johnson_D2, $johnson_D3, $failureDisplacement, 14500.0, 7600000000.0, 0.35)
+    druckerDamage(12.0169, 8.749553, 5612301.0, 11551390.0, 2.000000E-02, -2.000000E+00, 5.090000E-05, 14500.0, 7600000000.0, 0.35)
     assignSection(sectionName, partName, sectionLocation, materialName)
     meshPart(meshSize, partName, sectionLocation, elementType, elementShape)
     createInstance(instanceName, partName)
