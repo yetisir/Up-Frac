@@ -6,7 +6,7 @@ from scipy.interpolate import griddata
 import sys  
 import os
 
-def interpolateData(binaryDataFile):
+def interpolateData(binaryDataFile, sName):
     file = open(binaryDataFile, 'rb')
     if os.name == 'nt':
         rawTimeHistory = numpy.array(pickle.load(file, encoding='latin1')).transpose()
@@ -25,38 +25,33 @@ def interpolateData(binaryDataFile):
         strainHistory[i, :] = griddata(rawTimeHistory, rawStrainHistory[i], timeHistory)
     stressHistory = stressHistory.transpose()
     strainHistory = strainHistory.transpose()
-    
-    with open('output.dat', 'w') as f:
-        f.write('time S11 S22 S12 LE11 LE22 LE12\n')
-        for i in range(len(timeHistory)):
-            f.write(str(timeHistory[i])+' ')
-            for j in range(len(stressHistory[i])):
-                f.write(str(stressHistory[i][j])+' ')
-            for j in range(len(strainHistory[i])):
-                f.write(str(strainHistory[i][j])+' ')
-            f.write('\n')
             
     bundle = [timeHistory, stressHistory, strainHistory]
     bundleFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'fittedHistory', sName+'_fittedHistory.pkl')
-    # ostModelFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'OstModel0.txt')
-    # newSet = False
-    # try:
-        # with open(ostModelFileName, 'r') as trialsFile:
-            # text = trialsFile.readlines()
-            # if len(text) <=2:
-                # newSet = True
-    # except FileNotFoundError:
-        # newSet = True
-    # if newSet is False:
-    # elif newSet is True:
-        # with open(bundleFileName, 'wb') as fittedFile:
-             # pickle.dump(bundle, fittedFile)
     with open(bundleFileName, 'ab') as fittedFile:
         pickle.dump(bundle, fittedFile)           
        
+    return bundle
+    
+def writeOuput(bundles):
+    with open('output.dat', 'w') as f:
+        f.write('time S11 S22 S12 LE11 LE22 LE12\n')
+        for k in range(len(bundles)):
+            timeHistory = bundles[k][0]
+            strainHistory = bundles[k][1]
+            stressHistory = bundles[k][2]
+            for i in range(len(timeHistory)):
+                f.write(str(timeHistory[i])+' ')
+                for j in range(len(stressHistory[i])):
+                    f.write(str(stressHistory[i][j])+' ')
+                for j in range(len(strainHistory[i])):
+                    f.write(str(strainHistory[i][j])+' ')
+                f.write('\n')
     
 def main():
-    interpolateData(os.path.join(os.getcwd(), 'rawHistory.pkl'))
-    
+    bundles = []
+    for i in range(len(confiningStress)):
+        bundles.append(interpolateData(os.path.join(os.getcwd(), 'Job-{0}_rawHistory.pkl'.format(i+1)), sName[i]))
+    writeOuput(bundles)
 if __name__ == '__main__':            
     main()
