@@ -1,14 +1,14 @@
 mName = 'voronoiDrucker'
-sName = 'voronoiDrucker(0.0)'
+sName = ['voronoiDrucker(0.0)', 'voronoiDrucker(0.5)', 'voronoiDrucker(0.10)', 'voronoiDrucker(0.20)']
     
 gridPoints = [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]
 
 sectionLocation = (10/2, 10/2, 0.0)
 
-simulationTime = 20.000000000000018
-numberOfSteps = 50
+simulationTime = 0.8
+numberOfSteps = 2
 
-confiningStress = 0.0
+confiningStress = [0.0, 5000000.0, 10000000.0, 20000000.0]
 
 dilationAngle = 10
 density = 2700000.0

@@ -38,8 +38,8 @@ def writeOuput(bundles):
         f.write('time S11 S22 S12 LE11 LE22 LE12\n')
         for k in range(len(bundles)):
             timeHistory = bundles[k][0]
-            strainHistory = bundles[k][1]
-            stressHistory = bundles[k][2]
+            stressHistory = bundles[k][1]
+            strainHistory = bundles[k][2]
             for i in range(len(timeHistory)):
                 f.write(str(timeHistory[i])+' ')
                 for j in range(len(stressHistory[i])):

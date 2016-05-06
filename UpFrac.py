@@ -5,53 +5,54 @@ import pickle
 import shutil
 
 def createOstIn(fileName, parameters, startTime, endTime):
-    print('Creating OstIn.txt for OSTRICH:')
-    with open(os.path.join('HOMOGENIZE', 'binaryData', fileName+'_homogenizedData.pkl'), 'rb') as bundleFile:
-        bundle = pickle.load(bundleFile)
-        timeHistory = bundle[0]
-        stressHistory = bundle[1]
-        strainHistory = bundle[2]
     #TODO: change import format, use template, not module maybe?
     import OSTRICH.ostIn
     observations = ''
     startIndex = 0
     endIndex = 0
-    for i in range(len(timeHistory)):
-        if timeHistory[i] <= startTime:
-            startIndex = i
-        if timeHistory[i] <= endTime:
-            endIndex = i
-    th = timeHistory
-    timeHistory = timeHistory[startIndex:endIndex+1]
-    stressHistory = stressHistory[startIndex:endIndex+1]
-    strainHistory = strainHistory[startIndex:endIndex+1]
-    numObservations = len(timeHistory)
-    
+    print('Creating OstIn.txt for OSTRICH:')
+    for k in range(len(confiningStress)):
+        with open(os.path.join('HOMOGENIZE', 'binaryData', fileName+str(confiningStress[k])+')_homogenizedData.pkl'), 'rb') as bundleFile:
+            bundle = pickle.load(bundleFile)
+            timeHistory = bundle[0]
+            stressHistory = bundle[1]
+            strainHistory = bundle[2]
+
+        for i in range(len(timeHistory)):
+            if timeHistory[i] <= startTime:
+                startIndex = i +1
+            if timeHistory[i] <= endTime:
+                endIndex = i
+        th = timeHistory
+        timeHistory = timeHistory[startIndex:endIndex+1]
+        stressHistory = stressHistory[startIndex:endIndex+1]
+        strainHistory = strainHistory[startIndex:endIndex+1]
+        numObservations = len(timeHistory) + 1
     #TODO: add weightings so strain and stress can be used together
-    for i in range(numObservations):
-        for j in range(len(parameters)):
-            if parameters[j] == 'S11':
-                o = stressHistory[i][0, 0]
-                c = 2
-            elif parameters[j] == 'S22':
-                o = stressHistory[i][1, 1]
-                c = 3
-            elif parameters[j] == 'S12':
-                o = stressHistory[i][0, 1]
-                c = 4
-            elif parameters[j] == 'LE11':
-                o = strainHistory[i][0, 0]
-                c = 5
-            elif parameters[j] == 'LE22':
-                o = strainHistory[i][1, 1]
-                c = 6
-            elif parameters[j] == 'LE12':
-                o = strainHistory[i][0, 1]
-                c = 7
-            l = i+2
-            obsNo = i*len(parameters)+j+1
-            newObservation = 'obs{} \t\t{:10f} \t1 \toutput.dat \tOST_NULL \t{} \t\t{}\n'.format(obsNo, o, l, c)
-            observations += newObservation
+        for i in range(1, numObservations):
+            for j in range(len(parameters)):
+                if parameters[j] == 'S11':
+                    o = stressHistory[i-1][0, 0]
+                    c = 2
+                elif parameters[j] == 'S22':
+                    o = stressHistory[i-1][1, 1]
+                    c = 3
+                elif parameters[j] == 'S12':
+                    o = stressHistory[i-1][0, 1]
+                    c = 4
+                elif parameters[j] == 'LE11':
+                    o = strainHistory[i-1][0, 0]
+                    c = 5
+                elif parameters[j] == 'LE22':
+                    o = strainHistory[i-1][1, 1]
+                    c = 6
+                elif parameters[j] == 'LE12':
+                    o = strainHistory[i-1][0, 1]
+                    c = 7
+                l = k*(numObservations+startIndex) + i + 1 + startIndex
+                obsNo = k*(numObservations-1)*len(parameters) + (i-1)*len(parameters) + (j +1)
+                newObservation = 'obs{} \t\t{:10f} \t1 \toutput.dat \tOST_NULL \t{} \t\t{}\n'.format(obsNo, o, l, c)
+                observations += newObservation
     with open(os.path.join('OSTRICH', 'OstIn.tpl'), 'w') as f:
         f.write(OSTRICH.ostIn.topText+observations+OSTRICH.ostIn.bottomText)
     print('\tDone')
@@ -79,11 +80,11 @@ if __name__ == '__main__':
         startTime = 0
         splitTimes = parameterizationSplits[i] + [sTime[i]]
         for j in range(len(splitTimes)):  
-            homoFileName = '{0}({1}.{2})'.format(mName, i, 0)
+            homoFileName = '{0}({1}.'.format(mName, i, 0)
             endTime = splitTimes[j]
 
             numObs, dt = createOstIn(homoFileName, relVars, startTime, endTime) #please fix, this fucntion should not return this value
-            os.system('python createOstrichInput.py ' + homoFileName + '  ' + str(parameterizationRun) + ' ' + str(numObs)+' '+str(dt))
+            os.system('python createOstrichInput.py ' + mName + '  ' + str(parameterizationRun) + ' ' + str(numObs)+' '+str(dt))
             os.chdir(os.path.join(os.getcwd(), 'OSTRICH'))
             os.system('cleanup.bat')
             os.system('ostrich.exe')
@@ -93,5 +94,6 @@ if __name__ == '__main__':
 
             parameterizationRun +=1
             startTime = endTime
+            # input()#*******************************************
             # main()
     

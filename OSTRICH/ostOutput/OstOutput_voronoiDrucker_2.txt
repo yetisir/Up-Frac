@@ -28,161 +28,49 @@ Ostrich Setup
 Model                  : simulationData.bat > OstExeOut.txt
 Algorithm              : Levenberg-Marquardt
 Objective Function     : WSSE
-Number of Parameters   : 5
+Number of Parameters   : 3
 Number of Tied Params  : 0
-Number of Observations : 48
-Seed for Random Nums.  : 1462304523
+Number of Observations : 184
+Seed for Random Nums.  : 1462546186
 
 Ostrich Run Record
-iter  obj. function  $hardening_A  $hardening_B  $frictionAngle  $initialTensileStrength  $dilationAngle  lambda
-0     4.945684E+13  5.000000E+06  1.000000E+07  1.500000E+01  1.000000E+04  1.000000E+01  1.000000E+01
-1     3.755516E+13  5.097698E+06  1.046926E+07  1.401690E+01  5.500000E+03  1.074955E+01  9.090909E+00
-2     3.231052E+13  5.187698E+06  1.046926E+07  1.401690E+01  5.500000E+03  1.074955E+01  8.264463E+00
-3     3.103861E+13  5.277698E+06  1.046926E+07  1.401690E+01  5.500000E+03  1.074955E+01  7.513148E+00
-4     2.900644E+13  5.612301E+06  1.155139E+07  1.201690E+01  1.450000E+04  8.749553E+00  6.209213E+00
-5     2.900644E+13  5.612301E+06  1.155139E+07  1.201690E+01  1.450000E+04  8.749553E+00  5.644739E+00
+iter  obj. function  $hardening_A  $frictionAngle  $hardening_B  lambda
+0     1.534060E+17  1.000000E+06  4.000000E+01  3.200000E+08  1.000000E+01
+1     1.534060E+17  1.000000E+06  4.000000E+01  3.200000E+08  9.090909E+00
 
 Optimal Parameter Set
-Objective Function : 2.900644E+13
-$hardening_A       : 5.612301E+06
-$hardening_B       : 1.155139E+07
-$frictionAngle     : 1.201690E+01
-$initialTensileStrength : 1.450000E+04
-$dilationAngle     : 8.749553E+00
-
-Statistical Output
-
-Untransformed WSSE : 2.900644E+13
-********************** NOTE **********************
-Insensitive observations (3) and/or parameters (0)
-were detected and have not been included in the 
-following statistical calculations.
-**************************************************
-
-Adjusted Obj.Func. : 2.056022E+13
-
-Parameter      Value            Sensitive?
-$hardening_A   5.612301E+06    YES
-$hardening_B   1.155139E+07    YES
-$frictionAngle 1.201690E+01    YES
-$initialTensileStrength 1.450000E+04    YES
-$dilationAngle 8.749553E+00    YES
-
-Observation Residuals
-Observation    Measured       Simulated      Weight          Residual(Transformed and Weighted)   Sensitive?
-obs1          -6.409183E+06  -3.502946E+06  1.000000E+00  -2.906238E+06      NO
-obs2          6.920000E-04  2.097368E-04  1.000000E+00  +4.822632E-04      NO
-obs3          -7.586702E+06  -6.883824E+06  1.000000E+00  -7.028784E+05      YES
-obs4          1.386000E-03  4.375784E-04  1.000000E+00  +9.484216E-04      NO
-obs5          -8.767814E+06  -9.749114E+06  1.000000E+00  +9.813001E+05      YES
-obs6          2.083000E-03  7.295519E-04  1.000000E+00  +1.353448E-03      YES
-obs7          -9.639833E+06  -1.122833E+07  1.000000E+00  +1.588500E+06      YES
-obs8          2.906000E-03  1.189600E-03  1.000000E+00  +1.716400E-03      YES
-obs9          -1.013927E+07  -1.127275E+07  1.000000E+00  +1.133477E+06      YES
-obs10         3.896000E-03  1.846366E-03  1.000000E+00  +2.049634E-03      YES
-obs11         -1.055583E+07  -1.151585E+07  1.000000E+00  +9.600238E+05      YES
-obs12         5.009000E-03  2.474923E-03  1.000000E+00  +2.534077E-03      YES
-obs13         -1.097887E+07  -1.185367E+07  1.000000E+00  +8.747980E+05      YES
-obs14         6.079000E-03  3.091924E-03  1.000000E+00  +2.987076E-03      YES
-obs15         -1.143659E+07  -1.224142E+07  1.000000E+00  +8.048335E+05      YES
-obs16         7.120000E-03  3.705499E-03  1.000000E+00  +3.414501E-03      YES
-obs17         -1.126510E+07  -1.197454E+07  1.000000E+00  +7.094333E+05      YES
-obs18         8.465000E-03  4.411063E-03  1.000000E+00  +4.053937E-03      YES
-obs19         -1.174810E+07  -1.205979E+07  1.000000E+00  +3.116896E+05      YES
-obs20         9.575000E-03  5.067740E-03  1.000000E+00  +4.507260E-03      YES
-obs21         -1.195988E+07  -1.226700E+07  1.000000E+00  +3.071180E+05      YES
-obs22         1.082000E-02  5.707811E-03  1.000000E+00  +5.112189E-03      YES
-obs23         -1.205049E+07  -1.231014E+07  1.000000E+00  +2.596430E+05      YES
-obs24         1.222400E-02  6.370871E-03  1.000000E+00  +5.853129E-03      YES
-obs25         -1.228284E+07  -1.226474E+07  1.000000E+00  -1.809228E+04      YES
-obs26         1.351700E-02  7.046069E-03  1.000000E+00  +6.470931E-03      YES
-obs27         -1.267368E+07  -1.226460E+07  1.000000E+00  -4.090878E+05      YES
-obs28         1.470100E-02  7.714662E-03  1.000000E+00  +6.986338E-03      YES
-obs29         -1.295177E+07  -1.271776E+07  1.000000E+00  -2.340140E+05      YES
-obs30         1.580900E-02  8.318687E-03  1.000000E+00  +7.490313E-03      YES
-obs31         -1.330659E+07  -1.282238E+07  1.000000E+00  -4.842164E+05      YES
-obs32         1.713800E-02  8.971998E-03  1.000000E+00  +8.166002E-03      YES
-obs33         -1.358053E+07  -1.282074E+07  1.000000E+00  -7.597891E+05      YES
-obs34         1.846800E-02  9.639509E-03  1.000000E+00  +8.828491E-03      YES
-obs35         -1.374997E+07  -1.273737E+07  1.000000E+00  -1.012601E+06      YES
-obs36         1.979900E-02  1.031745E-02  1.000000E+00  +9.481552E-03      YES
-obs37         -1.406496E+07  -1.276202E+07  1.000000E+00  -1.302937E+06      YES
-obs38         2.119200E-02  1.097795E-02  1.000000E+00  +1.021405E-02      YES
-obs39         -1.398166E+07  -1.285998E+07  1.000000E+00  -1.121682E+06      YES
-obs40         2.262000E-02  1.162753E-02  1.000000E+00  +1.099247E-02      YES
-obs41         -1.309236E+07  -1.281173E+07  1.000000E+00  -2.806279E+05      YES
-obs42         2.410400E-02  1.220415E-02  1.000000E+00  +1.189985E-02      YES
-obs43         -1.221504E+07  -1.268975E+07  1.000000E+00  +4.747159E+05      YES
-obs44         2.556800E-02  1.269230E-02  1.000000E+00  +1.287570E-02      YES
-obs45         -1.130537E+07  -1.251818E+07  1.000000E+00  +1.212809E+06      YES
-obs46         2.691400E-02  1.307179E-02  1.000000E+00  +1.384221E-02      YES
-obs47         -1.026843E+07  -1.259392E+07  1.000000E+00  +2.325490E+06      YES
-obs48         2.801500E-02  1.324162E-02  1.000000E+00  +1.477338E-02      YES
-
-Correlation between raw measured and simulated observations (no transformation or weighting)
-Ry         :  0.994
-Ry-squared :  0.988
-
-Correlation between measured and simulated observations (with transformation and weighting)
-Rw         :  0.994
-Rw-squared :  0.988
-
-Error Variance and Standard Error of the Regression
-S^2 : 5.140056E+11
-S   : 7.169418E+05
-
-Parameter Variance-Covariance
-               $hardening_A   $hardening_B   $frictionAngle   $initialTensileStrength   $dilationAngle   
-$hardening_A  +9.461523E+09  -2.274759E+11  +1.297640E+03  +5.519961E+08  -1.045716E+04  
-$hardening_B  -2.274759E+11  +1.085763E+13  -1.181613E+05  -2.669742E+10  +2.597400E+05  
-$frictionAngle  +1.297640E+03  -1.181613E+05  +3.087637E-02  +1.806618E+01  -3.659104E-03  
-$initialTensileStrength  +5.519961E+08  -2.669742E+10  +1.806618E+01  +7.496422E+07  -6.449460E+02  
-$dilationAngle  -1.045716E+04  +2.597400E+05  -3.659104E-03  -6.449460E+02  +2.007729E-02  
-
-Parameter Standard Error
-$hardening_A   : 9.727036E+04 
-$hardening_B   : 3.295092E+06 
-$frictionAngle   : 1.757167E-01 
-$initialTensileStrength   : 8.658188E+03 
-$dilationAngle   : 1.416944E-01 
-
-Parameter Correlation
-               $hardening_A  $hardening_B  $frictionAngle  $initialTensileStrength  $dilationAngle  
-$hardening_A  +1.000         -0.710         +0.076         +0.655         -0.759         
-$hardening_B  -0.710         +1.000         -0.204         -0.936         +0.556         
-$frictionAngle  +0.076         -0.204         +1.000         +0.012         -0.147         
-$initialTensileStrength  +0.655         -0.936         +0.012         +1.000         -0.526         
-$dilationAngle  -0.759         +0.556         -0.147         -0.526         +1.000         
+Objective Function : 1.534060E+17
+$hardening_A       : 1.000000E+06
+$frictionAngle     : 4.000000E+01
+$hardening_B       : 3.200000E+08
 
 Algorithm Metrics
 Algorithm         : Levenberg-Marquardt
 Max Iterations    : 20
-Actual Iterations : 5
-Convergence Val   : 0.000100
+Actual Iterations : 1
+Convergence Val   : 0.001000
 LPRCV             : 0.300000
 LRRCV             : 0.010000
 Max Lambda Trials : 10
 Move Limit        : 0.100000
-Total Alg Evals   : 19
-Total Evals       : 50
+Total Alg Evals   : 4
+Total Evals       : 7
 Upper Violations  : 0
-Lower Violations  : 1
-Move Limit Viols  : 37
+Lower Violations  : 0
+Move Limit Viols  : 6
 LPRCV : Lambda-Phi Ratio Convergence Value
 LRRCV : Lambda Relative Reduction Convergence Value
-Total Evals             : 50
+Total Evals             : 7
 Telescoping Strategy    : none
 
 Finite Difference Metrics
 Difference Type    : Forward
 Increment Type    : Range-Relative
 Finite Difference Increments
-$hardening_A : 0.010000
-$hardening_B : 0.010000
-$frictionAngle : 0.010000
-$initialTensileStrength : 0.010000
-$dilationAngle : 0.010000
+$hardening_A : 0.100000
+$frictionAngle : 0.100000
+$hardening_B : 0.100000
 Finite Difference Mimumum Increment : 1.000000E-10
-Jacobian Evals     : 30
+Jacobian Evals     : 3
 Optimal Step Evals : 0
-Statistics Evals   : 1
+Statistics Evals   : 0

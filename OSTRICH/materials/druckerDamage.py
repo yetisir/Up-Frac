@@ -3,10 +3,10 @@ materialParameters =  [['$elasticModulus',
                 '$poissonsRatio'], 
                 
                 ['$frictionAngle', 
-                '$dilationAngle',
+                # '$dilationAngle',
+                # '$initialTensileStrength',
                 '$hardening_A', 
-                '$hardening_B',
-                '$initialTensileStrength'],
+                '$hardening_B'],
                 
                 ['$johnson_D2', 
                 '$johnson_D3', 

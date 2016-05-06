@@ -30,76 +30,47 @@ Algorithm              : Levenberg-Marquardt
 Objective Function     : WSSE
 Number of Parameters   : 3
 Number of Tied Params  : 0
-Number of Observations : 52
-Seed for Random Nums.  : 1462306626
+Number of Observations : 200
+Seed for Random Nums.  : 1462547202
 
 Ostrich Run Record
 iter  obj. function  $johnson_D2   $johnson_D3   $failureDisplacement  lambda
-0     3.138943E+15  2.000000E-02  -2.000000E+00  5.000000E-05  1.000000E+01
+0     1.209139E+17  1.000000E-03  -2.000000E+00  2.000000E-01  1.000000E+01
+1     1.209113E+17  5.500000E-04  -2.000000E+00  2.000000E-01  9.090909E+00
 
-Statistical Output
+Optimal Parameter Set
+Objective Function : 1.209113E+17
+$johnson_D2        : 5.500000E-04
+$johnson_D3        : -2.000000E+00
+$failureDisplacement : 2.000000E-01
 
-Untransformed WSSE : 3.138943E+15
+Algorithm Metrics
+Algorithm         : Levenberg-Marquardt
+Max Iterations    : 20
+Actual Iterations : 1
+Convergence Val   : 0.001000
+LPRCV             : 0.300000
+LRRCV             : 0.010000
+Max Lambda Trials : 10
+Move Limit        : 0.100000
+Total Alg Evals   : 4
+Total Evals       : 7
+Upper Violations  : 0
+Lower Violations  : 0
+Move Limit Viols  : 3
+LPRCV : Lambda-Phi Ratio Convergence Value
+LRRCV : Lambda Relative Reduction Convergence Value
+Total Evals             : 7
+Telescoping Strategy    : none
 
-Observation Residuals
-Observation    Measured       Simulated      Weight          Residual(Transformed and Weighted)   Sensitive?
-obs1          -1.026843E+07  -3.394407E+06  1.000000E+00  -6.874025E+06      YES
-obs2          2.801500E-02  2.258351E-04  1.000000E+00  +2.778916E-02      YES
-obs3          -9.241965E+06  -6.788813E+06  1.000000E+00  -2.453152E+06      YES
-obs4          2.882200E-02  4.516701E-04  1.000000E+00  +2.837033E-02      YES
-obs5          -8.212450E+06  -9.517844E+06  1.000000E+00  +1.305394E+06      YES
-obs6          2.936100E-02  7.612602E-04  1.000000E+00  +2.859974E-02      YES
-obs7          -6.989698E+06  -1.038580E+07  1.000000E+00  +3.396104E+06      YES
-obs8          2.960200E-02  1.305115E-03  1.000000E+00  +2.829689E-02      YES
-obs9          -5.808534E+06  -1.125376E+07  1.000000E+00  +5.445228E+06      YES
-obs10         2.983500E-02  1.848969E-03  1.000000E+00  +2.798603E-02      YES
-obs11         -4.506678E+06  -1.162627E+07  1.000000E+00  +7.119591E+06      YES
-obs12         2.997800E-02  2.461566E-03  1.000000E+00  +2.751643E-02      YES
-obs13         -3.297430E+06  -1.198708E+07  1.000000E+00  +8.689654E+06      YES
-obs14         3.004800E-02  3.075786E-03  1.000000E+00  +2.697221E-02      YES
-obs15         -2.274680E+06  -1.227651E+07  1.000000E+00  +1.000183E+07      YES
-obs16         3.004200E-02  3.700628E-03  1.000000E+00  +2.634137E-02      YES
-obs17         -1.333071E+06  -1.221648E+07  1.000000E+00  +1.088340E+07      YES
-obs18         2.999600E-02  4.377476E-03  1.000000E+00  +2.561852E-02      YES
-obs19         -8.245963E+05  -1.215644E+07  1.000000E+00  +1.133184E+07      YES
-obs20         2.993800E-02  5.054323E-03  1.000000E+00  +2.488368E-02      YES
-obs21         -3.870807E+05  -1.215378E+07  1.000000E+00  +1.176670E+07      YES
-obs22         2.987500E-02  5.723462E-03  1.000000E+00  +2.415154E-02      YES
-obs23         -6.223556E+04  -1.221618E+07  1.000000E+00  +1.215394E+07      YES
-obs24         2.983700E-02  6.383859E-03  1.000000E+00  +2.345314E-02      YES
-obs25         1.893494E+05  -1.231319E+07  1.000000E+00  +1.250254E+07      YES
-obs26         2.980100E-02  7.039168E-03  1.000000E+00  +2.276183E-02      YES
-obs27         1.975340E+05  -1.253205E+07  1.000000E+00  +1.272958E+07      YES
-obs28         2.978600E-02  7.676567E-03  1.000000E+00  +2.210943E-02      YES
-obs29         2.401602E+05  -1.275090E+07  1.000000E+00  +1.299106E+07      YES
-obs30         2.981800E-02  8.313966E-03  1.000000E+00  +2.150403E-02      YES
-obs31         2.802395E+05  -1.275726E+07  1.000000E+00  +1.303750E+07      YES
-obs32         2.983800E-02  8.980307E-03  1.000000E+00  +2.085769E-02      YES
-obs33         3.073265E+05  -1.274624E+07  1.000000E+00  +1.305356E+07      YES
-obs34         2.986500E-02  9.649015E-03  1.000000E+00  +2.021599E-02      YES
-obs35         2.731952E+05  -1.273522E+07  1.000000E+00  +1.300841E+07      YES
-obs36         2.986600E-02  1.031772E-02  1.000000E+00  +1.954828E-02      YES
-obs37         1.924373E+05  -1.282143E+07  1.000000E+00  +1.301387E+07      YES
-obs38         2.987200E-02  1.096795E-02  1.000000E+00  +1.890405E-02      YES
-obs39         2.031102E+05  -1.291063E+07  1.000000E+00  +1.311374E+07      YES
-obs40         2.985400E-02  1.161761E-02  1.000000E+00  +1.823639E-02      YES
-obs41         1.827999E+05  -1.276790E+07  1.000000E+00  +1.295070E+07      YES
-obs42         2.982300E-02  1.215028E-02  1.000000E+00  +1.767272E-02      YES
-obs43         1.928159E+05  -1.253667E+07  1.000000E+00  +1.272948E+07      YES
-obs44         2.980600E-02  1.263830E-02  1.000000E+00  +1.716770E-02      YES
-obs45         1.735198E+05  -1.233715E+07  1.000000E+00  +1.251067E+07      YES
-obs46         2.979600E-02  1.308805E-02  1.000000E+00  +1.670795E-02      YES
-obs47         1.889952E+05  -1.241164E+07  1.000000E+00  +1.260063E+07      YES
-obs48         2.980400E-02  1.320722E-02  1.000000E+00  +1.659678E-02      YES
-obs49         1.884256E+05  -1.248612E+07  1.000000E+00  +1.267455E+07      YES
-obs50         2.977600E-02  1.332639E-02  1.000000E+00  +1.644961E-02      YES
-obs51         9.907795E+04  -1.172354E+07  1.000000E+00  +1.182261E+07      YES
-obs52         2.977400E-02  1.328722E-02  1.000000E+00  +1.648678E-02      YES
-
-Correlation between raw measured and simulated observations (no transformation or weighting)
-Ry         :  0.000
-Ry-squared :  0.000
-
-Correlation between measured and simulated observations (with transformation and weighting)
-Rw         :  0.000
-Rw-squared :  0.000
+Finite Difference Metrics
+Difference Type    : Forward
+Increment Type    : Range-Relative
+Finite Difference Increments
+$johnson_D2  : 0.100000
+$johnson_D3  : 0.100000
+$failureDisplacement : 0.100000
+Finite Difference Mimumum Increment : 1.000000E-10
+Jacobian Evals     : 3
+Optimal Step Evals : 0
+Statistics Evals   : 0

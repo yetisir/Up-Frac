@@ -56,11 +56,11 @@ def getModelParameters(modelNumber, endTime, numObservations):
     
     parameters =  {'$$mSize': mSize,
                             '$$mName': '\''+modelName+'\'',
-                            '$$sName': '\''+fileName+'\'',
+                            '$$sName': ['{0}({1}.{2})'.format(modelName, 0, x) for x in confiningStress],
                             '$$nObs': numObservations,
                             '$$rho': rho*1e9,
                             '$$dAngle': jDilation,
-                            '$$confStress': confiningStress[0]*1e6, #***********************************************************fix for different confining stresses!!!!!
+                            '$$confStress': [x*1e6 for x in confiningStress], #***********************************************************fix for different confining stresses!!!!!
                             '$$cStrain': getInelasticStrain(), #fix for concrete plasticity
                             '$$iStrain': getInelasticStrain(),
                             '$$vel':vel[modelNumber],
@@ -130,12 +130,11 @@ if __name__ == '__main__':
     
     clargs = sys.argv
     if len(clargs) >= 2:
-        fileName = clargs[1]
+        modelName = clargs[1]
         parameterizationRun = int(clargs[2])
         numObservations = int(clargs[3])
         dt = float(clargs[4])
      #else: error message
-    modelName = fileName[:fileName.find('(')]
     module = __import__('UDEC.modelData.'+modelName+'_modelData', globals(), locals(), ['*'])
     for k in dir(module):
         locals()[k] = getattr(module, k)

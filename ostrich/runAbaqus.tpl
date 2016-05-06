@@ -69,13 +69,15 @@ def concreteDamage(elasticModulus, poissonsRatio, peakYeildStress, peakYeildStra
     mat.concreteDamagedPlasticity.ConcreteTensionDamage(
         table=(tabulateVectors(tensileDamage, crackingStrain)))         
 
-def druckerDamage(frictionAngle, dilationAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, initialTensileStrength, elasticModulus, poissonsRatio):
+def druckerDamage(frictionAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, elasticModulus, poissonsRatio):
     materialName = 'Material-1'
     
     hardening_n = 0.5
     compressiveYeildStress = add(hardening_A, multiply(hardening_B, power(inelasticStrain, hardening_n)))
     triaxiality = divide(range(0, 100), 50)
     johnson_D1 = 0
+    dilationAngle = 6
+    initialTensileStrength = 0
     damageInitiationStrain = add(johnson_D1, multiply(johnson_D2, exp(multiply(johnson_D3, triaxiality))))    
             
     mat = mdb.models['Model-1'].Material(name=materialName)
@@ -134,15 +136,15 @@ def applyDisplacementBoundaryCondition(name, instance, step, location, u):
         region=region, u1=u[0], u2=u[1], ur3=u[2], amplitude=UNSET, 
         distributionType=UNIFORM, fieldName='', localCsys=None)    
         
-def applyConfiningStress(name, instance, step, location, stress):
-    a = mdb.models['Model-1'].rootAssembly
-    edges1 = a.instances[instance].edges.findAt((location, ))
-    region = a.Surface(side1Edges=edges1, name=name)
-    mdb.models['Model-1'].TabularAmplitude(name='Amp-2', timeSpan=STEP, 
-        smooth=SOLVER_DEFAULT, data=((0.0, 0.0), (5, 1)))
-    mdb.models['Model-1'].Pressure(name=name, createStepName=step, 
-        region=region, distributionType=UNIFORM, field='', magnitude=stress, 
-        amplitude='Amp-2')
+# def applyConfiningStress(name, instance, step, location, stress):
+    # a = mdb.models['Model-1'].rootAssembly
+    # edges1 = a.instances[instance].edges.findAt((location, ))
+    # region = a.Surface(side1Edges=edges1, name=name)
+    # mdb.models['Model-1'].TabularAmplitude(name='Amp-2', timeSpan=STEP, 
+        # smooth=SOLVER_DEFAULT, data=((0.0, 0.0), (5, 1)))
+    # mdb.models['Model-1'].Pressure(name=name, createStepName=step, 
+        # region=region, distributionType=UNIFORM, field='', magnitude=stress, 
+        # amplitude='Amp-2')
         
 def applyGeostaticStress(name, instance, location, hStress, K=0.4):
     a = mdb.models['Model-1'].rootAssembly
@@ -187,6 +189,12 @@ def createGeostaticStep(name, previous):
 def applyGravity(magnitude, stepName):
     mdb.models['Model-1'].Gravity(name='Gravity', createStepName=stepName, comp2=magnitude,
                                   distributionType=UNIFORM, field='')
+                                  
+def applyConfiningStress(confiningStress):
+    if confiningStress != 0:
+        applyInitialStress('Geostatic', instanceName, sectionLocation, confiningStress)
+        applyBoundaryStress('Left', instanceName, 'Step-1', boundaries['Left'], confiningStress)
+        applyBoundaryStress('Right', instanceName, 'Step-1', boundaries['Right'], confiningStress)
 
 def buildModel():
     partName = 'Block'
@@ -196,8 +204,10 @@ def buildModel():
 
     sketchPart(partName, gridPoints)
     
-    #concreteDamage($elasticModulus, $poissonsRatio, $peakYeildStress, $peakYeildStrain,  $initialCompressiveYeild, $compressiveDamageScaling, $initialTensileYeild, $tLambda, $tensileDamageScaling)
-    druckerDamage($frictionAngle, $dilationAngle, $hardening_A, $hardening_B, $johnson_D2, $johnson_D3, $failureDisplacement, $initialTensileStrength, $elasticModulus, $poissonsRatio)
+    #concreteDamage(7600000000.0, 0.35, $peakYeildStress, $peakYeildStrain,  $initialCompressiveYeild, $compressiveDamageScaling, $initialTensileYeild, $tLambda, $tensileDamageScaling)
+# def druckerDamage(frictionAngle, dilationAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, initialTensileStrength, elasticModulus, poissonsRatio):
+    #druckerDamage(40.5169, 1012301.0, 321551390.0, 1.000000E-03, -15, 0.2, 10600000000.0, 0.35)
+    druckerDamage($frictionAngle, $hardening_A, $hardening_B, $johnson_D2, $johnson_D3, $failureDisplacement, $elasticModulus, $poissonsRatio)
     assignSection(sectionName, partName, sectionLocation, materialName)
     meshPart(meshSize, partName, sectionLocation, elementType, elementShape)
     createInstance(instanceName, partName)
@@ -211,10 +221,6 @@ def buildModel():
     # if confiningStress != 0:
         # applyConfiningStress('Right', instanceName, steps[1], boundaries['Right'], -confiningStress)
         # applyConfiningStress('Left', instanceName, steps[1], boundaries['Left'], -confiningStress)
-    if confiningStress != 0:
-        applyInitialStress('Geostatic', instanceName, sectionLocation, confiningStress)
-        applyBoundaryStress('Left', instanceName, steps[1], boundaries['Left'], confiningStress)
-        applyBoundaryStress('Right', instanceName, steps[1], boundaries['Right'], confiningStress)
     # applyGeostaticStress('Geostatic', instanceName, sectionLocation, confiningStress)
    
     applyDisplacementBoundaryCondition('Bottom', instanceName, steps[0], boundaries['Bottom'],
@@ -269,21 +275,24 @@ def getTime(jobName, stepName, instanceName):
 def main():
     open('log.txt', 'w').close()
     buildModel()
-    mdb.Job(name='Job-1', model='Model-1', description='', type=ANALYSIS, atTime=None,
-            waitMinutes=0, waitHours=0, queue=None, memory=90, memoryUnits=PERCENTAGE,
-            getMemoryFromAnalysis=True, explicitPrecision=SINGLE,
-            nodalOutputPrecision=SINGLE, echoPrint=OFF,
-            modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='',
-            scratch='', parallelizationMethodExplicit=DOMAIN, numDomains=1, 
-            activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1, numGPUs=0)
-    mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+    for i in range(len(confiningStress)):
+        applyConfiningStress(confiningStress[i])
+        jobName = 'Job-{0}'.format(i+1)
+        mdb.Job(name=jobName, model='Model-1', description='', type=ANALYSIS, atTime=None,
+                waitMinutes=0, waitHours=0, queue=None, memory=90, memoryUnits=PERCENTAGE,
+                getMemoryFromAnalysis=True, explicitPrecision=SINGLE,
+                nodalOutputPrecision=SINGLE, echoPrint=OFF,
+                modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='',
+                scratch='', parallelizationMethodExplicit=DOMAIN, numDomains=1, 
+                activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1, numGPUs=0)
+        mdb.jobs[jobName].submit(consistencyChecking=OFF)
     
-    timeHistory = getTime('Job-1', 'Step-1', instanceName)
-    stressHistory = getStress('Job-1', 'Step-1', instanceName)
-    strainHistory = getStrain('Job-1', 'Step-1', instanceName)
-    file = open('rawHistory.pkl', 'wb')
-    pickle.dump(timeHistory, file)
-    pickle.dump(stressHistory, file)
-    pickle.dump(strainHistory, file)
-    file.close()
+        timeHistory = getTime(jobName, 'Step-1', instanceName)
+        stressHistory = getStress(jobName, 'Step-1', instanceName)
+        strainHistory = getStrain(jobName, 'Step-1', instanceName)
+        file = open('{0}_rawHistory.pkl'.format(jobName), 'wb')
+        pickle.dump(timeHistory, file)
+        pickle.dump(stressHistory, file)
+        pickle.dump(strainHistory, file)
+        file.close()
 if __name__ == '__main__': main()

@@ -1,6 +1,4 @@
-#Configuration File for Ostrich Program
 ProgramType Levenberg-Marquardt
-#ProgramType GeneticAlgorithm
 
 BeginFilePairs    
 runAbaqus.temp.tpl	runAbaqus.py
@@ -10,17 +8,13 @@ ModelExecutable    simulationData.bat
 
 ModelSubdir model
 
-#Parameter Specification
 BeginParams
-#parameter	init.	low	    high	tx_in   tx_ost	tx_out
 $poissonsRatio	0.35	0.3	0.4	none	none	none
 $elasticModulus	10000000000.0	5000000000.0	15000000000.0	none	none	none
 
 EndParams
 
-#Observation Configuration
 BeginObservations
-#observation	value		weight	file		keyword		line	column
 obs1 		-4239066.125916 	1 	output.dat 	OST_NULL 	2 		3
 obs2 		 -0.000387 	1 	output.dat 	OST_NULL 	2 		6
 obs3 		-6409183.264753 	1 	output.dat 	OST_NULL 	3 		3
@@ -40,7 +34,6 @@ obs16 		 -0.000797 	1 	output.dat 	OST_NULL 	12 		6
 
 EndObservations
 
-#Configuration for Levenberg-Marquardt algorithm
 BeginLevMar
 InitialLambda    10.0
 LambdaScaleFactor    1.1
@@ -55,18 +48,7 @@ EndLevMar
 BeginMathAndStats
 DiffType    forward
 DiffRelIncrement    0.1
-#Default
-#AllStats
 NoStats
-#StdDev
-#StdErr
-#CorrCoeff
-#Beale
-#Linssen
-#CooksD
-#DFBETAS
-#Confidence
-#Sensitivity
 EndMathAndStats
 
 BeginExtraFiles

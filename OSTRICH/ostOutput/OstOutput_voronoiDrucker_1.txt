@@ -30,83 +30,45 @@ Algorithm              : Levenberg-Marquardt
 Objective Function     : WSSE
 Number of Parameters   : 2
 Number of Tied Params  : 0
-Number of Observations : 4
-Seed for Random Nums.  : 1462303835
+Number of Observations : 16
+Seed for Random Nums.  : 1462545320
 
 Ostrich Run Record
-iter  obj. function  $elasticModulus  $poissonsRatio  lambda
-0     8.969105E+11  7.500000E+09  3.500000E-01  1.000000E+01
-1     8.712224E+11  7.600000E+09  3.500000E-01  9.090909E+00
-2     8.712224E+11  7.600000E+09  3.500000E-01  8.264463E+00
+iter  obj. function  $poissonsRatio  $elasticModulus  lambda
+0     2.091372E+15  3.500000E-01  1.000000E+10  1.000000E+01
+1     2.091372E+15  3.500000E-01  1.000000E+10  9.090909E+00
 
 Optimal Parameter Set
-Objective Function : 8.712224E+11
-$elasticModulus    : 7.600000E+09
+Objective Function : 2.091372E+15
 $poissonsRatio     : 3.500000E-01
-
-Statistical Output
-
-Untransformed WSSE : 8.712224E+11
-
-Observation Residuals
-Observation    Measured       Simulated      Weight          Residual(Transformed and Weighted)   Sensitive?
-obs1          -4.239066E+06  -3.405639E+06  1.000000E+00  -8.334272E+05      YES
-obs2          1.970000E-04  2.244662E-04  1.000000E+00  -2.746617E-05      YES
-obs3          -6.409183E+06  -6.829447E+06  1.000000E+00  +4.202636E+05      YES
-obs4          6.920000E-04  4.464583E-04  1.000000E+00  +2.455417E-04      YES
-
-Correlation between raw measured and simulated observations (no transformation or weighting)
-Ry         :  0.987
-Ry-squared :  0.974
-
-Correlation between measured and simulated observations (with transformation and weighting)
-Rw         :  0.987
-Rw-squared :  0.974
-
-Error Variance and Standard Error of the Regression
-S^2 : 4.356112E+11
-S   : 6.600085E+05
-
-Parameter Variance-Covariance
-               $elasticModulus   $poissonsRatio   
-$elasticModulus  +3.136613E+21  -3.337503E+11  
-$poissonsRatio  -3.337503E+11  +3.551603E+01  
-
-Parameter Standard Error
-$elasticModulus   : 5.600547E+10 
-$poissonsRatio   : 5.959532E+00 
-
-Parameter Correlation
-               $elasticModulus  $poissonsRatio  
-$elasticModulus  +1.000         -1.000         
-$poissonsRatio  -1.000         +1.000         
+$elasticModulus    : 1.000000E+10
 
 Algorithm Metrics
 Algorithm         : Levenberg-Marquardt
 Max Iterations    : 20
-Actual Iterations : 2
-Convergence Val   : 0.000100
+Actual Iterations : 1
+Convergence Val   : 0.001000
 LPRCV             : 0.300000
 LRRCV             : 0.010000
 Max Lambda Trials : 10
 Move Limit        : 0.100000
-Total Alg Evals   : 8
-Total Evals       : 15
+Total Alg Evals   : 4
+Total Evals       : 6
 Upper Violations  : 0
 Lower Violations  : 0
-Move Limit Viols  : 1
+Move Limit Viols  : 6
 LPRCV : Lambda-Phi Ratio Convergence Value
 LRRCV : Lambda Relative Reduction Convergence Value
-Total Evals             : 15
+Total Evals             : 6
 Telescoping Strategy    : none
 
 Finite Difference Metrics
 Difference Type    : Forward
 Increment Type    : Range-Relative
 Finite Difference Increments
-$elasticModulus : 0.010000
-$poissonsRatio : 0.010000
+$poissonsRatio : 0.100000
+$elasticModulus : 0.100000
 Finite Difference Mimumum Increment : 1.000000E-10
-Jacobian Evals     : 6
+Jacobian Evals     : 2
 Optimal Step Evals : 0
-Statistics Evals   : 1
+Statistics Evals   : 0

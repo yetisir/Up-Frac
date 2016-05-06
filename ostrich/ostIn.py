@@ -29,7 +29,7 @@ BeginLevMar
 InitialLambda    10.0
 LambdaScaleFactor    1.1
 MoveLimit    0.1
-AlgorithmConvergenceValue    0.0001
+AlgorithmConvergenceValue    0.001
 LambdaPhiRatio    0.3
 LambdaRelReduction    0.01
 MaxLambdas    10
@@ -38,10 +38,10 @@ EndLevMar
 
 BeginMathAndStats
 DiffType    forward
-DiffRelIncrement    0.01
-Default
+DiffRelIncrement    0.1
+#Default
 #AllStats
-#NoStats
+NoStats
 #StdDev
 #StdErr
 #CorrCoeff
