@@ -17,7 +17,7 @@ jCohesion = 0.1
 jTension = 10
 jDilation = 10
 
-confiningStress = [0, 5, 10, 20]
+confiningStress = [0, 5, 10]
 
 units = 'm-MPa-Gg-s'
 # testMode = 't' #c, t, or all
@@ -49,7 +49,7 @@ vel = [0.01]
                                 # 'poissonsRatio':{'init':0.35, 'low':0.3, 'high':0.4}}
                                 
 abaqusMaterial = 'druckerDamage'
-parameterizationSplits = [[1, sTime[0]/2]]
+parameterizationSplits = [[1, 7]]
 ostrichParameters = {'frictionAngle':{'init':40, 'low':35, 'high':45}, 
                                 # 'dilationAngle':{'init':10, 'low':5, 'high':15},
                                 'hardening_A':{'init':1e6, 'low':0.5e6, 'high':5e6},

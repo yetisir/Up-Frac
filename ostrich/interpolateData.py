@@ -53,5 +53,9 @@ def main():
     for i in range(len(confiningStress)):
         bundles.append(interpolateData(os.path.join(os.getcwd(), 'Job-{0}_rawHistory.pkl'.format(i+1)), sName[i]))
     writeOuput(bundles)
-if __name__ == '__main__':            
-    main()
+if __name__ == '__main__':
+    #this is bad, but avoids instabilities. please fix soon. 
+    try:
+        main()
+    except:
+        pass

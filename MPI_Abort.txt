@@ -1,0 +1,5 @@
+Rank # 1 has aborted with an error code of 1!
+Rank # 0 has aborted with an error code of 1!
+Rank # 2 has aborted with an error code of 1!
+Rank # 3 has aborted with an error code of 1!
+Rank # 1 has aborted with an error code of 1!

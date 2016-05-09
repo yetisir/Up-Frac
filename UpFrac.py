@@ -3,6 +3,7 @@ import os
 import sys
 import pickle
 import shutil
+import time
 
 def createOstIn(fileName, parameters, startTime, endTime):
     #TODO: change import format, use template, not module maybe?
@@ -10,7 +11,6 @@ def createOstIn(fileName, parameters, startTime, endTime):
     observations = ''
     startIndex = 0
     endIndex = 0
-    print('Creating OstIn.txt for OSTRICH:')
     for k in range(len(confiningStress)):
         with open(os.path.join('HOMOGENIZE', 'binaryData', fileName+str(confiningStress[k])+')_homogenizedData.pkl'), 'rb') as bundleFile:
             bundle = pickle.load(bundleFile)
@@ -55,7 +55,6 @@ def createOstIn(fileName, parameters, startTime, endTime):
                 observations += newObservation
     with open(os.path.join('OSTRICH', 'OstIn.tpl'), 'w') as f:
         f.write(OSTRICH.ostIn.topText+observations+OSTRICH.ostIn.bottomText)
-    print('\tDone')
     dt = timeHistory[1]-timeHistory[0]
     return [len(th[0:endIndex+1] ), dt]#this is soooooooo wrong , fix ASAP. should be retruned from a seperate function
 
@@ -64,6 +63,7 @@ def createOstIn(fileName, parameters, startTime, endTime):
 
 
 if __name__ == '__main__':
+    MPI = True
     os.system('cls')
     
     clargs = sys.argv
@@ -82,18 +82,59 @@ if __name__ == '__main__':
         for j in range(len(splitTimes)):  
             homoFileName = '{0}({1}.'.format(mName, i, 0)
             endTime = splitTimes[j]
-
+            print('*'*70)
+            print('OSTRICH file setup for {0} set {1}'.format(fileName, parameterizationRun))
+            print('*'*70)
+            print('Creating OstIn.txt template...'.format(fileName, parameterizationRun))
             numObs, dt = createOstIn(homoFileName, relVars, startTime, endTime) #please fix, this fucntion should not return this value
+            print('\tDone')
+            print('Filling in model templates...')
             os.system('python createOstrichInput.py ' + mName + '  ' + str(parameterizationRun) + ' ' + str(numObs)+' '+str(dt))
+            print('\tDone')
             os.chdir(os.path.join(os.getcwd(), 'OSTRICH'))
+            print('Cleaning up OSTRICH mess from previous run...')
             os.system('cleanup.bat')
-            os.system('ostrich.exe')
+            print('\tDone')
+            print('Initializing OSTRICH...' )
+            print('\tDone')
+            if MPI:
+                print('Running OSTRICH MPI...\n\t')
+                os.system('mpirun.bat >NUL')
+                while 1:
+                    try:
+                        with open('OstStatus0.txt', 'r')as file:
+                            lines = file.readlines()
+                            comp = int(float(lines[2][18:-1]))
+                            numString = '{0}%'.format(comp)
+                            print(numString, end='')
+                            print('\b'*len(numString), end='')
+                            sys.stdout.flush()
+                            if comp == 100:
+                                print('Shutting Down OSTRICH...')
+                                sleepTime = 60
+                                for k in range(sleepTime):
+                                    time.sleep(1)
+                                    numString = '{0}%'.format(int(k/sleepTime*100))
+                                    print(numString, end='')
+                                    print('\b'*len(numString), end='')
+                                    sys.stdout.flush()
+                                break
+                    except (FileNotFoundError, PermissionError, IndexError):
+                        pass
+            else:
+                print('Running Serial OSTRICH')
+                os.system('ostrich.exe')
+                print('\tDone')
+                print('Shutting Down OSTRICH...')
+                print('\Done')
             os.chdir(os.pardir)
+            print('\tDone')
             
+            print('Saving estimated parameter set')
             shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}.txt'.format(fileName, parameterizationRun)))
-
+            print('\tDone\n')
+                
             parameterizationRun +=1
             startTime = endTime
-            # input()#*******************************************
             # main()
     

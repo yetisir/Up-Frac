@@ -1,6 +1,8 @@
 topText = """#Configuration File for Ostrich Program
-ProgramType Levenberg-Marquardt
+#ProgramType Levenberg-Marquardt
 #ProgramType GeneticAlgorithm
+#ProgramType PSO-GM
+ProgramType ParticleSwarm
 
 BeginFilePairs    
 runAbaqus.temp.tpl	runAbaqus.py
@@ -29,19 +31,19 @@ BeginLevMar
 InitialLambda    10.0
 LambdaScaleFactor    1.1
 MoveLimit    0.1
-AlgorithmConvergenceValue    0.001
+AlgorithmConvergenceValue    0.01
 LambdaPhiRatio    0.3
 LambdaRelReduction    0.01
 MaxLambdas    10
 MaxIterations    20
 EndLevMar
 
-BeginMathAndStats
-DiffType    forward
-DiffRelIncrement    0.1
+#BeginMathAndStats
+#DiffType    forward
+#DiffRelIncrement    0.1
 #Default
 #AllStats
-NoStats
+#NoStats
 #StdDev
 #StdErr
 #CorrCoeff
@@ -51,7 +53,7 @@ NoStats
 #DFBETAS
 #Confidence
 #Sensitivity
-EndMathAndStats
+#EndMathAndStats
 
 BeginExtraFiles
 parameters.py
@@ -60,9 +62,14 @@ simulationData.py
 vectorMath.py
 EndExtraFiles
 
-BeginGeneticAlg
-PopulationSize 10
-MutationRate 0.05
-Survivors 1
-NumGenerations 50
-EndGeneticAlg"""
+BeginParticleSwarm
+SwarmSize  10
+NumGenerations  10
+EndParticleSwarm
+
+#BeginGeneticAlg
+#PopulationSize 10
+#MutationRate 0.05
+#Survivors 1
+#NumGenerations 50
+#EndGeneticAlg"""

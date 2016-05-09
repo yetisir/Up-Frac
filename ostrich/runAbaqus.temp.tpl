@@ -207,7 +207,7 @@ def buildModel():
     #concreteDamage(7600000000.0, 0.35, $peakYeildStress, $peakYeildStrain,  $initialCompressiveYeild, $compressiveDamageScaling, $initialTensileYeild, $tLambda, $tensileDamageScaling)
 # def druckerDamage(frictionAngle, dilationAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, initialTensileStrength, elasticModulus, poissonsRatio):
     #druckerDamage(40.5169, 1012301.0, 321551390.0, 1.000000E-03, -15, 0.2, 10600000000.0, 0.35)
-    druckerDamage(40, 1000000.0, 320000000.0, 0.001, -2, 0.2, $elasticModulus, $poissonsRatio)
+    druckerDamage(35.01681, 2401793.0, 277473100.0, $johnson_D2, $johnson_D3, $failureDisplacement, 14457030000.0, 0.3647001)
     assignSection(sectionName, partName, sectionLocation, materialName)
     meshPart(meshSize, partName, sectionLocation, elementType, elementShape)
     createInstance(instanceName, partName)

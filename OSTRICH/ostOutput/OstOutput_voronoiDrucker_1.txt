@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------
- OSTRICH version 16.02.10 (Built Feb 10 2016 @ 10:08:27)
+ OSTRICH version 16.02.05 (Built Feb  5 2016 @ 09:33:49)
 
  A computer program for model-independent calibration and optimization.
 
@@ -26,49 +26,85 @@
 
 Ostrich Setup
 Model                  : simulationData.bat > OstExeOut.txt
-Algorithm              : Levenberg-Marquardt
+Algorithm              : Particle Swarm Optimization
 Objective Function     : WSSE
 Number of Parameters   : 2
 Number of Tied Params  : 0
-Number of Observations : 16
-Seed for Random Nums.  : 1462545320
+Number of Observations : 12
+Seed for Random Nums.  : 1462826952
 
 Ostrich Run Record
-iter  obj. function  $poissonsRatio  $elasticModulus  lambda
-0     2.091372E+15  3.500000E-01  1.000000E+10  1.000000E+01
-1     2.091372E+15  3.500000E-01  1.000000E+10  9.090909E+00
+gen   best value     $elasticModulus  $poissonsRatio  Convergence Value
+0     1.151499E+13  1.430881E+10  3.880175E-01  8.147556E-01
+1     1.108046E+13  1.415820E+10  3.811784E-01  4.318333E-01
+2     1.083785E+13  1.435262E+10  3.752821E-01  1.098545E-01
+3     1.083785E+13  1.435262E+10  3.752821E-01  7.291530E-02
+4     1.072055E+13  1.445703E+10  3.647001E-01  6.747719E-02
+5     1.072055E+13  1.445703E+10  3.647001E-01  4.465564E-02
+6     1.072055E+13  1.445703E+10  3.647001E-01  3.780735E-02
+7     1.072055E+13  1.445703E+10  3.647001E-01  3.653002E-02
+8     1.072055E+13  1.445703E+10  3.647001E-01  2.726576E-02
+9     1.072055E+13  1.445703E+10  3.647001E-01  2.224662E-02
+10    1.072055E+13  1.445703E+10  3.647001E-01  1.574912E-02
 
 Optimal Parameter Set
-Objective Function : 2.091372E+15
-$poissonsRatio     : 3.500000E-01
-$elasticModulus    : 1.000000E+10
+Objective Function : 1.072055E+13
+$elasticModulus    : 1.445703E+10
+$poissonsRatio     : 3.647001E-01
 
 Algorithm Metrics
-Algorithm         : Levenberg-Marquardt
-Max Iterations    : 20
-Actual Iterations : 1
-Convergence Val   : 0.001000
-LPRCV             : 0.300000
-LRRCV             : 0.010000
-Max Lambda Trials : 10
-Move Limit        : 0.100000
-Total Alg Evals   : 4
-Total Evals       : 6
-Upper Violations  : 0
-Lower Violations  : 0
-Move Limit Viols  : 6
-LPRCV : Lambda-Phi Ratio Convergence Value
-LRRCV : Lambda Relative Reduction Convergence Value
-Total Evals             : 6
+Algorithm               : Particle Swarm Optimization
+Desired Convergence Val : 1.000000E-03
+Actual Convergence Val  : 1.574912E-02
+Max Generations         : 10
+Actual Generations      : 10
+Swarm Size              : 10
+Constriction Factor     : 1.00
+Cognitive Weight        : 2.00
+Social Weight           : 2.00
+Inertia Weight          : 1.20
+Inertia Reduction Rate  : 0.10
+Initialization Method   : Random
+Upper Violations        : 32
+Lower Violations        : 0
+Total Evals             : 118
 Telescoping Strategy    : none
+Algorithm failed to converge on a solution, more generations may be needed
 
-Finite Difference Metrics
-Difference Type    : Forward
-Increment Type    : Range-Relative
-Finite Difference Increments
-$poissonsRatio : 0.100000
-$elasticModulus : 0.100000
-Finite Difference Mimumum Increment : 1.000000E-10
-Jacobian Evals     : 2
-Optimal Step Evals : 0
-Statistics Evals   : 0
+Statistical Output
+
+Untransformed WSSE : 1.072055E+13
+********************** NOTE **********************
+Insensitive observations (2) and/or parameters (0)
+were detected and have not been included in the 
+following statistical calculations.
+**************************************************
+
+Adjusted Obj.Func. : 1.072055E+13
+
+Parameter      Value            Sensitive?
+$elasticModulus 1.445703E+10    YES
+$poissonsRatio 3.647001E-01    YES
+
+Observation Residuals
+Observation    Measured       Simulated      Weight          Residual(Transformed and Weighted)   Sensitive?
+obs1          -4.239066E+06  -3.314859E+06  1.000000E+00  -9.242067E+05      YES
+obs2          -3.870000E-04  -4.000913E-04  1.000000E+00  +1.309128E-05      YES
+obs3          -6.409183E+06  -5.023515E+06  1.000000E+00  -1.385668E+06      YES
+obs4          -7.900000E-04  -8.002741E-04  1.000000E+00  +1.027407E-05      YES
+obs5          -7.230298E+06  -6.859561E+06  1.000000E+00  -3.707375E+05      YES
+obs6          -3.940000E-04  -4.000913E-04  1.000000E+00  +6.091313E-06      YES
+obs7          -1.132769E+07  -1.304145E+07  1.000000E+00  +1.713757E+06      YES
+obs8          -7.840000E-04  -8.002741E-04  1.000000E+00  +1.627407E-05      NO
+obs9          -9.797113E+06  -7.629202E+06  1.000000E+00  -2.167911E+06      YES
+obs10         -3.970000E-04  -4.000851E-04  1.000000E+00  +3.085061E-06      YES
+obs11         -1.424599E+07  -1.383118E+07  1.000000E+00  -4.148126E+05      YES
+obs12         -7.900000E-04  -8.002741E-04  1.000000E+00  +1.027407E-05      NO
+
+Correlation between raw measured and simulated observations (no transformation or weighting)
+Ry         :  0.981
+Ry-squared :  0.963
+
+Correlation between measured and simulated observations (with transformation and weighting)
+Rw         :  0.981
+Rw-squared :  0.963
