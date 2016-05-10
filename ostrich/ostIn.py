@@ -38,10 +38,10 @@ MaxLambdas    10
 MaxIterations    20
 EndLevMar
 
-#BeginMathAndStats
+BeginMathAndStats
 #DiffType    forward
 #DiffRelIncrement    0.1
-#Default
+Default
 #AllStats
 #NoStats
 #StdDev
@@ -53,7 +53,7 @@ EndLevMar
 #DFBETAS
 #Confidence
 #Sensitivity
-#EndMathAndStats
+EndMathAndStats
 
 BeginExtraFiles
 parameters.py
@@ -63,7 +63,7 @@ vectorMath.py
 EndExtraFiles
 
 BeginParticleSwarm
-SwarmSize  10
+SwarmSize  5
 NumGenerations  10
 EndParticleSwarm
 

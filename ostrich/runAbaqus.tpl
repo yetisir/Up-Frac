@@ -69,16 +69,14 @@ def concreteDamage(elasticModulus, poissonsRatio, peakYeildStress, peakYeildStra
     mat.concreteDamagedPlasticity.ConcreteTensionDamage(
         table=(tabulateVectors(tensileDamage, crackingStrain)))         
 
-def druckerDamage(frictionAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, elasticModulus, poissonsRatio):
+def druckerDamage(frictionAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, elasticModulus, poissonsRatio, initialTensileStrength, dilationAngle):
     materialName = 'Material-1'
     
     hardening_n = 0.5
     compressiveYeildStress = add(hardening_A, multiply(hardening_B, power(inelasticStrain, hardening_n)))
     triaxiality = divide(range(0, 100), 50)
     johnson_D1 = 0
-    dilationAngle = 6
-    initialTensileStrength = 0
-    damageInitiationStrain = add(johnson_D1, multiply(johnson_D2, exp(multiply(johnson_D3, triaxiality))))    
+    damageInitiationStrain = add(johnson_D1, multiply(johnson_D2, exp(multiply(-johnson_D3, triaxiality))))    
             
     mat = mdb.models['Model-1'].Material(name=materialName)
     mat.Density(table=((density, ), ))
@@ -207,7 +205,7 @@ def buildModel():
     #concreteDamage(7600000000.0, 0.35, $peakYeildStress, $peakYeildStrain,  $initialCompressiveYeild, $compressiveDamageScaling, $initialTensileYeild, $tLambda, $tensileDamageScaling)
 # def druckerDamage(frictionAngle, dilationAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, initialTensileStrength, elasticModulus, poissonsRatio):
     #druckerDamage(40.5169, 1012301.0, 321551390.0, 1.000000E-03, -15, 0.2, 10600000000.0, 0.35)
-    druckerDamage($frictionAngle, $hardening_A, $hardening_B, $johnson_D2, $johnson_D3, $failureDisplacement, $elasticModulus, $poissonsRatio)
+    druckerDamage($frictionAngle, $hardening_A, $hardening_B, $johnson_D2, $johnson_D3, $failureDisplacement, $elasticModulus, $poissonsRatio, $initialTensileStrength, $dilationAngle)
     assignSection(sectionName, partName, sectionLocation, materialName)
     meshPart(meshSize, partName, sectionLocation, elementType, elementShape)
     createInstance(instanceName, partName)
@@ -274,25 +272,28 @@ def getTime(jobName, stepName, instanceName):
     
 def main():
     open('log.txt', 'w').close()
-    buildModel()
-    for i in range(len(confiningStress)):
-        applyConfiningStress(confiningStress[i])
-        jobName = 'Job-{0}'.format(i+1)
-        mdb.Job(name=jobName, model='Model-1', description='', type=ANALYSIS, atTime=None,
-                waitMinutes=0, waitHours=0, queue=None, memory=90, memoryUnits=PERCENTAGE,
-                getMemoryFromAnalysis=True, explicitPrecision=SINGLE,
-                nodalOutputPrecision=SINGLE, echoPrint=OFF,
-                modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='',
-                scratch='', parallelizationMethodExplicit=DOMAIN, numDomains=1, 
-                activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1, numGPUs=0)
-        mdb.jobs[jobName].submit(consistencyChecking=OFF)
-    
-        timeHistory = getTime(jobName, 'Step-1', instanceName)
-        stressHistory = getStress(jobName, 'Step-1', instanceName)
-        strainHistory = getStrain(jobName, 'Step-1', instanceName)
-        file = open('{0}_rawHistory.pkl'.format(jobName), 'wb')
-        pickle.dump(timeHistory, file)
-        pickle.dump(stressHistory, file)
-        pickle.dump(strainHistory, file)
-        file.close()
+    try:
+        buildModel()
+        for i in range(len(confiningStress)):
+            applyConfiningStress(confiningStress[i])
+            jobName = 'Job-{0}'.format(i+1)
+            mdb.Job(name=jobName, model='Model-1', description='', type=ANALYSIS, atTime=None,
+                    waitMinutes=0, waitHours=0, queue=None, memory=90, memoryUnits=PERCENTAGE,
+                    getMemoryFromAnalysis=True, explicitPrecision=SINGLE,
+                    nodalOutputPrecision=SINGLE, echoPrint=OFF,
+                    modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='',
+                    scratch='', parallelizationMethodExplicit=DOMAIN, numDomains=1, 
+                    activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1, numGPUs=0)
+            mdb.jobs[jobName].submit(consistencyChecking=OFF)
+        
+            timeHistory = getTime(jobName, 'Step-1', instanceName)
+            stressHistory = getStress(jobName, 'Step-1', instanceName)
+            strainHistory = getStrain(jobName, 'Step-1', instanceName)
+            file = open('{0}_rawHistory.pkl'.format(jobName), 'wb')
+            pickle.dump(timeHistory, file)
+            pickle.dump(stressHistory, file)
+            pickle.dump(strainHistory, file)
+            file.close()
+    except:
+        pass
 if __name__ == '__main__': main()

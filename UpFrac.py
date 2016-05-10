@@ -4,6 +4,7 @@ import sys
 import pickle
 import shutil
 import time
+import psutil
 
 def createOstIn(fileName, parameters, startTime, endTime):
     #TODO: change import format, use template, not module maybe?
@@ -98,11 +99,11 @@ if __name__ == '__main__':
             print('Initializing OSTRICH...' )
             print('\tDone')
             if MPI:
-                print('Running OSTRICH MPI...\n\t')
+                print('Running OSTRICH MPI...\n\t', end='')
                 os.system('mpirun.bat >NUL')
                 while 1:
                     try:
-                        with open('OstStatus0.txt', 'r')as file:
+                        with open('OstStatus0.txt', 'r') as file:
                             lines = file.readlines()
                             comp = int(float(lines[2][18:-1]))
                             numString = '{0}%'.format(comp)
@@ -110,14 +111,29 @@ if __name__ == '__main__':
                             print('\b'*len(numString), end='')
                             sys.stdout.flush()
                             if comp == 100:
-                                print('Shutting Down OSTRICH...')
-                                sleepTime = 60
+                                print('100%')
+                                print('Computing parameter statistics...')
+                                while 1:
+                                    runningProcesses = psutil.pids()
+                                    br = True
+                                    for k in runningProcesses:
+                                        try:
+                                            if psutil.Process(k).name() == 'OstrichMPI.exe':
+                                                br = False
+                                        except:
+                                            pass
+                                    if br:
+                                        break
+                                        
+                                print('Shutting Down OSTRICH...\n\t', end='')
+                                sleepTime = 10
                                 for k in range(sleepTime):
                                     time.sleep(1)
                                     numString = '{0}%'.format(int(k/sleepTime*100))
                                     print(numString, end='')
                                     print('\b'*len(numString), end='')
                                     sys.stdout.flush()
+                                print('100%')
                                 break
                     except (FileNotFoundError, PermissionError, IndexError):
                         pass
@@ -128,13 +144,14 @@ if __name__ == '__main__':
                 print('Shutting Down OSTRICH...')
                 print('\Done')
             os.chdir(os.pardir)
-            print('\tDone')
             
             print('Saving estimated parameter set')
             shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}.txt'.format(fileName, parameterizationRun)))
             print('\tDone\n')
-                
+          
             parameterizationRun +=1
             startTime = endTime
-            # main()
+    os.chdir(os.path.join(os.getcwd(), 'OSTRICH'))
+    os.system('cleanup.bat')
+    os.chdir(os.pardir)
     
