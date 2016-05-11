@@ -246,7 +246,7 @@ class Homogenize(DataSet):
     #Homogenization Functions
     def calculateHomogenizationParameters(self):
         print('-'*70)
-        print('Calculating Homogenization Parameters')
+        print('Calculating Homogenization Parameters for {}'.format(self.fileName))
         print('-'*70)
         print('Processing Homogenization Data:')
         print('\tCalculating boundary blocks')
@@ -317,6 +317,7 @@ class Homogenize(DataSet):
                 yy = self.cornerY(self.boundaryCornersOrdered, time)
 
                 totalArea = Common.area(list(zip(self.cornerX(self.boundaryCornersOrdered, time), self.cornerY(self.boundaryCornersOrdered, time))))
+            print(sigma[0,0]/totalArea)
             sigmaHistory.append(sigma/totalArea*1e6)
         print('')
         print('\tDone')
@@ -350,6 +351,7 @@ class Homogenize(DataSet):
                     epsilon += dW*(x + x.transpose())
 
             area = sum([self.blockData[time][b]['area'] for b in self.insideBoundaryBlocks])
+            
             epsilonHistory.append(epsilon/2/area)
         print('')
         print('\tDone')

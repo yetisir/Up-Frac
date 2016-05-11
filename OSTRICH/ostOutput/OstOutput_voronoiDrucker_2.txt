@@ -1,0 +1,190 @@
+--------------------------------------------------------------------------
+ OSTRICH version 16.02.05 (Built Feb  5 2016 @ 09:33:49)
+
+ A computer program for model-independent calibration and optimization.
+
+ Author             L. Shawn Matott
+ Copyright (C) 2007 L. Shawn Matott
+
+ This program is free software; you can redistribute 
+ it and/or modify it under the terms of the GNU  
+ General Public License as published by the Free 
+ Software Foundation; either version 2 of the 
+ License, or(at your option) any later version. 
+
+ This program is distributed in the hope that it will 
+ be useful, but WITHOUT ANY WARRANTY; without even 
+ the implied warranty of MERCHANTABILITY or FITNESS 
+ FOR A PARTICULAR PURPOSE. See the GNU General Public 
+ License for more details. 
+
+ You should have received a copy of the GNU General 
+ Public License along with this program; if not, 
+ write to the Free Software Foundation, Inc., 59 
+ Temple Place, Suite 330, Boston, MA 02111-1307 USA 
+--------------------------------------------------------------------------
+
+Ostrich Setup
+Model                  : simulationData.bat > OstExeOut.txt
+Algorithm              : Particle Swarm Optimization
+Objective Function     : WSSE
+Number of Parameters   : 3
+Number of Tied Params  : 0
+Number of Observations : 90
+Seed for Random Nums.  : 1462827280
+
+Ostrich Run Record
+gen   best value     $frictionAngle  $hardening_B  $hardening_A  Convergence Value
+0     6.397370E+14  3.567672E+01  2.572026E+08  3.077096E+06  9.020160E-01
+1     6.323641E+14  3.611643E+01  2.543263E+08  3.043150E+06  7.599066E-01
+2     6.323641E+14  3.611643E+01  2.543263E+08  3.043150E+06  2.991252E-01
+3     6.133041E+14  3.562948E+01  2.550032E+08  2.898020E+06  1.448123E-01
+4     5.760270E+14  3.504254E+01  2.710111E+08  2.693614E+06  1.032834E-01
+5     5.738067E+14  3.502127E+01  2.709507E+08  2.684737E+06  6.948168E-02
+6     5.683330E+14  3.514754E+01  2.544883E+08  2.704811E+06  4.310472E-02
+7     5.350121E+14  3.503123E+01  2.719542E+08  2.513194E+06  7.618619E-02
+8     5.230811E+14  3.503362E+01  2.733956E+08  2.419744E+06  9.747303E-02
+9     5.153131E+14  3.501681E+01  2.774731E+08  2.401793E+06  4.906415E-02
+10    5.153131E+14  3.501681E+01  2.774731E+08  2.401793E+06  5.420370E-02
+
+Optimal Parameter Set
+Objective Function : 5.153131E+14
+$frictionAngle     : 3.501681E+01
+$hardening_B       : 2.774731E+08
+$hardening_A       : 2.401793E+06
+
+Algorithm Metrics
+Algorithm               : Particle Swarm Optimization
+Desired Convergence Val : 1.000000E-03
+Actual Convergence Val  : 5.420370E-02
+Max Generations         : 10
+Actual Generations      : 10
+Swarm Size              : 10
+Constriction Factor     : 1.00
+Cognitive Weight        : 2.00
+Social Weight           : 2.00
+Inertia Weight          : 1.20
+Inertia Reduction Rate  : 0.10
+Initialization Method   : Random
+Upper Violations        : 0
+Lower Violations        : 60
+Total Evals             : 118
+Telescoping Strategy    : none
+Algorithm failed to converge on a solution, more generations may be needed
+
+Statistical Output
+
+Untransformed WSSE : 5.153131E+14
+********************** NOTE **********************
+Insensitive observations (3) and/or parameters (0)
+were detected and have not been included in the 
+following statistical calculations.
+**************************************************
+
+Adjusted Obj.Func. : 5.153131E+14
+
+Parameter      Value            Sensitive?
+$frictionAngle 3.501681E+01    YES
+$hardening_B   2.774731E+08    YES
+$hardening_A   2.401793E+06    YES
+
+Observation Residuals
+Observation    Measured       Simulated      Weight          Residual(Transformed and Weighted)   Sensitive?
+obs1          -7.586702E+06  -8.204895E+06  1.000000E+00  +6.181931E+05      YES
+obs2          -1.174000E-03  -1.200753E-03  1.000000E+00  +2.675252E-05      YES
+obs3          -8.767814E+06  -9.411262E+06  1.000000E+00  +6.434479E+05      YES
+obs4          -1.552000E-03  -1.601305E-03  1.000000E+00  +4.930493E-05      YES
+obs5          -9.639833E+06  -1.023582E+07  1.000000E+00  +5.959876E+05      YES
+obs6          -1.913000E-03  -2.002068E-03  1.000000E+00  +8.906839E-05      YES
+obs7          -1.013927E+07  -1.128298E+07  1.000000E+00  +1.143714E+06      YES
+obs8          -2.303000E-03  -2.402968E-03  1.000000E+00  +9.996820E-05      YES
+obs9          -1.055583E+07  -1.213663E+07  1.000000E+00  +1.580803E+06      YES
+obs10         -2.694000E-03  -2.803956E-03  1.000000E+00  +1.099559E-04      YES
+obs11         -1.097887E+07  -1.288763E+07  1.000000E+00  +1.908759E+06      YES
+obs12         -3.065000E-03  -3.205176E-03  1.000000E+00  +1.401759E-04      YES
+obs13         -1.143659E+07  -1.368915E+07  1.000000E+00  +2.252557E+06      YES
+obs14         -3.437000E-03  -3.606475E-03  1.000000E+00  +1.694749E-04      YES
+obs15         -1.126510E+07  -1.436088E+07  1.000000E+00  +3.095773E+06      YES
+obs16         -3.791000E-03  -4.008015E-03  1.000000E+00  +2.170148E-04      YES
+obs17         -1.174810E+07  -1.497961E+07  1.000000E+00  +3.231510E+06      YES
+obs18         -4.157000E-03  -4.409737E-03  1.000000E+00  +2.527366E-04      YES
+obs19         -1.195988E+07  -1.556030E+07  1.000000E+00  +3.600416E+06      YES
+obs20         -4.548000E-03  -4.811594E-03  1.000000E+00  +2.635941E-04      YES
+obs21         -1.205049E+07  -1.603870E+07  1.000000E+00  +3.988206E+06      YES
+obs22         -4.959000E-03  -5.213595E-03  1.000000E+00  +2.545951E-04      YES
+obs23         -1.228284E+07  -1.647522E+07  1.000000E+00  +4.192385E+06      YES
+obs24         -5.338000E-03  -5.615803E-03  1.000000E+00  +2.778025E-04      YES
+obs25         -1.267368E+07  -1.683641E+07  1.000000E+00  +4.162726E+06      YES
+obs26         -5.719000E-03  -6.018138E-03  1.000000E+00  +2.991377E-04      YES
+obs27         -1.295177E+07  -1.713961E+07  1.000000E+00  +4.187836E+06      YES
+obs28         -6.067000E-03  -6.420602E-03  1.000000E+00  +3.536017E-04      YES
+obs29         -1.330659E+07  -1.737773E+07  1.000000E+00  +4.071134E+06      YES
+obs30         -6.396000E-03  -6.823221E-03  1.000000E+00  +4.272210E-04      NO
+obs31         -1.476690E+07  -1.843044E+07  1.000000E+00  +3.663539E+06      YES
+obs32         -1.176000E-03  -1.200714E-03  1.000000E+00  +2.471443E-05      YES
+obs33         -1.734460E+07  -2.127941E+07  1.000000E+00  +3.934806E+06      YES
+obs34         -1.567000E-03  -1.601326E-03  1.000000E+00  +3.432565E-05      YES
+obs35         -1.922869E+07  -2.291558E+07  1.000000E+00  +3.686890E+06      YES
+obs36         -1.956000E-03  -2.002029E-03  1.000000E+00  +4.602928E-05      YES
+obs37         -2.097669E+07  -2.332058E+07  1.000000E+00  +2.343893E+06      YES
+obs38         -2.330000E-03  -2.402945E-03  1.000000E+00  +7.294498E-05      YES
+obs39         -2.273793E+07  -2.434587E+07  1.000000E+00  +1.607936E+06      YES
+obs40         -2.719000E-03  -2.803982E-03  1.000000E+00  +8.498224E-05      YES
+obs41         -2.428274E+07  -2.537324E+07  1.000000E+00  +1.090507E+06      YES
+obs42         -3.110000E-03  -3.205208E-03  1.000000E+00  +9.520796E-05      YES
+obs43         -2.565531E+07  -2.636331E+07  1.000000E+00  +7.079923E+05      YES
+obs44         -3.502000E-03  -3.606537E-03  1.000000E+00  +1.045369E-04      YES
+obs45         -2.713886E+07  -2.692747E+07  1.000000E+00  -2.113899E+05      YES
+obs46         -3.881000E-03  -4.008022E-03  1.000000E+00  +1.270216E-04      YES
+obs47         -2.814895E+07  -2.758478E+07  1.000000E+00  -5.641668E+05      YES
+obs48         -4.269000E-03  -4.409664E-03  1.000000E+00  +1.406641E-04      YES
+obs49         -2.936190E+07  -2.821450E+07  1.000000E+00  -1.147402E+06      YES
+obs50         -4.653000E-03  -4.811654E-03  1.000000E+00  +1.586540E-04      YES
+obs51         -3.038967E+07  -2.858933E+07  1.000000E+00  -1.800339E+06      YES
+obs52         -5.028000E-03  -5.213668E-03  1.000000E+00  +1.856684E-04      YES
+obs53         -3.166138E+07  -2.887011E+07  1.000000E+00  -2.791268E+06      YES
+obs54         -5.412000E-03  -5.615806E-03  1.000000E+00  +2.038060E-04      YES
+obs55         -3.243045E+07  -2.910557E+07  1.000000E+00  -3.324886E+06      YES
+obs56         -5.796000E-03  -6.018106E-03  1.000000E+00  +2.221056E-04      YES
+obs57         -3.316692E+07  -2.929201E+07  1.000000E+00  -3.874907E+06      YES
+obs58         -6.175000E-03  -6.420582E-03  1.000000E+00  +2.455817E-04      YES
+obs59         -3.411789E+07  -2.926413E+07  1.000000E+00  -4.853757E+06      YES
+obs60         -6.554000E-03  -6.823221E-03  1.000000E+00  +2.692210E-04      NO
+obs61         -1.835381E+07  -1.991831E+07  1.000000E+00  +1.564501E+06      YES
+obs62         -1.181000E-03  -1.200821E-03  1.000000E+00  +1.982097E-05      YES
+obs63         -2.205669E+07  -2.670400E+07  1.000000E+00  +4.647302E+06      YES
+obs64         -1.572000E-03  -1.601328E-03  1.000000E+00  +2.932780E-05      YES
+obs65         -2.521396E+07  -3.230659E+07  1.000000E+00  +7.092629E+06      YES
+obs66         -1.967000E-03  -2.002049E-03  1.000000E+00  +3.504923E-05      YES
+obs67         -2.791433E+07  -3.464735E+07  1.000000E+00  +6.733019E+06      YES
+obs68         -2.358000E-03  -2.402949E-03  1.000000E+00  +4.494862E-05      YES
+obs69         -2.999724E+07  -3.528070E+07  1.000000E+00  +5.283455E+06      YES
+obs70         -2.745000E-03  -2.803930E-03  1.000000E+00  +5.893000E-05      YES
+obs71         -3.204933E+07  -3.630238E+07  1.000000E+00  +4.253054E+06      YES
+obs72         -3.125000E-03  -3.205107E-03  1.000000E+00  +8.010651E-05      YES
+obs73         -3.412015E+07  -3.714811E+07  1.000000E+00  +3.027956E+06      YES
+obs74         -3.512000E-03  -3.606562E-03  1.000000E+00  +9.456229E-05      YES
+obs75         -3.602927E+07  -3.793748E+07  1.000000E+00  +1.908211E+06      YES
+obs76         -3.901000E-03  -4.008121E-03  1.000000E+00  +1.071206E-04      YES
+obs77         -3.785083E+07  -3.873414E+07  1.000000E+00  +8.833086E+05      YES
+obs78         -4.293000E-03  -4.409767E-03  1.000000E+00  +1.167674E-04      YES
+obs79         -3.971155E+07  -3.938216E+07  1.000000E+00  -3.293861E+05      YES
+obs80         -4.682000E-03  -4.811663E-03  1.000000E+00  +1.296632E-04      YES
+obs81         -4.145926E+07  -4.020397E+07  1.000000E+00  -1.255295E+06      YES
+obs82         -5.063000E-03  -5.213569E-03  1.000000E+00  +1.505688E-04      YES
+obs83         -4.310044E+07  -4.051694E+07  1.000000E+00  -2.583502E+06      YES
+obs84         -5.450000E-03  -5.615800E-03  1.000000E+00  +1.658003E-04      YES
+obs85         -4.440847E+07  -4.042126E+07  1.000000E+00  -3.987209E+06      YES
+obs86         -5.833000E-03  -6.018118E-03  1.000000E+00  +1.851178E-04      YES
+obs87         -4.591515E+07  -4.047197E+07  1.000000E+00  -5.443187E+06      YES
+obs88         -6.217000E-03  -6.420566E-03  1.000000E+00  +2.035660E-04      YES
+obs89         -4.703368E+07  -4.103739E+07  1.000000E+00  -5.996296E+06      YES
+obs90         -6.589000E-03  -6.823221E-03  1.000000E+00  +2.342210E-04      NO
+
+Correlation between raw measured and simulated observations (no transformation or weighting)
+Ry         :  0.987
+Ry-squared :  0.974
+
+Correlation between measured and simulated observations (with transformation and weighting)
+Rw         :  0.987
+Rw-squared :  0.974
