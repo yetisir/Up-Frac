@@ -4,7 +4,7 @@ mName = os.path.basename(__file__[:__file__.find('_')])
 
 mSize = 10
 bSize = 0.5
-meshSize = 0.5
+meshSize = 0.0625
 vorSeed = 1
 rho = 2.7e-3
 E = 12e3
@@ -17,7 +17,7 @@ jCohesion = 0.1
 jTension = 10
 jDilation = 10
 
-confiningStress = [0, 5, 10, 20]
+confiningStress = [0]
 
 units = 'm-MPa-Gg-s'
 # testMode = 't' #c, t, or all

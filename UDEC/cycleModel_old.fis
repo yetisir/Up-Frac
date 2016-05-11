@@ -65,12 +65,12 @@ def setup
 	;numberOfSteps = 40
 	;--------------------------------------------------------------------------
 	
-	numContactArray = (numContacts)*2
-	numBlockArray = (numBlocks)+2
-	numCornerArray = (numCorners)+2
-	numGridPointArray = (numGridPoints)+2
-	numZoneArray = (numZones)+2
-	numDomainArray = (numDomains)*2
+	numContactArray = (numContacts)*(numberOfSteps*2)+2
+	numBlockArray = (numBlocks)*(numberOfSteps)+2
+	numCornerArray = (numCorners)*(numberOfSteps)+2
+	numGridPointArray = (numGridPoints)*(numberOfSteps)+2
+	numZoneArray = (numZones)*(numberOfSteps)+2
+	numDomainArray = (numDomains)*(numberOfSteps*2)+2
 end
 setup
 
@@ -134,14 +134,13 @@ def cycleModel
 	;Loop for the specified number of time steps
 	timeStep = simulationTime/numberOfSteps
 	totalTime = 0.0
-
+	cCounter = 3
+	bCounter = 3
+	crCounter = 3
+	gpCounter = 3
+	zCounter = 3
+	dCounter = 3
 	loop z (1, numberOfSteps)
-		cCounter = 3
-		bCounter = 3
-		crCounter = 3
-		gpCounter = 3
-		zCounter = 3
-		dCounter = 3
 		;Cycle the model for the duration of each time step
 		totalTime = totalTime + timeStep
 		command
@@ -309,45 +308,42 @@ def cycleModel
 			bi = b_next(bi)
 			bCounter = bCounter + 1
 		endloop
-	
-		cCounter = cCounter - 1
-		dCounter = dCounter - 1
-
-		;Write data array to file
-		fName = 'UpFracDEMData\'+modelName+'___contact.dat'+string(z)
-		status = open(fName, 1, 1)
-		status = write(contactData, cCounter)
-		status = close
-
-		fName = 'UpFracDEMData\'+modelName+'___block.dat'+string(z)
-		status = open(fName, 1, 1)
-		status = write(blockData, numBlockArray)
-		status = close
-
-		fName = 'UpFracDEMData\'+modelName+'___corner.dat'+string(z)
-		status = open(fName, 1, 1)
-		status = write(cornerData, numCornerArray)
-		status = close
-		
-		fName = 'UpFracDEMData\'+modelName+'___gridPoint.dat'+string(z)
-		status = open(fName, 1, 1)
-		status = write(gridPointData, numGridPointArray)
-		status = close
-		
-		fName = 'UpFracDEMData\'+modelName+'___zone.dat'+string(z)
-		status = open(fName, 1, 1)
-		status = write(zoneData, numZoneArray)
-		status = close
-		
-		fName = 'UpFracDEMData\'+modelName+'___domain.dat'+string(z)
-		status = open(fName, 1, 1)
-		status = write(domainData, dCounter)
-		status = close		
-
-		cCounter = cCounter + 1
-		dCounter = dCounter + 1		
 		
 	endloop
+	
+	cCounter = cCounter - 1
+	dCounter = dCounter - 1
+
+	;Write data array to file
+	fName = 'UpFracDEMData\'+modelName+'___contact.dat'
+	status = open(fName, 1, 1)
+	status = write(contactData, cCounter)
+	status = close
+
+	fName = 'UpFracDEMData\'+modelName+'___block.dat'
+	status = open(fName, 1, 1)
+	status = write(blockData, numBlockArray)
+	status = close
+
+	fName = 'UpFracDEMData\'+modelName+'___corner.dat'
+	status = open(fName, 1, 1)
+	status = write(cornerData, numCornerArray)
+	status = close
+	
+	fName = 'UpFracDEMData\'+modelName+'___gridPoint.dat'
+	status = open(fName, 1, 1)
+	status = write(gridPointData, numGridPointArray)
+	status = close
+	
+	fName = 'UpFracDEMData\'+modelName+'___zone.dat'
+	status = open(fName, 1, 1)
+	status = write(zoneData, numZoneArray)
+	status = close
+	
+	fName = 'UpFracDEMData\'+modelName+'___domain.dat'
+	status = open(fName, 1, 1)
+	status = write(domainData, dCounter)
+	status = close
 	
 	fName = 'savFiles\'+modelName+'.sav'
 	command
