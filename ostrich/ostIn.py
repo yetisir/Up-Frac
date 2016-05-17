@@ -63,7 +63,7 @@ vectorMath.py
 EndExtraFiles
 
 BeginParticleSwarm
-SwarmSize  5
+SwarmSize  48
 NumGenerations  10
 EndParticleSwarm
 

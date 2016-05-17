@@ -124,7 +124,7 @@ if __name__ == '__main__':
                                             pass
                                     if br:
                                         break
-                                        
+                                print('\tDone')        
                                 print('Shutting Down OSTRICH...\n\t', end='')
                                 sleepTime = 10
                                 for k in range(sleepTime):
@@ -135,8 +135,9 @@ if __name__ == '__main__':
                                     sys.stdout.flush()
                                 print('100%')
                                 break
-                    except (FileNotFoundError, PermissionError, IndexError):
+                    except (FileNotFoundError, IndexError, PermissionError):
                         pass
+                    time.sleep(1)
             else:
                 print('Running Serial OSTRICH')
                 os.system('ostrich.exe')
@@ -152,6 +153,6 @@ if __name__ == '__main__':
             parameterizationRun +=1
             startTime = endTime
     os.chdir(os.path.join(os.getcwd(), 'OSTRICH'))
-    os.system('cleanup.bat')
+    # os.system('cleanup.bat')
     os.chdir(os.pardir)
     

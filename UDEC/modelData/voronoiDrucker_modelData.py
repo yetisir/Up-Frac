@@ -17,7 +17,7 @@ jCohesion = 0.1
 jTension = 10
 jDilation = 10
 
-confiningStress = [0, 5, 10]
+confiningStress = [5, 10, 20]
 
 units = 'm-MPa-Gg-s'
 relVars = ['S22', 'LE22']
@@ -36,7 +36,7 @@ ostrichParameters = {'frictionAngle':{'init':40, 'low':35, 'high':55},
                                 'johnson_D2':{'init':1e-3, 'low':0.5e-3, 'high':5e-3},
                                 'johnson_D3':{'init':2, 'low':1, 'high':50},
                                 'failureDisplacement':{'init':0.2, 'low':0, 'high':1},
-                                'initialTensileStrength':{'init':100e3, 'low':0, 'high':1e6},
+                                'initialTensileStrength':{'init':50e3, 'low':0, 'high':100e3},
                                 'elasticModulus':{'init':10e9, 'low':5e9, 'high':15e9},
                                 'poissonsRatio':{'init':0.35, 'low':0.3, 'high':0.45}}
  

@@ -6,6 +6,7 @@ from parameters import *
 import pickle
 import subprocess
 from vectorMath import *
+import time
           
 def fWrite(stuff):
     with open('log.txt', 'a') as f:
@@ -165,7 +166,7 @@ def applyInitialStress(name, instance, location, cStress):
     faces1 = a.instances[instance].faces.findAt((location, ))
     region = a.Set(faces=faces1, name=name)
     mdb.models['Model-1'].Stress(name=name, region=region, 
-        distributionType=UNIFORM, sigma11=-cStress, sigma22=0, sigma33=-cStress, 
+        distributionType=UNIFORM, sigma11=-cStress, sigma22=-cStress/2, sigma33=-cStress, 
         sigma12=0, sigma13=None, sigma23=None)        
         
 def createStaticStep(name, previous):
@@ -271,29 +272,51 @@ def getTime(jobName, stepName, instanceName):
     return timeHistory
     
 def main():
-    open('log.txt', 'w').close()
+    #open('log.txt', 'w').close()
+    buildModel()
+    for i in range(len(confiningStress)):
+        applyConfiningStress(confiningStress[i])
+        jobName = 'Job-{0}'.format(i+1)
+        mdb.Job(name=jobName, model='Model-1', description='', type=ANALYSIS, atTime=None,
+                waitMinutes=0, waitHours=0, queue=None, memory=90, memoryUnits=PERCENTAGE,
+                getMemoryFromAnalysis=True, explicitPrecision=SINGLE,
+                nodalOutputPrecision=SINGLE, echoPrint=OFF,
+                modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='',
+                scratch='', parallelizationMethodExplicit=DOMAIN, numDomains=1, 
+                activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1, numGPUs=0)
+        mdb.jobs[jobName].submit(consistencyChecking=OFF)
+    
+        while 1:
+            try:
+                timeHistory = getTime(jobName, 'Step-1', instanceName)
+                stressHistory = getStress(jobName, 'Step-1', instanceName)
+                strainHistory = getStrain(jobName, 'Step-1', instanceName)
+                break
+            except:
+                pass
+        file = open('{0}_rawHistory.pkl'.format(jobName), 'wb')
+        pickle.dump(timeHistory, file)
+        pickle.dump(stressHistory, file)
+        pickle.dump(strainHistory, file)
+        file.close()
+
+if __name__ == '__main__': 
     try:
-        buildModel()
-        for i in range(len(confiningStress)):
-            applyConfiningStress(confiningStress[i])
-            jobName = 'Job-{0}'.format(i+1)
-            mdb.Job(name=jobName, model='Model-1', description='', type=ANALYSIS, atTime=None,
-                    waitMinutes=0, waitHours=0, queue=None, memory=90, memoryUnits=PERCENTAGE,
-                    getMemoryFromAnalysis=True, explicitPrecision=SINGLE,
-                    nodalOutputPrecision=SINGLE, echoPrint=OFF,
-                    modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='',
-                    scratch='', parallelizationMethodExplicit=DOMAIN, numDomains=1, 
-                    activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1, numGPUs=0)
-            mdb.jobs[jobName].submit(consistencyChecking=OFF)
-        
-            timeHistory = getTime(jobName, 'Step-1', instanceName)
-            stressHistory = getStress(jobName, 'Step-1', instanceName)
-            strainHistory = getStrain(jobName, 'Step-1', instanceName)
-            file = open('{0}_rawHistory.pkl'.format(jobName), 'wb')
-            pickle.dump(timeHistory, file)
-            pickle.dump(stressHistory, file)
-            pickle.dump(strainHistory, file)
-            file.close()
-    except:
-        pass
-if __name__ == '__main__': main()
+        main()
+    except Exception as e:
+        time.sleep(1)
+        fWrite(e)
+        with open('OstExeOut.txt', 'r') as f:
+            for i in f.readlines():
+                fWrite(i)
+        try:
+            with open('Job-1.dat', 'r') as f:
+                for i in f.readlines():
+                    fWrite(i)
+            with open('Job-2.dat', 'r') as f:
+                for i in f.readlines():
+                    fWrite(i)
+            with open('Job-3.dat', 'r') as f:
+                for i in f.readlines():
+                    fWrite(i)
+        except:pass
