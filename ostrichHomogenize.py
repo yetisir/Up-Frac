@@ -12,15 +12,15 @@ def writeToFile(timeHistory, stressHistory, strainHistory, fileName, modelNo):
         # f.write('0.0 '+str(confiningStress*1e6)+' '+str(stressHistory[0][1,1])+' 0.0 0.0 0.0 0.0\n') 
         f.write('0.0 0.0 '+str(stressHistory[0][1,1])+' 0.0 0.0 0.0 0.0\n') #fix this line
         
-        prescribedStrainHistory = prescribedStrain(mSize, velTable[modelNo], timeHistory)
+        #prescribedStrainHistory = prescribedStrain(mSize, velTable[modelNo], timeHistory)
         for i in range(len(stressHistory)):
             S11 = stressHistory[i][0,0]
             S22 = stressHistory[i][1,1]
             S12 = stressHistory[i][0,1]
             LE11 = strainHistory[i][0,0]                  
             #Assuming displacement controlled boundary conditions in the 22 direction
-            LE22 = prescribedStrainHistory[i]
-            # LE22 = strainHistory[i][1,1]
+            #LE22 = prescribedStrainHistory[i]
+            LE22 = strainHistory[i][1,1]
             LE12 = strainHistory[i][0,1]
             time = timeHistory[i]
             record = [time, S11, S22, S12, LE11, LE22, LE12]
@@ -44,8 +44,8 @@ def prescribedStrain(originalLength, velTable, timeHistory):
         velocityTable.append(amp)
         velocityTable.append(amp*-1)
         amp = amp*-1
-    velocityTimes.append((velTable[i]+accelTime))
-    velocityTable.append(amp)
+        velocityTimes.append((velTable[i]+accelTime))
+        varselocityTable.append(amp)
 
     startIndex = 0
     endIndex = 0

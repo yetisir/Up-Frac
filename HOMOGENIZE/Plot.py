@@ -91,7 +91,7 @@ class Plot(object):
         self.saveFigure()
         plt.show()
         
-    def saveFigure(self, plot):
+    def saveFigure(self):
         fileName = os.path.join('figures', self.fileName+'_'+self.plotName) 
         self.figure.savefig(fileName+'.svg', format='svg')
         self.figure.savefig(fileName+'.png', format='png')

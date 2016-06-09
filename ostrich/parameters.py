@@ -1,14 +1,14 @@
-mName = 'voronoiDrucker'
-sName = ['voronoiDrucker(0.5)', 'voronoiDrucker(0.10)', 'voronoiDrucker(0.20)']
+mName = 'voronoiGranite'
+sName = ['voronoiGranite(0.0)', 'voronoiGranite(0.5)', 'voronoiGranite(0.10)', 'voronoiGranite(0.20)']
     
 gridPoints = [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]
 
 sectionLocation = (10/2, 10/2, 0.0)
 
-simulationTime = 20.0
-numberOfSteps = 50
+simulationTime = 10
+numberOfSteps = 36
 
-confiningStress = [5000000.0, 10000000.0, 20000000.0]
+confiningStress = [0.0, 5000000.0, 10000000.0, 20000000.0]
 
 dilationAngle = 10
 density = 2700000.0
@@ -27,9 +27,9 @@ try:
     boundaries = {'Bottom': (10/2, 0.0, 0.0), 'Top':(10/2, 10, 0.0), 'Left':(0.0, 10/2, 0.0), 'Right':(10, 10/2, 0.0)}
 
     # steps = ('Initial', 'Step-1', 'Step-2')
-    v = 0.01
+    v = 0.05
     vNames = (('Bottom', ), ('Top', ), ('Left', ), ('Right', ))
-    velocityTable = ((0, -1), (8.0, -1), (12.0, 1), (20, 1))
+    velocityTable = ((0, -1), (10, -1))
 
     largeDef=ON
 except ImportError: pass
