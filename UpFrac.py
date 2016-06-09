@@ -100,7 +100,7 @@ if __name__ == '__main__':
             print('\tDone')
             if MPI:
                 print('Running OSTRICH MPI...\n\t', end='')
-                os.system('mpirun.bat >NUL')
+                os.system('mpirun.bat >NUL 2>OstErrors.log')
                 while 1:
                     try:
                         with open('OstStatus0.txt', 'r') as file:

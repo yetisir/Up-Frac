@@ -317,7 +317,6 @@ class Homogenize(DataSet):
                 yy = self.cornerY(self.boundaryCornersOrdered, time)
 
                 totalArea = Common.area(list(zip(self.cornerX(self.boundaryCornersOrdered, time), self.cornerY(self.boundaryCornersOrdered, time))))
-            print(sigma[0,0]/totalArea)
             sigmaHistory.append(sigma/totalArea*1e6)
         print('')
         print('\tDone')

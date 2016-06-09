@@ -29,14 +29,16 @@ vel = [0.01]
                                
 abaqusMaterial = 'druckerDamage'
 parameterizationSplits = [[]]
-ostrichParameters = {'frictionAngle':{'init':40, 'low':35, 'high':55}, 
-                                'dilationAngle':{'init':10, 'low':5, 'high':15},
-                                'hardening_A':{'init':1e6, 'low':0.5e6, 'high':5e6},
-                                'hardening_B':{'init':320e6, 'low':100e6, 'high':1000e6},
-                                'johnson_D2':{'init':1e-3, 'low':0.5e-3, 'high':5e-3},
-                                'johnson_D3':{'init':2, 'low':1, 'high':50},
-                                'failureDisplacement':{'init':0.2, 'low':0, 'high':1},
+ostrichParameters = {'elasticModulus':{'init':10e9, 'low':5e9, 'high':15e9},
+                                'poissonsRatio':{'init':0.35, 'low':0.3, 'high':0.45},
+                                'frictionAngle':{'init':40, 'low':35, 'high':55}, 
                                 'initialTensileStrength':{'init':50e3, 'low':0, 'high':100e3},
-                                'elasticModulus':{'init':10e9, 'low':5e9, 'high':15e9},
-                                'poissonsRatio':{'init':0.35, 'low':0.3, 'high':0.45}}
+                                'dilationAngle':{'init':10, 'low':5, 'high':15},
+                                'initialCompressiveYeild':{'init':5e6, 'low':1e6, 'high':10e6},
+                                'peakCompressiveYeildDiff':{'init':5e6, 'low':1e6, 'high':10e6},
+                                'peakPlasticStrain':{'init':0.5e-3, 'low':0.2e-3, 'high':1e-3},
+                                'johnson_D1':{'init':0.5, 'low':0, 'high':5},
+                                'johnson_D2':{'init':5, 'low':1, 'high':10},
+                                'johnson_D3':{'init':5, 'low':1, 'high':10},
+                                'failureDisplacement':{'init':0.2, 'low':0, 'high':1}}
  

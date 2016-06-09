@@ -7,7 +7,7 @@ import math
 
 def writeToFile(timeHistory, stressHistory, strainHistory, fileName, modelNo):
     print('Saving homogenization time history:')
-    with open(os.path.join('ostrich', 'observationUDEC.dat'), 'w') as f:
+    with open(os.path.join('HOMOGENIZE', 'textData', fileName+'_homogenizedData.dat'), 'w') as f:
         f.write('time S11 S22 S12 LE11 LE22 LE12\n')
         # f.write('0.0 '+str(confiningStress*1e6)+' '+str(stressHistory[0][1,1])+' 0.0 0.0 0.0 0.0\n') 
         f.write('0.0 0.0 '+str(stressHistory[0][1,1])+' 0.0 0.0 0.0 0.0\n') #fix this line

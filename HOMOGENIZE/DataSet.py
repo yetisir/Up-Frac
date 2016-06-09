@@ -1,4 +1,5 @@
 import os
+import time
 import copy
 import pickle
 import Common
@@ -17,18 +18,24 @@ class DataSet(object):
             if loadBinary is True:
                 try:
                     print('Attempting to load DEM Data from binary:')
-                    pickleData = pickle.load(open(filePath, 'rb'))
-                    self.blockData = pickleData[0]
-                    self.contactData = pickleData[1]
-                    self.cornerData = pickleData[2]
-                    self.zoneData = pickleData[3]
-                    self.gridPointData = pickleData[4]
-                    self.domainData = pickleData[5]
-                    parse = False
-                    print('\tSuccess')
+                    os.stat(filePath)
+                    #binTime = os.stat(filePath).st_mtime
+                    #dataTime = os.stat(os.path.join('UpFracDEMData', fileName + '___block.dat')).st_mtime
+                    if 1:#binTime > dataTime:
+                        pickleData = pickle.load(open(filePath, 'rb'))
+                        self.blockData = pickleData[0]
+                        self.contactData = pickleData[1]
+                        self.cornerData = pickleData[2]
+                        self.zoneData = pickleData[3]
+                        self.gridPointData = pickleData[4]
+                        self.domainData = pickleData[5]
+                        parse = False
+                        print('\tSuccess')
+                    else:
+                        print('\tFailed... Binary data out of date')
                 except:
-                    print('\tFailed')
-
+                    print('\tFailed... Binary data not found')
+                    
             if parse is True:
                 print('Parsing DEM data from text files:')
                 blockFileName = fileName + '___block.dat'

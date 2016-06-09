@@ -15,16 +15,18 @@ ModelSubdir model
 #Parameter Specification
 BeginParams
 #parameter	init.	low	    high	tx_in   tx_ost	tx_out
-$johnson_D2	0.001	0.0005	0.005	none	none	none
-$initialTensileStrength	50000.0	0	100000.0	none	none	none
+$johnson_D2	5	1	10	none	none	none
 $poissonsRatio	0.35	0.3	0.45	none	none	none
-$failureDisplacement	0.2	0	1	none	none	none
-$hardening_B	320000000.0	100000000.0	1000000000.0	none	none	none
-$johnson_D3	2	1	50	none	none	none
-$frictionAngle	40	35	55	none	none	none
-$elasticModulus	10000000000.0	5000000000.0	15000000000.0	none	none	none
-$hardening_A	1000000.0	500000.0	5000000.0	none	none	none
+$initialCompressiveYeild	5000000.0	1000000.0	10000000.0	none	none	none
+$initialTensileStrength	50000.0	0	100000.0	none	none	none
+$johnson_D3	5	1	10	none	none	none
+$peakPlasticStrain	0.0005	0.0002	0.001	none	none	none
 $dilationAngle	10	5	15	none	none	none
+$elasticModulus	10000000000.0	5000000000.0	15000000000.0	none	none	none
+$failureDisplacement	0.2	0	1	none	none	none
+$frictionAngle	40	35	55	none	none	none
+$johnson_D1	0.5	0	5	none	none	none
+$peakCompressiveYeildDiff	5000000.0	1000000.0	10000000.0	none	none	none
 
 EndParams
 
@@ -368,11 +370,12 @@ parameters.py
 interpolateData.py
 simulationData.py
 vectorMath.py
+jclean.bat
 EndExtraFiles
 
 BeginParticleSwarm
-SwarmSize  48
-NumGenerations  10
+SwarmSize  24
+NumGenerations  50
 EndParticleSwarm
 
 #BeginGeneticAlg

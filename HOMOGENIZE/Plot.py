@@ -1,9 +1,14 @@
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 import os
 from collections import OrderedDict
 class Plot(object):
     def __init__(self, plotName, showPlots=True, interactive=False):
+        if showPlots != True:
+            import matplotlib
+            matplotlib.use('Agg')
+        global plt
+        global animation
+        import matplotlib.pyplot as plt
+        import matplotlib.animation as animation
     
         print('-'*70)
         print('Establishing {} Plot'.format(plotName))
