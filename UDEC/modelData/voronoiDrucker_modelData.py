@@ -1,4 +1,3 @@
-#Add cmd output and error handling
 import os.path
 mName = os.path.basename(__file__[:__file__.find('_')])
 
