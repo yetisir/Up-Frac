@@ -1,0 +1,1 @@
+robocopy C:\Users\mmyetisi\Documents\GitHub\UpFrac2\UDEC\UpFracDEMData \\tsclient\C\Users\mmyetisi\Documents\GitHub\UpFrac2\UDEC\UpFracDEMData

@@ -1,0 +1,142 @@
+;import parameter offsets
+call 'C:\Program Files (x86)\Itasca\UDEC500\Datafiles\Fish\FIN\CONTACT.FIN'
+call 'C:\Program Files (x86)\Itasca\UDEC500\Datafiles\Fish\FIN\DOMAIN.FIN'
+call 'C:\Program Files (x86)\Itasca\UDEC500\Datafiles\Fish\FIN\BLOCK.FIN'
+
+def setup
+	;**************************************************************************
+	;Function to initialize the numContacts and numBlocks variables. In order 
+	;to define an array size with a variable, the variable cannot be defined 
+	;within the same function. As such, this function serves the purpose of 
+	;facilitating the construction of an array with a length equal to the 
+	;number of contacts.
+	;**************************************************************************
+	
+	;Loop through all contacts and count each one
+	ci = contact_head
+	numContacts = 0
+	loop while ci # 0
+		numContacts = numContacts + 1
+		ci = c_next(ci)
+	endloop
+	
+	di = domain_head
+	numDomains = 0
+	loop while di # 0
+		numDomains = numDomains + 1
+		di = d_next(di)
+	endloop
+	
+	bi = block_head
+	numBlocks = 0
+	numCorners = 0
+	numZones = 0
+	numGridPoints = 0
+	loop while bi # 0
+		cri = imem(bi+$KP)
+		ti = cri
+		numCorners = numCorners + 1
+		cri = imem(cri+$KR)
+		loop while cri # ti
+			numCorners = numCorners + 1
+			cri = imem(cri+$KR)
+		endloop
+		
+		zi = b_zone(bi)
+		loop while zi # 0
+			numZones = numZones + 1
+			zi = z_next(zi)
+		endloop
+		
+		gi = b_gp(bi)
+		loop while gi # 0
+			numGridPoints = numGridPoints + 1
+			gi = gp_next(gi)
+		endloop
+		
+		numBlocks = numBlocks + 1
+		bi = b_next(bi)
+	endloop
+
+	;--------------------------------------------------------------------------
+	;Data Recording Variables - Change as required
+	;modelName = 'ostrichTest3'
+	;simulationTime = 20.0	;**important: make sure value is specified as float
+	;numberOfSteps = 40
+	;--------------------------------------------------------------------------
+	
+	numContactArray = (numContacts)*2
+	numBlockArray = (numBlocks)+2
+	numCornerArray = (numCorners)+2
+	numGridPointArray = (numGridPoints)+2
+	numZoneArray = (numZones)+2
+	numDomainArray = (numDomains)*2
+end
+setup
+
+
+def cycleModel
+	;**************************************************************************
+	;Function to collect contact data for each contact and block and write to 
+	;file at specified intervals during cycling. The contact and block data is 
+	;written to a separate file for each time step.
+	;**************************************************************************
+
+	;Define contact and block file headers
+	contactHeader = 'time cIndex x y length flowRate aperture nForce sForce '
+	contactHeader = contactHeader + 'xNormCosine yNormCosine blocks domains '
+	contactHeader = contactHeader + 'corners'
+	
+	blockHeader = 'time bIndex x y area xForce yForce'
+	blockHeader = blockHeader + ' corners zones gridPoints'
+		
+	cornerHeader = 'time crIndex gridPoint'
+	
+	gridPointHeader = 'time gpIndex x y xDisp yDisp xForce yForce xVel yVel '
+	gridPointHeader = gridPointHeader+'block corner'
+	
+	zoneHeader = 'time zIndex S11 S22 S12 block gridPoints'
+	
+	domainHeader = 'time dIndex x y area porePressure'
+	
+	contactTypes = 'f i f f f f f f f f f l l l'
+	blockTypes = 'f i f f f f f l l l l'
+	cornerTypes = 'f i i'
+	gridPointTypes = 'f i f f f f f f f f i i'
+	zoneTypes = 'f i f f f i l'
+	domainTypes = 'f i f f f f'
+
+	;Initialize data arrays and insert headers
+	array contactData (numContactArray)
+	contactData(1) = contactHeader
+	contactData(2) = contactTypes
+	
+	array blockData (numBlockArray)
+	blockData(1) = blockHeader
+	blockData(2) = blockTypes
+	
+	array cornerData (numCornerArray)
+	cornerData(1) = cornerHeader
+	cornerData(2) = cornerTypes
+	
+	array gridPointData (numGridPointArray)
+	gridPointData(1) = gridPointHeader
+	gridPointData(2) = gridPointTypes
+	
+	array zoneData (numzoneArray)
+	zoneData(1) = zoneHeader
+	zoneData(2) = zoneTypes
+	
+	array domainData (numDomainArray)
+	domainData(1) = domainHeader
+	domainData(2) = domainTypes
+	
+	;Loop for the specified number of time steps
+	timeStep = simulationTime/numberOfSteps
+	totalTime = 0.0
+
+
+
+end
+
+cycleModel

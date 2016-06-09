@@ -31,7 +31,7 @@ UDECParameters = {
     '$bSize': bSize,
     '$meshSize': meshSize,
     '$round': float(bSize)/100,
-    '$edge': float(bSize)/100,
+    '$edge': float(bSize)/20,
     '$vSeed': 1,
     '$rho': rho,
     '$bulk': E/(3*(1-2*nu)),
