@@ -1,6 +1,10 @@
-OSTRICH/model0
+OSTRICH/ostOutput
+OSTRICH/fittedHistory
+UDEC/rawData
+UDEC/compiledData
 UDEC/UpFracDEMData
 UDEC/savFiles
 binaryData
 HOMOGENIZE/binaryData
+HOMOGENIZE/textData
 figures
