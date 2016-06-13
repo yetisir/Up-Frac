@@ -1,9 +1,14 @@
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 import os
 from collections import OrderedDict
 class Plot(object):
     def __init__(self, plotName, showPlots=True, interactive=False):
+        if showPlots != True:
+            import matplotlib
+            matplotlib.use('Agg')
+        global plt
+        global animation
+        import matplotlib.pyplot as plt
+        import matplotlib.animation as animation
     
         print('-'*70)
         print('Establishing {} Plot'.format(plotName))
@@ -86,7 +91,7 @@ class Plot(object):
         self.saveFigure()
         plt.show()
         
-    def saveFigure(self, plot):
+    def saveFigure(self):
         fileName = os.path.join('figures', self.fileName+'_'+self.plotName) 
         self.figure.savefig(fileName+'.svg', format='svg')
         self.figure.savefig(fileName+'.png', format='png')

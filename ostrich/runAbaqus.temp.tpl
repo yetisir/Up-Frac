@@ -70,13 +70,20 @@ def concreteDamage(elasticModulus, poissonsRatio, peakYeildStress, peakYeildStra
     mat.concreteDamagedPlasticity.ConcreteTensionDamage(
         table=(tabulateVectors(tensileDamage, crackingStrain)))         
 
-def druckerDamage(frictionAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, elasticModulus, poissonsRatio, initialTensileStrength, dilationAngle):
+def druckerDamage(elasticModulus, poissonsRatio, frictionAngle, initialTensileStrength, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, johnson_D1, johnson_D2, johnson_D3, failureDisplacement):
     materialName = 'Material-1'
     
-    hardening_n = 0.5
-    compressiveYeildStress = add(hardening_A, multiply(hardening_B, power(inelasticStrain, hardening_n)))
+    #hardening_n = 0.5
+    #compressiveYeildStress = add(hardening_A, multiply(hardening_B, power(inelasticStrain, hardening_n)))
+    peakCompressiveYeild = initialCompressiveYeild+peakCompressiveYeildDiff
+    
+    alpha = (2*peakCompressiveYeild-initialCompressiveYeild+2*sqrt(peakCompressiveYeild*(peakCompressiveYeild-initialCompressiveYeild)))/initialCompressiveYeild
+    beta = log((2*alpha)/(1+alpha))[0]/peakPlasticStrain
+
+    plasticStrain = divide(range(0, 100), 5000)
+    compressiveYeildStress = multiply(initialCompressiveYeild, subtract(multiply(1+alpha, exp(multiply(-beta, plasticStrain))), multiply(alpha, exp(multiply(-2*beta, plasticStrain)))))
+    
     triaxiality = divide(range(0, 100), 50)
-    johnson_D1 = 0
     damageInitiationStrain = add(johnson_D1, multiply(johnson_D2, exp(multiply(-johnson_D3, triaxiality))))    
             
     mat = mdb.models['Model-1'].Material(name=materialName)
@@ -206,7 +213,21 @@ def buildModel():
     #concreteDamage(7600000000.0, 0.35, $peakYeildStress, $peakYeildStrain,  $initialCompressiveYeild, $compressiveDamageScaling, $initialTensileYeild, $tLambda, $tensileDamageScaling)
 # def druckerDamage(frictionAngle, dilationAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, initialTensileStrength, elasticModulus, poissonsRatio):
     #druckerDamage(40.5169, 1012301.0, 321551390.0, 1.000000E-03, -15, 0.2, 10600000000.0, 0.35)
-    druckerDamage($frictionAngle, $hardening_A, $hardening_B, $johnson_D2, $johnson_D3, $failureDisplacement, $elasticModulus, $poissonsRatio, $initialTensileStrength, $dilationAngle)
+    elasticModulus = $elasticModulus
+    poissonsRatio = $poissonsRatio
+    frictionAngle = $frictionAngle
+    initialTensileStrength = $initialTensileStrength
+    dilationAngle = $dilationAngle
+    initialCompressiveYeild = $initialCompressiveYeild
+    peakCompressiveYeildDiff = $peakCompressiveYeildDiff
+    peakPlasticStrain = $peakPlasticStrain
+    johnson_D1 = $johnson_D1
+    johnson_D2 = $johnson_D2
+    johnson_D3 = $johnson_D3
+    failureDisplacement = $failureDisplacement
+    
+    
+    druckerDamage(elasticModulus, poissonsRatio, frictionAngle, initialTensileStrength, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, johnson_D1, johnson_D2, johnson_D3, failureDisplacement)
     assignSection(sectionName, partName, sectionLocation, materialName)
     meshPart(meshSize, partName, sectionLocation, elementType, elementShape)
     createInstance(instanceName, partName)
@@ -290,33 +311,37 @@ def main():
             try:
                 timeHistory = getTime(jobName, 'Step-1', instanceName)
                 stressHistory = getStress(jobName, 'Step-1', instanceName)
-                strainHistory = getStrain(jobName, 'Step-1', instanceName)
+                strainHistory = getStrain(jobName, 'Step-1', instanceName)                
+                with open('{0}_rawHistory.pkl'.format(jobName), 'wb') as file:
+                    pickle.dump(timeHistory, file)
+                    pickle.dump(stressHistory, file)
+                    pickle.dump(strainHistory, file)
                 break
-            except:
+            except:# FileNotFoundError:
                 pass
-        file = open('{0}_rawHistory.pkl'.format(jobName), 'wb')
-        pickle.dump(timeHistory, file)
-        pickle.dump(stressHistory, file)
-        pickle.dump(strainHistory, file)
-        file.close()
+
 
 if __name__ == '__main__': 
-    try:
-        main()
-    except Exception as e:
-        time.sleep(1)
-        fWrite(e)
-        with open('OstExeOut.txt', 'r') as f:
-            for i in f.readlines():
-                fWrite(i)
+    attempts = 2
+    while attempts >0:
         try:
-            with open('Job-1.dat', 'r') as f:
-                for i in f.readlines():
-                    fWrite(i)
-            with open('Job-2.dat', 'r') as f:
-                for i in f.readlines():
-                    fWrite(i)
-            with open('Job-3.dat', 'r') as f:
-                for i in f.readlines():
-                    fWrite(i)
-        except:pass
+            main()
+            break
+        except Exception as e:
+            os.system('jclean.bat')
+            fWrite(e)
+            attempts -= 1
+                # with open('OstExeOut.txt', 'r') as f:
+                    # for i in f.readlines():
+                        # fWrite(i)
+                # try:
+                    # with open('Job-1.dat', 'r') as f:
+                        # for i in f.readlines():
+                            # fWrite(i)
+                    # with open('Job-2.dat', 'r') as f:
+                        # for i in f.readlines():
+                            # fWrite(i)
+                    # with open('Job-3.dat', 'r') as f:
+                        # for i in f.readlines():
+                            # fWrite(i)
+                # except:pass

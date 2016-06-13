@@ -60,11 +60,12 @@ parameters.py
 interpolateData.py
 simulationData.py
 vectorMath.py
+jclean.bat
 EndExtraFiles
 
 BeginParticleSwarm
-SwarmSize  48
-NumGenerations  10
+SwarmSize  24
+NumGenerations  50
 EndParticleSwarm
 
 #BeginGeneticAlg

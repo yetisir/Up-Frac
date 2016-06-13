@@ -154,7 +154,7 @@ if __name__ == '__main__':
                     # endTime = sTime
     
     
-    endTime = dt*numObservations
+    endTime = sTime[0]#dt*numObservations
     fillTemplate('parameters.tpl', getModelParameters(modelNumber, endTime, numObservations), 'parameters.py')
     fillTemplate('ostIn.tpl', getOstrichParameters(parameterizationRun), 'ostIn.txt')
     # fillTemplate('ostIn.txt', getOstInVoid(), 'ostIn.txt')

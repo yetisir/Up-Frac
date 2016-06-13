@@ -2,12 +2,8 @@ import os
 import numpy as np
 import math
 import sys
-import matplotlib
 import pickle
 import Common
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from matplotlib import colorbar, patches
 from scipy.ndimage.filters import gaussian_filter
 from collections import OrderedDict
 
@@ -17,7 +13,14 @@ class FracPlot(DataSet, Plot):
     def __init__(self, plotName, fileName=None, dataClass=None, showPlots=True):
         DataSet.__init__(self, fileName=fileName, dataClass=dataClass)
         Plot.__init__(self, plotName, showPlots=showPlots, interactive=False)
-
+        global plt
+        global animation
+        global colorbar
+        global patches
+        import matplotlib.pyplot as plt
+        import matplotlib.animation as animation
+        from matplotlib import colorbar, patches
+        
         # print('-'*70)
         # print('Establishing {} Plot'.format(plotName))
         # print('-'*70)
