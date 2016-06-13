@@ -6,11 +6,10 @@ gridPoints = [[0, 0], [$$mSize, 0], [$$mSize, $$mSize], [0, $$mSize], [0, 0]]
 sectionLocation = ($$mSize/2, $$mSize/2, 0.0)
 
 simulationTime = $$sTime
-numberOfSteps = $$nObs
+numberOfSteps = $$nSteps
 
 confiningStress = $$confStress
 
-dilationAngle = $$dAngle
 density = $$rho
 crackingStrain = $$cStrain
 inelasticStrain = $$iStrain

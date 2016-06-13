@@ -5,6 +5,9 @@ import os
 import csv
 from OSTRICH.vectorMath import *
 import math
+import argparse
+import importlib
+import pickle
 
 def getMaxStrain():
     with open(os.path.join('OSTRICH', 'observationUDEC.dat')) as udecFile:
@@ -46,61 +49,80 @@ def maxTensileStrainIO(mode):
             file.write(str(getMaxStrain())) 
         return 1
         
-def getModelParameters(modelNumber, endTime, numObservations):
-    #TODO: cleanup, make more general, maybe move to material definitions since not consistant
-    # print(math.floor((numObservations)*(endTime/sTime[modelNumber])))
-    # print((numObservations)*(endTime/sTime[modelNumber]))
-    # print(numObservations)
-    # print(endTime)
-    # print(sTime[modelNumber])
-    
-    parameters =  {'$$mSize': mSize,
-                            '$$mName': '\''+modelName+'\'',
-                            '$$sName': ['{0}({1}.{2})'.format(modelName, 0, x) for x in confiningStress],
-                            '$$nObs': numObservations,
-                            '$$rho': rho*1e9,
-                            '$$dAngle': jDilation,
-                            '$$confStress': [x*1e6 for x in confiningStress], #***********************************************************fix for different confining stresses!!!!!
+def getModelParameters(parameterizationRun):
+
+    parameters =  {'$$mSize': modelData.modelSize,
+                            '$$mName': '\''+modelData.modelName+'\'',
+                            '$$sName': ['{0}({1}.{2})'.format(modelData.modelName, 0, x) for x in modelData.confiningStress],
+                            '$$nSteps': modelData.numberOfSteps,
+                            '$$rho': modelData.rho*1e9,
+                            '$$confStress': [x*1e6 for x in modelData.confiningStress], #***********************************************************fix for different confining stresses!!!!!
                             '$$cStrain': getInelasticStrain(), #fix for concrete plasticity
                             '$$iStrain': getInelasticStrain(),
-                            '$$vel':vel[modelNumber],
-                            '$$sTime':endTime,
-                            '$$vString':getVelocityString(velTable[modelNumber])}
-    # if '(c)' in modelName:
-        # parameters .update({ '$$maxTS':maxTensileStrainIO('r'),
-                                # '$$sTime':sTime_c,
-                                # '$$vel':vel_c,
-                                # '$$vString':getVelocityString(velTable_c) })
-    # elif '(t)' in modelName:
-        # parameters.update({ '$$maxTS':maxTensileStrainIO('w'),
-                                # '$$sTime':sTime_t,
-                                # '$$vel':vel_t,
-                                # '$$vString':getVelocityString(velTable_t) })
+                            '$$vel':modelData.velocity[parameterizationRun],
+                            '$$sTime':modelData.simulationTime[parameterizationRun],
+                            '$$vString':getVelocityString(modelData.velocityTable[parameterizationRun])}
     return parameters
                                 
 def getOstrichParameters(parameterizationRun):
     ostrichParametersText = '' 
+    ostrichParameters = material.ostrichParameters.keys()
     for parameter in ostrichParameters:
-        if '$' + parameter in materialParameters[parameterizationRun-1]:
-            p = ostrichParameters[parameter]
+            p = material.ostrichParameters[parameter]
             newRecord = '$' + parameter + '\t' + str(p['init']) + '\t' + str(p['low']) + '\t' +str(p['high']) +'\tnone\tnone\tnone\n'
             ostrichParametersText += newRecord
-    return {'$$ostrichParameters':ostrichParametersText}
+ 
+    observations = ''
+    obsNo = 0
+    for k in range(len(modelData.confiningStress)):
+        with open(os.path.join('HOMOGENIZE', 'binaryData', '{0}({1}.{2})_homogenizedData.pkl'.format(modelData.modelName, parameterizationRun, modelData.confiningStress[k])), 'rb') as bundleFile:
+            bundle = pickle.load(bundleFile)
+            timeHistory = bundle[0]
+            stressHistory = bundle[1]
+            strainHistory = bundle[2]
+
+        numObservations = len(timeHistory) + 1
+        #TODO: add weightings so strain and stress can be used together
+        for i in range(1, numObservations):
+            for j in range(len(modelData.relevantMeasurements)):
+                if modelData.relevantMeasurements[j] == 'S11':
+                    o = stressHistory[i-1][0, 0]
+                    c = 2
+                elif modelData.relevantMeasurements[j] == 'S22':
+                    o = stressHistory[i-1][1, 1]
+                    c = 3
+                elif modelData.relevantMeasurements[j] == 'S12':
+                    o = stressHistory[i-1][0, 1]
+                    c = 4
+                elif modelData.relevantMeasurements[j] == 'LE11':
+                    o = strainHistory[i-1][0, 0]
+                    c = 5
+                elif modelData.relevantMeasurements[j] == 'LE22':
+                    o = strainHistory[i-1][1, 1]
+                    c = 6
+                elif modelData.relevantMeasurements[j] == 'LE12':
+                    o = strainHistory[i-1][0, 1]
+                    c = 7
+                l = i + 1 
+                #obsNo = k*(numObservations-1)*len(modelData.relevantMeasurements) + (i-1)*len(modelData.relevantMeasurements) + (j +1)
+                obsNo += 1
+                newObservation = 'obs{} \t\t{:10f} \t1 \toutput.dat \tOST_NULL \t{} \t\t{}\n'.format(obsNo, o, l, c)
+                observations += newObservation
+
+    parameters = {'$$ostrichParameters':ostrichParametersText, 
+                            '$$ostrichObservations':observations}
+
+
+
+    return parameters
+
     
-# def getOstInVoid(parameterizationRun):
-    # parameters = {}
-    # for parameter in materialParameters[parameterizationRun-1]:
-        # parameters[parameter] = '#'+parameter
-    # return parameters
-    
-def getModelConstants(modelName, parameterizationRun):
+def getModelConstants(parameterizationRun):
     parameters = {}
-    for parameter in ostrichParameters:
-        parameters['$'+parameter] = ostrichParameters[parameter]['init']
-    for parameter in materialParameters[parameterizationRun-1]:
+    for parameter in material.ostrichParameters:
         parameters[parameter] = parameter
     for i in range(parameterizationRun-1):
-         with open(os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}.txt'.format(modelName, i+1))) as ostOutputFile:
+         with open(os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}.txt'.format(modelData.modelName, i+1))) as ostOutputFile:
             ostOutput = ostOutputFile.read()
             startIndex = ostOutput.find('Optimal Parameter Set')
             endIndex = ostOutput.find('\n\n', startIndex)
@@ -121,49 +143,101 @@ def fillTemplate(template, parameters, file):
         with open(os.path.join('OSTRICH', file), 'w') as modelFile:
             modelFile.write(t)
             
-# def main():
-    #use argparse
-               
-            
+
+def importModelData(modelName):
+    global modelData
+    modelData = importlib.import_module('UDEC.modelData.'+modelName)
+
+def importMaterialData(materialName):
+    global material
+    material = importlib.import_module('OSTRICH.materials.'+materialName)
+
+def run(modelName, parameterizationRun):
+    importModelData(modelName)
+    importMaterialData(modelData.abaqusMaterial)
+    main(parameterizationRun)
+
+def main(parameterizationRun):
+    fillTemplate('parameters.tpl', getModelParameters(parameterizationRun-1), 'parameters.py')
+    fillTemplate('ostIn.tpl', getOstrichParameters(parameterizationRun-1), 'ostIn.txt')
+    fillTemplate('runAbaqus.tpl', getModelConstants(parameterizationRun-1), 'runAbaqus.temp.tpl') 
+ 
 if __name__ == '__main__':
-    # main()
+    parser = argparse.ArgumentParser(description='createOstrichInput: Creates the Neccessary Input files to Run OSTIRCH')
+    parser.add_argument('-n', '--name', required=True, help='Name of the file containing the model data without the extension')
+    parser.add_argument('-r', '--run', required=True, type=int, help='Parameterization run number')
+
+    args = parser.parse_args()
+    modelName = args.name
+    parameterizationRun = args.run
     
-    clargs = sys.argv
-    if len(clargs) >= 2:
-        modelName = clargs[1]
-        parameterizationRun = int(clargs[2])
-        numObservations = int(clargs[3])
-        dt = float(clargs[4])
-     #else: error message
-    module = __import__('UDEC.modelData.'+modelName+'_modelData', globals(), locals(), ['*'])
-    for k in dir(module):
-        locals()[k] = getattr(module, k)
-    module = __import__('OSTRICH.materials.'+abaqusMaterial, globals(), locals(), ['*'])
-    for k in dir(module):
-        locals()[k] = getattr(module, k)
-        
-    counter = 0
-    for i in range(len(parameterizationSplits)):
-        for j in range(len(parameterizationSplits[i])+1):
-            counter += 1
-            if counter == parameterizationRun:
-                modelNumber = i
-                # if j < len(parameterizationSplits[i]):
-                    # endTime = parameterizationSplits[i][j]
-                # else:
-                    # endTime = sTime
-    
-    
-    endTime = sTime[0]#dt*numObservations
-    fillTemplate('parameters.tpl', getModelParameters(modelNumber, endTime, numObservations), 'parameters.py')
-    fillTemplate('ostIn.tpl', getOstrichParameters(parameterizationRun), 'ostIn.txt')
-    # fillTemplate('ostIn.txt', getOstInVoid(), 'ostIn.txt')
-    fillTemplate('runAbaqus.tpl', getModelConstants(modelName, parameterizationRun), 'runAbaqus.temp.tpl')
+    importModelData(modelName)
+    importMaterialData(modelData.abaqusMaterial)
+    main(parameterizationRun)
+ 
         
         
         
-        
-        
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def createOstIn(fileName, parameters):
+    # #TODO: change import format, use template, not module maybe?
+    # observations = ''
+    # for k in range(len(confiningStress)):
+        # with open(os.path.join('HOMOGENIZE', 'binaryData', fileName+str(confiningStress[k])+')_homogenizedData.pkl'), 'rb') as bundleFile:
+            # bundle = pickle.load(bundleFile)
+            # timeHistory = bundle[0]
+            # stressHistory = bundle[1]
+            # strainHistory = bundle[2]
+
+        # numObservations = len(timeHistory) + 1
+        # #TODO: add weightings so strain and stress can be used together
+        # for i in range(1, numObservations):
+            # for j in range(len(parameters)):
+                # if parameters[j] == 'S11':
+                    # o = stressHistory[i-1][0, 0]
+                    # c = 2
+                # elif parameters[j] == 'S22':
+                    # o = stressHistory[i-1][1, 1]
+                    # c = 3
+                # elif parameters[j] == 'S12':
+                    # o = stressHistory[i-1][0, 1]
+                    # c = 4
+                # elif parameters[j] == 'LE11':
+                    # o = strainHistory[i-1][0, 0]
+                    # c = 5
+                # elif parameters[j] == 'LE22':
+                    # o = strainHistory[i-1][1, 1]
+                    # c = 6
+                # elif parameters[j] == 'LE12':
+                    # o = strainHistory[i-1][0, 1]
+                    # c = 7
+                # l = k*(numObservations+startIndex) + i + 1 + startIndex
+                # obsNo = k*(numObservations-1)*len(parameters) + (i-1)*len(parameters) + (j +1)
+                # newObservation = 'obs{} \t\t{:10f} \t1 \toutput.dat \tOST_NULL \t{} \t\t{}\n'.format(obsNo, o, l, c)
+                # observations += newObservation
+    # with open(os.path.join('OSTRICH', 'OstIn.tpl'), 'w') as f:
+        # f.write(OSTRICH.ostIn.topText+observations+OSTRICH.ostIn.bottomText)
+      
         
         
         
