@@ -1,2 +1,2 @@
-python UpFrac_new.py -n voronoiGranite
+python UpFrac.py -n voronoiGranite
 PAUSE

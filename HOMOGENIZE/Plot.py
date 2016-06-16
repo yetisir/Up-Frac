@@ -1,7 +1,8 @@
 import os
 from collections import OrderedDict
+
 class Plot(object):
-    def __init__(self, plotName, showPlots=True, interactive=False):
+    def __init__(self, plotName, showPlots=True, interactive=False, colorBar=True):
         if showPlots != True:
             import matplotlib
             matplotlib.use('Agg')
@@ -17,15 +18,15 @@ class Plot(object):
         self.plotName = plotName
         
         #TODO: fix this to acocmodate non-colorbar plots
-        self.figure = plt.figure(figsize=(6,5))
-        self.axes = self.figure.add_axes([0.1, 0.1, 0.825*5/6, 0.825])
-        self.colorBarAxes = self.figure.add_axes([0.825, 0.1, 0.05, 0.825])
-        
-        
-        if showPlots != True:
-            matplotlib.use('Agg')
+        if colorBar:
+            self.figure = plt.figure(figsize=(6,5))
+            self.axes = self.figure.add_axes([0.1, 0.1, 0.825*5/6, 0.825])
+            self.colorBarAxes = self.figure.add_axes([0.825, 0.1, 0.05, 0.825])
+        else:
+            self.figure = plt.figure(figsize=(5,5))
+            self.axes = self.figure.add_axes([0.15, 0.1, 0.8, 0.85])
             
-    #Axis Functions    
+            
     #Axis Functions    
     def setAxis_Full(self, equal=True):
         axisLimits = self.limits()
@@ -76,20 +77,20 @@ class Plot(object):
         print ('Encoding Video File:')
         self.saveVideo(im_ani)
         print('\tDone')
-        plt.show()
+        self.showPlot()
 
     def firstFrame(self):
         self.axes.cla()
         for i in range(len(self.animationImages[0])):
             self.axes.add_artist(self.animationImages[0][i])
-        plt.show()
+        self.showPlot()
 
     def lastFrame(self):
         self.axes.cla()
         for i in range(len(self.animationImages[-1])):
             self.axes.add_artist(self.animationImages[-1][i])
         self.saveFigure()
-        plt.show()
+        self.showPlot()
         
     def saveFigure(self):
         fileName = os.path.join('figures', self.fileName+'_'+self.plotName) 
@@ -101,3 +102,7 @@ class Plot(object):
         writer = Writer(fps=15, bitrate=1800)
         fileName = os.path.abspath(os.path.join('figures', self.fileName+'_'+self.plotName) )
         ani.save(fileName+'.mp4', writer=writer)
+
+    def showPlot(self):
+        self.labelAxis()
+        plt.show()

@@ -2,10 +2,10 @@ import os
 import sys
 import Homogenize
 
-from FracPlot import FracPlot
+from .FracPlot import FracPlot
 class HomoPlot(FracPlot):
-    def __init__(self, plotName, homogenizationClass, showPlots=True):
-        FracPlot.__init__(self, plotName, dataClass=homogenizationClass, showPlots=showPlots)
+    def __init__(self, plotName, homogenizationClass, showPlots=True, colorBar=False):
+        FracPlot.__init__(self, plotName, dataClass=homogenizationClass, showPlots=showPlots, colorBar=colorBar)
 
         self.centre = homogenizationClass.centre
         self.radius = homogenizationClass.radius

@@ -3,39 +3,26 @@ import numpy as np
 import math
 import sys
 import pickle
-import Common
+from . import common
 from scipy.ndimage.filters import gaussian_filter
 from collections import OrderedDict
 
-from DataSet import DataSet
-from Plot import Plot
+from .DataSet import DataSet
+from .Plot import Plot
 class FracPlot(DataSet, Plot):
-    def __init__(self, plotName, fileName=None, dataClass=None, showPlots=True):
+    def __init__(self, plotName, fileName=None, dataClass=None, showPlots=True, colorBar=True):
         DataSet.__init__(self, fileName=fileName, dataClass=dataClass)
-        Plot.__init__(self, plotName, showPlots=showPlots, interactive=False)
+        Plot.__init__(self, plotName, showPlots=showPlots, interactive=False, colorBar=colorBar)
         global plt
         global animation
         global colorbar
         global patches
+        global matcolors
+        import matplotlib.colors as matcolors
         import matplotlib.pyplot as plt
         import matplotlib.animation as animation
         from matplotlib import colorbar, patches
         
-        # print('-'*70)
-        # print('Establishing {} Plot'.format(plotName))
-        # print('-'*70)
-        
-        # self.plotName = plotName
-        
-        # #TODO: fix this to acocmodate non-colorbar plots
-        # self.figure = plt.figure(figsize=(6,5))
-        # self.axes = self.figure.add_axes([0.1, 0.1, 0.825*5/6, 0.825])
-        # self.colorBarAxes = self.figure.add_axes([0.825, 0.1, 0.05, 0.825])
-        
-        # self.animationImages = [[] for _ in range(len(self.blockData.keys()))]
-        
-        # if showPlots != True:
-            # matplotlib.use('Agg')
         self.animationImages = [[] for _ in range(len(self.blockData.keys()))] #num frames
 
         time = min(self.blockData.keys())
@@ -152,11 +139,16 @@ class FracPlot(DataSet, Plot):
         if loadData == True:
             try:
                 print('Attempting to load interpolated {} stress grid from binary:'.format(stressType))
-                allX, allY, allZ = pickle.load(open(filePath, 'rb'))
-                calculate = False
-                print('\tSuccess')
+                stressGridTime = os.path.getmtime(filePath)
+                compiledDataTime = os.path.getmtime(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'binaryData', self.fileName+'_binary.dat'))
+                if stressGridTime > compiledDataTime:
+                    allX, allY, allZ = pickle.load(open(filePath, 'rb'))
+                    calculate = False
+                    print('\tSuccess')
+                else:
+                    print('\tFailed... Binanry data out of date')
             except:
-                print('\tFailed')
+                print('\tFailed... No binary data found')
 
         if calculate == True:
             print('Interpolating {} stress grid:'.format(stressType))
@@ -168,10 +160,10 @@ class FracPlot(DataSet, Plot):
                 print('\b'*len(numString), end='')
                 sys.stdout.flush()
                 
-                S11 = np.array(self.zoneS11(self.zoneData[time].keys(), time))
-                S22 = np.array(self.zoneS22(self.zoneData[time].keys(), time))
-                #S33 = np.array(self.zoneS33(self.zoneData[time].keys(), time))
-                S12 = np.array(self.zoneS12(self.zoneData[time].keys(), time))
+                S11 = np.array(self.zoneS11(self.zoneData[time].keys(), time))/1e6
+                S22 = np.array(self.zoneS22(self.zoneData[time].keys(), time))/1e6
+                #S33 = np.array(self.zoneS33(self.zoneData[time].keys(), time))/1e6
+                S12 = np.array(self.zoneS12(self.zoneData[time].keys(), time))/1e6
                 if stressType == 'S11':
                     stress = S11
                 elif stressType == 'S22':
@@ -181,7 +173,7 @@ class FracPlot(DataSet, Plot):
                 elif stressType == 'S12':
                     stress = S12
                 elif stressType == 'mises':
-                    stress = 'blah'
+                    stress = np.sqrt(np.divide(np.power(S11-S22, 2) + np.power(S22-S33, 2) + np.power(S33-S11, 2)+6*(S12)))
                 elif stressType == 'MaxP':
                     stress = 'blah'
                 elif stressType == 'MinP':
@@ -201,7 +193,7 @@ class FracPlot(DataSet, Plot):
                     zoneX.append(gridPointX/len(gridPoints))
                     zoneY.append(gridPointY/len(gridPoints))
                 
-                X, Y, Z = Common.grid(zoneX, zoneY, stress)
+                X, Y, Z = common.grid(zoneX, zoneY, stress)
                 allX.append(X)
                 allY.append(Y)
                 allZ.append(Z)
@@ -228,34 +220,16 @@ class FracPlot(DataSet, Plot):
             print('\b'*len(numString), end='')
             sys.stdout.flush()
             time = times[i]
- 
             X = allX[i]         
             Y = allY[i]
             Z = allZ[i]
-            Z = gaussian_filter(Z, sigma)
+            #Z = gaussian_filter(Z, sigma)
             im = self.axes.contourf(X, Y, Z, 10, cmap=cmap, vmin=zmin, vmax=zmax, origin='lower')
             self.animationImages[i] += im.collections
 
         print('\nPlotting {} stress field:'.format(stressType))
-        norm = matplotlib.colors.Normalize(vmin=zmin, vmax=zmax)
+        norm = matcolors.Normalize(vmin=zmin, vmax=zmax)
         colorBar = colorbar.ColorbarBase(self.colorBarAxes, cmap=cmap, norm=norm)
         colorBar.set_label('MPa')      
         print('\tDone')
         
-def main():
-    os.system('cls')
-    
-    clargs = sys.argv
-    if len(clargs) >= 2:
-        fileName = clargs[1]
-        
-    P = FracPlot('test', fileName=fileName)
-    P.setAxis_Zoom()  
-    P.plotStressField('S22', sigma=1)
-    P.plotZones()
-    P.plotBlocks()
-    P.addLegend()
-    P.animate()
-
-if __name__ == '__main__':
-    main()

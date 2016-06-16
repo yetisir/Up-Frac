@@ -10,11 +10,8 @@ import importlib
 import pickle
 
 def getMaxStrain():
-    with open(os.path.join('OSTRICH', 'observationUDEC.dat')) as udecFile:
-        udecData = csv.reader(udecFile, delimiter=' ')
-        next(udecData, None)  # skip the header
-        strains = [abs(float(item)) for sublist in [row[4:-1] for row in udecData] for item in sublist]
-    return max(strains)
+    
+    return 0.05
 
 def getVelocityString(velTable):
     accelTime = velTable[-1]/10
@@ -53,10 +50,10 @@ def getModelParameters(parameterizationRun):
 
     parameters =  {'$$mSize': modelData.modelSize,
                             '$$mName': '\''+modelData.modelName+'\'',
-                            '$$sName': ['{0}({1}.{2})'.format(modelData.modelName, 0, x) for x in modelData.confiningStress],
+                            '$$sName': ['{0}({1}.{2})'.format(modelData.modelName, 0, x) for x in range(len(modelData.confiningStress))],
                             '$$nSteps': modelData.numberOfSteps,
-                            '$$rho': modelData.rho*1e9,
-                            '$$confStress': [x*1e6 for x in modelData.confiningStress], #***********************************************************fix for different confining stresses!!!!!
+                            '$$rho': modelData.rho,
+                            '$$confStress': [x for x in modelData.confiningStress], #***********************************************************fix for different confining stresses!!!!!
                             '$$cStrain': getInelasticStrain(), #fix for concrete plasticity
                             '$$iStrain': getInelasticStrain(),
                             '$$vel':modelData.velocity[parameterizationRun],
@@ -75,7 +72,7 @@ def getOstrichParameters(parameterizationRun):
     observations = ''
     obsNo = 0
     for k in range(len(modelData.confiningStress)):
-        with open(os.path.join('HOMOGENIZE', 'binaryData', '{0}({1}.{2})_homogenizedData.pkl'.format(modelData.modelName, parameterizationRun, modelData.confiningStress[k])), 'rb') as bundleFile:
+        with open(os.path.join('HOMOGENIZE', 'binaryData', '{0}({1}.{2})_homogenizedData.pkl'.format(modelData.modelName, parameterizationRun, k)), 'rb') as bundleFile:
             bundle = pickle.load(bundleFile)
             timeHistory = bundle[0]
             stressHistory = bundle[1]
@@ -103,7 +100,7 @@ def getOstrichParameters(parameterizationRun):
                 elif modelData.relevantMeasurements[j] == 'LE12':
                     o = strainHistory[i-1][0, 1]
                     c = 7
-                l = i + 1 
+                l = k*(numObservations-1)*len(modelData.relevantMeasurements) + i*len(modelData.relevantMeasurements) + j
                 #obsNo = k*(numObservations-1)*len(modelData.relevantMeasurements) + (i-1)*len(modelData.relevantMeasurements) + (j +1)
                 obsNo += 1
                 newObservation = 'obs{} \t\t{:10f} \t1 \toutput.dat \tOST_NULL \t{} \t\t{}\n'.format(obsNo, o, l, c)

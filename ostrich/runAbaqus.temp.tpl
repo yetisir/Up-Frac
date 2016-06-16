@@ -42,7 +42,7 @@ def concreteDamage(elasticModulus, poissonsRatio, peakYeildStress, peakYeildStra
     b = 1e6
     a = (initialCompressiveYeild - peakYeildStress)/peakYeildStrain**2
     compressiveYeildStress = add(multiply(a, power(subtract(inelasticStrain, peakYeildStrain), 2)), peakYeildStress)
-    compressiveYeildStress = [b if x < b else x for x in compressiveYeildStress]
+    #compressiveYeildStress = [b if x < b else x for x in compressiveYeildStress]
     E = elasticModulus
     m = divide(1, add(divide(compressiveYeildStress, elasticModulus), inelasticStrain))
     m = min(m)*compressiveDamageScaling
@@ -70,7 +70,7 @@ def concreteDamage(elasticModulus, poissonsRatio, peakYeildStress, peakYeildStra
     mat.concreteDamagedPlasticity.ConcreteTensionDamage(
         table=(tabulateVectors(tensileDamage, crackingStrain)))         
 
-def druckerDamage(elasticModulus, poissonsRatio, frictionAngle, initialTensileStrength, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, johnson_D1, johnson_D2, johnson_D3, failureDisplacement):
+def druckerDamage(elasticModulus, poissonsRatio, frictionAngle, flowStressRatio, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, yeildStrain1, yeildStrain2Diff, failureDisplacement):
     materialName = 'Material-1'
     
     #hardening_n = 0.5
@@ -80,18 +80,26 @@ def druckerDamage(elasticModulus, poissonsRatio, frictionAngle, initialTensileSt
     alpha = (2*peakCompressiveYeild-initialCompressiveYeild+2*sqrt(peakCompressiveYeild*(peakCompressiveYeild-initialCompressiveYeild)))/initialCompressiveYeild
     beta = log((2*alpha)/(1+alpha))[0]/peakPlasticStrain
 
-    plasticStrain = divide(range(0, 100), 5000)
+    plasticStrain = divide(range(0, 100), 2000)
     compressiveYeildStress = multiply(initialCompressiveYeild, subtract(multiply(1+alpha, exp(multiply(-beta, plasticStrain))), multiply(alpha, exp(multiply(-2*beta, plasticStrain)))))
     
-    triaxiality = divide(range(0, 100), 50)
+    triaxiality = subtract(divide(range(0, 100), 25), 2)
+    #yeildStrainMinus1 = yeildStrain0+yeildStrainMinus1Diff
+    # johnson_D1 = (yeildStrainMinus1*yeildStrain1-yeildStrain0**2)/(yeildStrainMinus1+yeildStrain1-2*yeildStrain0)
+    # johnson_D2 = -(yeildStrain0-yeildStrain1)*(yeildStrain0-yeildStrainMinus1)/(yeildStrainMinus1+yeildStrain1-2*yeildStrain0)
+    # johnson_D3 = log(-(yeildStrain0-yeildStrain1)/(yeildStrain0-yeildStrainMinus1))[0]
+    yeildStrain2 = yeildStrain2Diff+yeildStrain1
+    johnson_D1 = 0
+    johnson_D2 = yeildStrain1**3/yeildStrain2**2
+    johnson_D3 = 4*log(yeildStrain2/yeildStrain1)[0]
     damageInitiationStrain = add(johnson_D1, multiply(johnson_D2, exp(multiply(-johnson_D3, triaxiality))))    
             
     mat = mdb.models['Model-1'].Material(name=materialName)
     mat.Density(table=((density, ), ))
     mat.Elastic(table=((elasticModulus, poissonsRatio), ))
 
-    mat.DruckerPrager(shearCriterion=HYPERBOLIC, table=((frictionAngle, initialTensileStrength, dilationAngle), ))
-    mat.druckerPrager.DruckerPragerHardening(table=(tabulateVectors(compressiveYeildStress, inelasticStrain)))
+    mat.DruckerPrager(shearCriterion=LINEAR, table=((frictionAngle, flowStressRatio, dilationAngle), ))
+    mat.druckerPrager.DruckerPragerHardening(table=(tabulateVectors(compressiveYeildStress, plasticStrain)))
     mat.DuctileDamageInitiation(table=(tabulateVectors(damageInitiationStrain, triaxiality)))
     mat.ductileDamageInitiation.DamageEvolution(type=DISPLACEMENT, table=((failureDisplacement, ), ))		
 
@@ -210,24 +218,20 @@ def buildModel():
 
     sketchPart(partName, gridPoints)
     
-    #concreteDamage(7600000000.0, 0.35, $peakYeildStress, $peakYeildStrain,  $initialCompressiveYeild, $compressiveDamageScaling, $initialTensileYeild, $tLambda, $tensileDamageScaling)
-# def druckerDamage(frictionAngle, dilationAngle, hardening_A, hardening_B, johnson_D2, johnson_D3, failureDisplacement, initialTensileStrength, elasticModulus, poissonsRatio):
-    #druckerDamage(40.5169, 1012301.0, 321551390.0, 1.000000E-03, -15, 0.2, 10600000000.0, 0.35)
     elasticModulus = $elasticModulus
     poissonsRatio = $poissonsRatio
     frictionAngle = $frictionAngle
-    initialTensileStrength = $initialTensileStrength
+    flowStressRatio = $flowStressRatio
     dilationAngle = $dilationAngle
     initialCompressiveYeild = $initialCompressiveYeild
     peakCompressiveYeildDiff = $peakCompressiveYeildDiff
     peakPlasticStrain = $peakPlasticStrain
-    johnson_D1 = $johnson_D1
-    johnson_D2 = $johnson_D2
-    johnson_D3 = $johnson_D3
+    yeildStrain1 = $yeildStrain1
+    yeildStrain2Diff = $yeildStrain2
     failureDisplacement = $failureDisplacement
     
     
-    druckerDamage(elasticModulus, poissonsRatio, frictionAngle, initialTensileStrength, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, johnson_D1, johnson_D2, johnson_D3, failureDisplacement)
+    druckerDamage(elasticModulus, poissonsRatio, frictionAngle, flowStressRatio, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, yeildStrain1, yeildStrain2Diff, failureDisplacement)
     assignSection(sectionName, partName, sectionLocation, materialName)
     meshPart(meshSize, partName, sectionLocation, elementType, elementShape)
     createInstance(instanceName, partName)

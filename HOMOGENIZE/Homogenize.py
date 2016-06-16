@@ -7,8 +7,8 @@ import sys
 import pickle
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-import Common
-from DataSet import DataSet
+from . import common
+from .DataSet import DataSet
 
 class Homogenize(DataSet):
     def __init__(self, centre, radius, dataClass=None, fileName=None, ):
@@ -120,11 +120,11 @@ class Homogenize(DataSet):
             j = 0
             success = 0
             while j < len(blockContacts):
-                relaventBlockContacts = Common.listIntersection(blockContacts[j], relaventContacts)
+                relaventBlockContacts = common.listIntersection(blockContacts[j], relaventContacts)
                 if i+1 > len(newBlockContacts):
                     i += -1
                     noSuccess += 1
-                elif Common.listIntersection(newBlockContacts[i], relaventBlockContacts):
+                elif common.listIntersection(newBlockContacts[i], relaventBlockContacts):
                     success += 1
                     if success > noSuccess:
                         newBlockContacts.append(blockContacts[j])
@@ -163,7 +163,7 @@ class Homogenize(DataSet):
             yVec1 = y1-y2
             xVec2 = x3-x2
             yVec2 = y3-y2
-            vecAngle = Common.angle(xVec1, yVec1, xVec2, yVec2)
+            vecAngle = common.angle(xVec1, yVec1, xVec2, yVec2)
             vecSign = xVec1*yVec2-xVec2*yVec1
             directionSign += vecSign
         if directionSign > 0:
@@ -175,7 +175,7 @@ class Homogenize(DataSet):
         
         for i in range(len(orderedBlocks)):
             allBlockCorners = self.blockData[time][orderedBlocks[i]]['corners']
-            blockCorners = Common.listIntersection(corners, allBlockCorners)           
+            blockCorners = common.listIntersection(corners, allBlockCorners)           
             orderedBlockCorners = []
             for corner in allBlockCorners:
                 if corner in blockCorners:
@@ -195,7 +195,7 @@ class Homogenize(DataSet):
                 yVec1 = y1-y2
                 xVec2 = x3-x2
                 yVec2 = y3-y2
-                vecAngle = Common.angle(xVec1, yVec1, xVec2, yVec2)
+                vecAngle = common.angle(xVec1, yVec1, xVec2, yVec2)
                 vecSign = xVec1*yVec2-xVec2*yVec1
                 blockDirection += vecSign
             if math.copysign(1, blockDirection) != math.copysign(1, directionSign):
@@ -271,7 +271,7 @@ class Homogenize(DataSet):
             print('\tCalculating boundary block corners')
             self.boundaryBlockCorners = self.cornersOnBlocks(self.boundaryContactBlocks)
             print('\tCalculating boundary corners')
-            self.boundaryCorners = Common.listIntersection(self.boundaryContactCorners, self.boundaryBlockCorners)
+            self.boundaryCorners = common.listIntersection(self.boundaryContactCorners, self.boundaryBlockCorners)
             print('\tCalculating missing boundary corners')
             self.allBoundaryCorners = self.duplicateCorners(self.boundaryCorners, self.boundaryContactBlocks)
             print('\tCalculating boundary block order')
@@ -310,14 +310,14 @@ class Homogenize(DataSet):
                     for gridPoint in gridPoints:
                         gpCoordinates = [self.gridPointData[time][gridPoint][var] for var in ['x', 'y']]
                         gp.append(gpCoordinates)
-                    zoneArea = Common.triangleArea(gp)
+                    zoneArea = common.triangleArea(gp)
                     sigma += numpy.multiply(zoneArea,S)
 
                 xx = self.cornerX(self.boundaryCornersOrdered, time)
                 yy = self.cornerY(self.boundaryCornersOrdered, time)
 
-                totalArea = Common.area(list(zip(self.cornerX(self.boundaryCornersOrdered, time), self.cornerY(self.boundaryCornersOrdered, time))))
-            sigmaHistory.append(sigma/totalArea*1e6)
+                totalArea = common.area(list(zip(self.cornerX(self.boundaryCornersOrdered, time), self.cornerY(self.boundaryCornersOrdered, time))))
+            sigmaHistory.append(sigma/totalArea)
         print('')
         print('\tDone')
         self.stressHistory = sigmaHistory

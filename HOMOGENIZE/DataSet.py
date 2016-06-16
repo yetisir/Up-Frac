@@ -2,7 +2,7 @@ import os
 import time
 import copy
 import pickle
-import Common
+from . import common
 
 class DataSet(object):
     def __init__(self, dataClass=None, fileName=None, loadBinary=True):
@@ -18,10 +18,9 @@ class DataSet(object):
             if loadBinary is True:
                 try:
                     print('Attempting to load DEM Data from binary:')
-                    os.stat(filePath)
-                    #binTime = os.stat(filePath).st_mtime
-                    #dataTime = os.stat(os.path.join('UpFracDEMData', fileName + '___block.dat')).st_mtime
-                    if 1:#binTime > dataTime:
+                    dataTime = os.path.getmtime(os.path.join('UDEC', 'compiledData', fileName + '___block.dat'))
+                    binTime = os.path.getmtime(filePath)
+                    if binTime > dataTime:
                         pickleData = pickle.load(open(filePath, 'rb'))
                         self.blockData = pickleData[0]
                         self.contactData = pickleData[1]
@@ -72,7 +71,7 @@ class DataSet(object):
         print('')
 
     def parseDataFile(self, fileName):
-        file = open(os.path.join('UDEC', 'UpFracDEMData', fileName))
+        file = open(os.path.join('UDEC', 'compiledData', fileName))
         header = file.readline()[0:-1].split(' ')
         types = file.readline()[0:-1].split(' ')
         data = {}
@@ -155,7 +154,7 @@ class DataSet(object):
         time = min(self.blockData.keys())
         contacts1 = self.contactsOnBlocks(blocks1)
         contacts2 = self.contactsOnBlocks(blocks2)
-        contacts = Common.listIntersection(contacts1, contacts2)
+        contacts = common.listIntersection(contacts1, contacts2)
         return contacts
 
     def blocksWithContacts(self, blocks, contacts):

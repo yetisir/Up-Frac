@@ -1,6 +1,8 @@
-import argparse
-parser = argparse.ArgumentParser(description='UpFrac: An Up-Scaling Utility for DEM Simulations')
-parser.add_argument('-n', '--name', required=True ,help='Name of the file containing the model data without the extension')
-
-args = parser.parse_args()
-print(args.name)
+from OSTRICH.vectorMath import *
+johnson_D1 = 8.595829E-01
+johnson_D2 = 3.398719E+00
+johnson_D3 = 8.072387E+00
+triaxiality = subtract(divide(range(0, 100), 25), 2)
+damageInitiationStrain = add(johnson_D1, multiply(johnson_D2, exp(multiply(-johnson_D3, triaxiality))))    
+print(triaxiality)
+print(damageInitiationStrain)

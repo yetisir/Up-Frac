@@ -11,7 +11,7 @@ def writeToFile(timeHistory, stressHistory, strainHistory, fileName, parameteriz
     print('Saving homogenization time history:')
     with open(os.path.join('HOMOGENIZE', 'textData', fileName+'_homogenizedData.dat'), 'w') as f:
         f.write('time S11 S22 S12 LE11 LE22 LE12\n')
-        f.write('0.0 '+str(modelData.confiningStress[parameterizationRun]*1e6)+' 0.0 0.0 0.0 0.0 0.0\n') 
+        f.write('0.0 '+str(modelData.confiningStress[parameterizationRun])+' 0.0 0.0 0.0 0.0 0.0\n') 
         #f.write('0.0 0.0 '+str(stressHistory[0][1,1])+' 0.0 0.0 0.0 0.0\n') #fix this line
         
         prescribedStrainHistory = prescribedStrain(modelData.modelSize, modelData.velocityTable[parameterizationRun], -modelData.velocity[parameterizationRun], timeHistory)
@@ -72,7 +72,7 @@ def main():
 
     for i in range(len(modelData.simulationTime)):
         for j in range(len(modelData.confiningStress)):
-            f = '{0}({1}.{2})'.format(modelData.modelName, i, modelData.confiningStress[j])
+            f = '{0}({1}.{2})'.format(modelData.modelName, i, j)
             H = Homogenize.Homogenize(revCentre, revRadius, fileName=f)
             stressHistory = H.stress()
             strainHistory = H.strain()
