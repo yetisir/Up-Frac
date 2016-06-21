@@ -1,17 +1,17 @@
 def modelParameters
-	modelName = 'voronoiGranite(0.5000000.0)'
+	modelName = 'voronoiGranite(0.1)'
 	simulationTime = 100.0
 	numberOfSteps = 50
 end	
 modelParameters
 
 config
-round 0.025
-edge 0.025
+round 0.05
+edge 0.01
 block 0,0 0,10 10,10 10,0
-vor edge 0.5 round 0.025 seed 1
+vor edge 0.5 iterations 20 round 0.025 seed 1
  jdelete
-gen edge 0.5
+gen edge 1
 group zone 'User:Rocks'
 ;zone model elastic density 2700.0 bulk 36111111111.111115 shear 27083333333.333336
 zone model mohr density 2700.0 bulk 36111111111.111115 shear 27083333333.333336 friction 51 cohesion 55100000.0 tension 11700000.0 range group 'User:Rocks'
@@ -26,16 +26,18 @@ boundary yvelocity 0 range -0.0005,10.0005 -0.0005,0.0005
 
 ;*****Left Boundary
 ;boundary xvelocity 0 range -0.0005,0.0005 -0.0005,10.0005
-boundary stress -5000000 0 0 range -0.0005,0.0005 -0.0005,10.0005
+boundary stress -1000000 0 0 range -0.0005,0.0005 -0.0005,10.0005
 
 ;*****Right Boundary
 ;boundary xvelocity 0 history=table 1 range 9.9995,10.0005 -0.0005,10.0005
-boundary stress -5000000 0 0 range 9.9995,10.0005 -0.0005,10.0005
+boundary stress -1000000 0 0 range 9.9995,10.0005 -0.0005,10.0005
 
 ;*****Top Boundary
 boundary yvelocity 0.005 history=table 1 range -0.0005,10.0005 9.9995,10.0005
 
-;fraction 0.0001
+fraction 0.01
 damping auto
+set ovtol 0.05
+set skip_error on
 
 call cycleModel.fis

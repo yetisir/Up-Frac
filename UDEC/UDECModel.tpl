@@ -9,7 +9,7 @@ config
 round $round
 edge $edge
 block 0,0 0,$mSize $mSize,$mSize $mSize,0
-vor edge $bSize round $round seed $vSeed
+vor edge $bSize iterations $vIterations round $vRound seed $vSeed
  jdelete
 gen edge $meshSize
 group zone 'User:Rocks'
@@ -35,7 +35,9 @@ boundary stress $cStress 0 0 range $rRange
 ;*****Top Boundary
 boundary yvelocity $vel history=table 1 range $tRange
 
-;fraction $timeFraction
+fraction $timeFraction
 damping auto
+set ovtol $round
+set skip_error on
 
 call cycleModel.fis
