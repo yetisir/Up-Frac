@@ -23,8 +23,10 @@ def getUDECParameters():
         '$mSize': modelData.modelSize,
         '$bSize': modelData.blockSize,
         '$meshSize': modelData.meshSize,
-        '$round': float(modelData.blockSize)/20,
-        '$edge': float(modelData.blockSize)/20,
+        '$round': float(modelData.blockSize)/10,
+        '$vRound': float(modelData.blockSize)/20,
+        '$vIterations': modelData.voronoiIterations,
+        '$edge': float(modelData.blockSize)/50,
         '$vSeed': modelData.voronoiSeed,
         '$rho': modelData.rho,
         '$bulk': modelData.E/(3*(1-2*modelData.nu)),
@@ -54,7 +56,7 @@ def createUDECModelFiles(UDECParameters):
         UDECParameters['$vel'] = modelData.velocity[i]
         for j in range(len(modelData.confiningStress)):
             UDECParameters['$cStress'] = int(-modelData.confiningStress[j])
-            UDECParameters['$mName'] = '\''+modelData.modelName+'('+str(i)+'.'+str(modelData.confiningStress[j])+')'+'\''      
+            UDECParameters['$mName'] = '\''+modelData.modelName+'('+str(i)+'.'+str(j)+')'+'\''      
             with open('UDECModel.tpl', 'r') as templateFile:
                 template = templateFile.read()
                 for k in UDECParameters.keys():

@@ -1,5 +1,5 @@
 def modelParameters
-	modelName = 'voronoiGranite(0.3)'
+	modelName = 'voronoiGraniteReverse(0.1)'
 	simulationTime = 100.0
 	numberOfSteps = 50
 end	
@@ -19,18 +19,18 @@ group joint 'User:Joints'
 joint model area jks 1000000000.0 jkn 10000000000.0 jfriction 32 jcohesion 100000.0 jtension 0 jdilation 5 range group 'User:Joints'
 set jcondf joint model area jks=1000000000.0 jkn=10000000000.0 jfriction=32 jcohesion=100000.0 jtension=0 jdilation=5
 table 1 delete
-table 1 ((0, -1), (100, -1))
+table 1 ((0, -1), (40.0, -1), (60.0, 1), (100, 1))
 
 ;*****Bottom Boundary
 boundary yvelocity 0 range -0.0005,10.0005 -0.0005,0.0005
 
 ;*****Left Boundary
 ;boundary xvelocity 0 range -0.0005,0.0005 -0.0005,10.0005
-boundary stress -4000000 0 0 range -0.0005,0.0005 -0.0005,10.0005
+boundary stress -1000000 0 0 range -0.0005,0.0005 -0.0005,10.0005
 
 ;*****Right Boundary
 ;boundary xvelocity 0 history=table 1 range 9.9995,10.0005 -0.0005,10.0005
-boundary stress -4000000 0 0 range 9.9995,10.0005 -0.0005,10.0005
+boundary stress -1000000 0 0 range 9.9995,10.0005 -0.0005,10.0005
 
 ;*****Top Boundary
 boundary yvelocity 0.005 history=table 1 range -0.0005,10.0005 9.9995,10.0005
