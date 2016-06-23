@@ -2,58 +2,66 @@ import pickle
 import sys
 import os
 import numpy
+import scipy
 import time
 import random
 from HOMOGENIZE.Plot import Plot
 from HOMOGENIZE.Homogenize import Homogenize
 import matplotlib.pyplot as plt
+import matplotlib
 import argparse
 import importlib
 
 class StressStrainPlot(Plot):
-    def __init__(self, plotName, fileName, showPlots=True, interactive=True, colorBar=False):
-        Plot.__init__(self, plotName, showPlots=showPlots, interactive=interactive, colorBar=colorBar)
-                
-        demFileName = os.path.join('HOMOGENIZE', 'binaryData', fileName+'_homogenizedData.pkl')
-        with open(demFileName, 'rb') as demFile:
-            self.demData = pickle.load(demFile)
-            
-        femFileName = os.path.join('OSTRICH', 'fittedHistory', fileName+'_fittedHistory.pkl')
+    def __init__(self, mode, showPlots=True, interactive=True, colorBar=False, parameterizationRun=0):
+        Plot.__init__(self, '{0}_{1}'.format(modelData.abaqusMaterial, mode), showPlots=showPlots, interactive=interactive, colorBar=colorBar)
+
+        self.demData = []
         self.femDataList = []
-        with open(femFileName, 'rb') as femFile:
-            while True:
-                try:
-                    femData = pickle.load(femFile)
-                    self.femDataList.append(femData)
-                except EOFError:
-                    break
-        
-        self.animationImages = [[] for _ in range(len(self.femDataList))] #num frames
-        self.fileName = fileName
-        
+        for i in range(len(modelData.confiningStress)):
+            demFileName = os.path.join('HOMOGENIZE', 'binaryData', '{0}({1}.{2})_homogenizedData.pkl'.format(modelData.modelName, parameterizationRun, i))
+            with open(demFileName, 'rb') as demFile:
+                self.demData.append(pickle.load(demFile))
+            try:    
+                femFileName = os.path.join('OSTRICH', 'fittedHistory', '{0}({1}.{2})_{3}_fittedHistory.pkl'.format(modelData.modelName, parameterizationRun, i, modelData.abaqusMaterial))
+                self.femDataList.append([])
+                with open(femFileName, 'rb') as femFile:
+                    while True:
+                        try:
+                            femData = pickle.load(femFile)
+                            self.femDataList[i].append(femData)
+                        except EOFError:
+                            break
+                self.animationImages = [[] for _ in range(len(self.femDataList[0]))] #num frames
+            except FileNotFoundError:
+                self.animationImages = [[]]
+        if len(self.animationImages) == 0:
+            self.animationImages = [[]]
         #an issue with matplotlib returns a depreciation warning. this suprpesses it.
         import warnings
         warnings.filterwarnings("ignore")
-         
+        self.parameterizationRun = parameterizationRun
+        self.fileName = modelData.modelName
     #Plotting Functions
-    def plotFemCurves(self, direction):
-        print('Plotting FEM stress-strain curves:')
-        for i in range(len(self.femDataList)):
-            stressData = self.femDataList[i][1]
-            strainData = self.femDataList[i][2]
-            if direction == '11':
-                dirIndex=0
-            elif direction == '22':
-                dirIndex=1
-            elif direction == '12':
-                dirIndex=2            
-            stress = [x[dirIndex]/-1e6 for x in stressData]
-            strain = [x[dirIndex]*-100 for x in strainData]
-            self.animationImages[i] += self.axes.plot(strain, stress, 'b.', label='FEM Approximation')
-        print('\tDone')           
 
-    def plotCurrentFemCurve(self, handle, direction):
-        femFileName = os.path.join('OSTRICH', 'fittedHistory', self.fileName+'_fittedHistory.pkl')
+    def plotAllFemCurves(self):
+        print('Plotting FEM stress-strain curves:')
+        for i in range(len(modelData.confiningStress)):
+            self.plotFemCurves(i)
+            print('\tPlotting for confining stress={0}MPa'.format(modelData.confiningStress[i]/1e6))
+        print('\tDone')        
+        
+        
+    def plotFemCurves(self, confiningStress):
+        for i in range(len(self.femDataList[0])):
+            stressData = self.femDataList[confiningStress][i][1]
+            strainData = self.femDataList[confiningStress][i][2]
+            stress = [(x[1])/-1e6 for x in stressData]
+            strain = [x[1]*-100 for x in strainData]
+            self.animationImages[i] += self.axes.plot(strain, stress, '--', linewidth=2, color=modelData.colors[confiningStress], label='FEM - {0}MPa'.format(modelData.confiningStress[confiningStress]/1e6))
+
+    def plotCurrentFemCurve(self, handle, confiningStress):
+        femFileName = os.path.join('OSTRICH', 'fittedHistory', '{0}({1}.{2})_{3}_fittedHistory.pkl'.format(modelData.modelName, self.parameterizationRun, confiningStress, modelData.abaqusMaterial))
         numFrames = 0
         with open(femFileName, 'rb') as femFile:
             while True:
@@ -65,32 +73,33 @@ class StressStrainPlot(Plot):
         
             stressData = femData[1]
             strainData = femData[2]
-            if direction == '11':
-                dirIndex=0
-            elif direction == '22':
-                dirIndex=1
-            elif direction == '12':
-                dirIndex=2            
-            stress = [x[dirIndex]/-1e6 for x in stressData]
-            strain = [x[dirIndex]*-100 for x in strainData]
+  
+            stress = [(x[1])/-1e6 for x in stressData]
+            strain = [x[1]*-100 for x in strainData]
             handle.set_xdata(strain)
             handle.set_ydata(stress)
         return numFrames
             
-    def interactivePlot(self, direction):
+    def interactivePlot(self):
         plt.ion()
-        h, = self.axes.plot([],[], 'b-')
+        handles = []
+        for i in range(len(modelData.confiningStress)):
+            h, = self.axes.plot([],[], '--', linewidth=2, color=modelData.colors[i])
+            handles.append(h)
         plt.show()
         lastNumFrames = 0
         print('Plotting FEM stress-strain curves:')
         print('\tChecking for new data...', end='')
         while True:
-            currentNumFrames = self.plotCurrentFemCurve(h, direction)
-            if currentNumFrames == lastNumFrames:
+            totalNumFrames = 0
+            for i in range(len(handles)):
+                currentNumFrames = self.plotCurrentFemCurve(handles[i], i)
+                totalNumFrames += currentNumFrames
+            if totalNumFrames == lastNumFrames:
                 resultString = 'No new data found'
             else:
                 resultString = 'Plotting new data'
-                lastNumFrames = currentNumFrames
+                lastNumFrames = totalNumFrames
             print (resultString, end='')
             plt.draw()
             sys.stdout.flush()
@@ -99,88 +108,134 @@ class StressStrainPlot(Plot):
             sys.stdout.flush()
             print('\b'*len(resultString), end='')
             plt.pause(0.5)
-            
-            
-    def plotDemCurve(self, direction):
-        print('Plotting DEM stress-strain curves:')
-        stressData = self.demData[1]
-        strainData = self.demData[2]
-        if direction == '11':
-            dirIndex=(0,0)
-        elif direction == '22':
-            dirIndex=(1,1)
-        elif direction == '12':
-            dirIndex=(0,1)
-        stress = [x[dirIndex]/-1e6 for x in stressData]
-        strain = [x[dirIndex]*-100 for x in strainData]
-        for i in range(len(self.femDataList)):
-            self.animationImages[i] += self.axes.plot(strain, stress, 'r-', label='DEM Simulation')
-        print('\tDone')        
 
-    def setAxis(self, direction):
-        axisLimits = self.limits(direction)
+    def plotDemCurves(self):
+        print('Plotting DEM stress-strain curves...')
+        for i in range(len(modelData.confiningStress)):
+            self.plotDemCurve(i)
+            print('\tPlotting for confining stress={0}MPa'.format(modelData.confiningStress[i]/1e6))
+        print('\tDone')        
+            
+    def plotDemCurve(self, confiningStress):
+        stressData = self.demData[confiningStress][1]
+        strainData = self.demData[confiningStress][2]
+
+        stress = [(x[(1,1)])/-1e6 for x in stressData]
+        strain = [x[(1,1)]*-100 for x in strainData]
+        for i in range(len(self.animationImages)):
+            self.animationImages[i] += self.axes.plot(strain, stress, '-', linewidth=1, color=modelData.colors[confiningStress], label='DEM - {0}MPa'.format(modelData.confiningStress[confiningStress]/1e6))
+    def setAxis(self):
+        axisLimits = self.limits()
         self.axes.set_xlim(axisLimits[0], axisLimits[1])
-        # self.axes.set_ylim(axisLimits[2], axisLimits[3])
-        self.axes.set_ylim(0, 45)
+        self.axes.set_ylim(axisLimits[2], axisLimits[3])
         self.labelAxis()             
         
-    def limits(self, direction):
-        demStress = self.demData[1]
-        demStrain = self.demData[2]
-        if direction == '11':
-            dirIndex=(0,0)
-        elif direction == '22':
-            dirIndex=(1,1)
-        elif direction == '12':
-            dirIndex=(1,2)
-        maxStress = max([x[dirIndex]/-1e6 for x in demStress])
-        minStress = min([x[dirIndex]/-1e6 for x in demStress])
-        maxStrain = max([x[dirIndex]*-100 for x in demStrain])
-        minStrain = min([x[dirIndex]*-100 for x in demStrain])
+    def limits(self):
+        demStress = []
+        demStrain = []
+        for i in range(len(modelData.confiningStress)):
+            demStress += self.demData[i][1]
+            demStrain += self.demData[i][2]
+
+        maxStress = max([(x[(1,1)])/-1e6 for x in demStress])
+        minStress = 0
+        maxStrain = max([x[(1,1)]*-100 for x in demStrain])
+        minStrain = 0
         
         stressBuffer = (maxStress-minStress)*0.2
-        strainBuffer = (maxStrain-minStrain)*0.2
+        strainBuffer = (maxStrain-minStrain)*0.3
         
-        return [minStrain-strainBuffer, maxStrain+strainBuffer, minStress-stressBuffer, maxStress+stressBuffer]        
+        return [0, maxStrain+strainBuffer, 0, maxStress+stressBuffer]        
     
     def labelAxis(self):
-        self.axes.set_xlabel('Strain (%)')
-        self.axes.set_ylabel('Stress (MPa)')     
+        self.axes.set_xlabel('Axial Logarithmic Strain (%)')
+        self.axes.set_ylabel('Axial Cauchy Stress (MPa)')
+
+    def addAnnotations(self):
+        for i in range(len(modelData.confiningStress)):
+            strains = [x[1]*-100 for x in self.femDataList[i][-1][2]]
+            stresses = [x[1]/-1e6 for x in self.femDataList[i][-1][1]]
+            x = max(strains)
+            y = stresses[strains.index(x)]
+            x+=0.1
+            textArtist = matplotlib.text.Text(x, y, '{0}MPa'.format(modelData.confiningStress[i]/1e6))
+            for j in range(len(self.animationImages)):
+                self.animationImages[j].append(textArtist)
+        solidLine = matplotlib.lines.Line2D([0,1], [0,1], linestyle='-', color='k')
+        dashedLine = matplotlib.lines.Line2D([0,1], [0,1], linestyle='--', color='k')
+        leg = matplotlib.legend.Legend(self.axes, [solidLine, dashedLine], ['DEM Response', 'Fitted FEM Response'], loc=2, framealpha=1, fontsize=12, frameon=False)
+        for i in range(len(self.animationImages)):
+            self.animationImages[i].append(leg)
+        self.addRootMeanSquareError()
+        
+    def addRootMeanSquareError(self):
+        demStress = []
+        femStress = []
+        for i in range(len(modelData.confiningStress)):
+            for j in range(len(self.demData[0][0])):
+                demStress.append(self.demData[i][1][j][(1,1)])
+                femStress.append(self.femDataList[i][-1][1][j][1])
+        rmse = numpy.sqrt(((numpy.array(demStress) - numpy.array(femStress)) ** 2).mean())
+        textArtist = matplotlib.text.Text(0.05, 0.82, 'RMSE={0:.2f}MPa'.format(rmse/1e6), transform=self.axes.transAxes)
+        for i in range(len(self.animationImages)):
+            self.animationImages[i].append(textArtist)
+            
     
-    
-def main(fileName, direction):
+def main(parameterizationRun=0, mode='lastFrame'):
     os.system('cls')
        
-    P = StressStrainPlot('test', fileName)
-
-    P.setAxis(direction)
-    P.plotDemCurve(direction)
-    #P.plotFemCurves('22')
-    P.interactivePlot(direction)
-    
-    P.animate()
-    
-    #P.showPlot()
-    #P.lastFrame()
-    
+    P = StressStrainPlot(mode, parameterizationRun=parameterizationRun)
+    P.setAxis()
+    try:
+        P.plotDemCurves()
+    except:
+        print('\tError Plotting DEM Curves')
+    P.plotAllFemCurves()
+    P.addAnnotations()
+    if mode == 'demOnly':
+        P.addLegend()
+        P.lastFrame()
+    else:
+        try:
+            if mode == 'lastFrame':
+                P.plotAllFemCurves()
+                P.addAnnotations()
+                P.lastFrame()
+            elif mode == 'firstFrame':
+                P.plotAllFemCurves()
+                P.addAnnotations()
+                P.firstFrame()
+            elif mode == 'continuous':
+                P.interactivePlot()
+            elif mode == 'history':
+                P.plotAllFemCurves()
+                P.addAnnotations()
+                P.animate()
+            else:
+                print('Mode not recognized')
+        except Exception as E:
+            print(E)
+            print('\tError Plotting FEM Curves')
 def importModelData(modelName):
     global modelData
     modelData = importlib.import_module('UDEC.modelData.'+modelName)
     
     
-def run(fileName, direction):
-    importModelData(fileName)
-    main(fileName, direction)
+def run(modelName, parameterizationRun=0, mode='lastFrame'):
+    importModelData(modelName)
+    main(parameterizationRun=parameterizationRun, mode=mode)
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='UpFracPlot:')
     parser.add_argument('-n', '--name', required=True ,help='Name of the file containing the model data without the extension')
-    parser.add_argument('-s', '--stress', required=True ,help='Stress component')
+    parser.add_argument('-p', '--parameterizationRun', required=False, type=int, default=0, help='Parameterization run')
+    parser.add_argument('-m', '--mode', required=False, default=0, help='Type of Plot')
 
     args = parser.parse_args()
-    fileName = args.name
-    direction = args.stress
+    modelName = args.name
+    parameterizationRun = args.parameterizationRun
+    mode = args.mode
     
-    importModelData(fileName[:fileName.rfind('(')])
-    main(fileName, direction)
+    importModelData(modelName)
+    main(parameterizationRun=parameterizationRun, mode=mode)
 

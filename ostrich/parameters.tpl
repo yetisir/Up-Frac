@@ -1,5 +1,7 @@
 mName = $$mName
 sName = $$sName
+
+abaqusMaterial = $$abaqusMaterial
     
 gridPoints = [[0, 0], [$$mSize, 0], [$$mSize, $$mSize], [0, $$mSize], [0, 0]]
 
@@ -11,8 +13,7 @@ numberOfSteps = $$nSteps
 confiningStress = $$confStress
 
 density = $$rho
-crackingStrain = $$cStrain
-inelasticStrain = $$iStrain
+approxStrain = $$approxStrain
 
 try:
     from abaqusConstants import *

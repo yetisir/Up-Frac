@@ -1,1 +1,1 @@
-python ostrichHomogenize.py -n voronoiGranite
+python ostrichHomogenize.py -n voronoiGranite -i

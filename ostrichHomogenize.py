@@ -3,27 +3,49 @@ import sys
 import pickle
 from HOMOGENIZE import Homogenize
 from numpy import interp
+import numpy
 import math
 import argparse
 import importlib
 
-def writeToFile(timeHistory, stressHistory, strainHistory, fileName, parameterizationRun):
+def writeToFile(timeHistory, stressHistory, strainHistory, fileName, parameterizationRun, interpolate=True):
     print('Saving homogenization time history:')
     with open(os.path.join('HOMOGENIZE', 'textData', fileName+'_homogenizedData.dat'), 'w') as f:
         f.write('time S11 S22 S12 LE11 LE22 LE12\n')
         f.write('0.0 '+str(modelData.confiningStress[parameterizationRun])+' 0.0 0.0 0.0 0.0 0.0\n') 
         #f.write('0.0 0.0 '+str(stressHistory[0][1,1])+' 0.0 0.0 0.0 0.0\n') #fix this line
         
+        #converting data correspond to an expected S22 strain step in order to compare against FEM better
         prescribedStrainHistory = prescribedStrain(modelData.modelSize, modelData.velocityTable[parameterizationRun], -modelData.velocity[parameterizationRun], timeHistory)
+        S11History = [x[0,0] for x in stressHistory]
+        S22History = [x[1,1] for x in stressHistory]
+        S12History = [x[0,1] for x in stressHistory]
+        LE11History = [x[0,0] for x in strainHistory]
+        LE22History = [x[1,1] for x in strainHistory]
+        LE12History = [x[0,1] for x in strainHistory]
+        if interpolate:
+            S22History = interpolateData(S22History, LE22History, prescribedStrainHistory, timeHistory, parameterizationRun)
+            S11History = interpolateData(S11History, LE22History, prescribedStrainHistory, timeHistory, parameterizationRun)
+            S12History = interpolateData(S12History, LE22History, prescribedStrainHistory, timeHistory, parameterizationRun)
+            LE11History = interpolateData(LE11History, LE22History, prescribedStrainHistory, timeHistory, parameterizationRun)
+            LE22History = prescribedStrainHistory
+            LE12History = interpolateData(LE12History, LE22History, prescribedStrainHistory, timeHistory, parameterizationRun)
         for i in range(len(stressHistory)):
-            S11 = stressHistory[i][0,0]
-            S22 = stressHistory[i][1,1]
-            S12 = stressHistory[i][0,1]
-            LE11 = strainHistory[i][0,0]                  
-            #Assuming displacement controlled boundary conditions in the 22 direction
-            strainHistory[i][1,1] = prescribedStrainHistory[i]
-            LE22 = strainHistory[i][1,1]
-            LE12 = strainHistory[i][0,1]
+            LE11 = LE11History[i]                 
+            LE22 = LE22History[i]
+            LE12 = LE12History[i]
+            S11 = S11History[i]
+            S22 = S22History[i]
+            S12 = S12History[i]
+            stressHistory[i][0,0] = S11
+            stressHistory[i][1,1] = S22
+            stressHistory[i][1,0] = S12
+            stressHistory[i][0,1] = S12
+            strainHistory[i][0,0] = LE11
+            strainHistory[i][1,1] = LE22
+            strainHistory[i][1,0] = LE12
+            strainHistory[i][0,1] = LE12
+
             time = timeHistory[i]
             record = [time, S11, S22, S12, LE11, LE22, LE12]
             record = ' '.join(map(str, record))
@@ -33,7 +55,34 @@ def writeToFile(timeHistory, stressHistory, strainHistory, fileName, parameteriz
     with open(os.path.join('HOMOGENIZE', 'binaryData', fileName+'_homogenizedData.pkl'), 'wb') as bundleFile:
         pickle.dump(bundle, bundleFile)
     print('\tDone')
+
+def interpolateData(rawStressData, rawStrainData, prescribedStrainData, prescribedTimeData, parameterizationRun):
+    newStressData = numpy.array([])
+    startStrainIndex = 0
+    for i in range(len(modelData.velocityTable[parameterizationRun])):
+        endStrain = interp(modelData.velocityTable[parameterizationRun][i], prescribedTimeData, prescribedStrainData)
+        endStrainIndex = len(prescribedStrainData) - prescribedStrainData[::-1].index(endStrain) - 1
+        sectionStrains = prescribedStrainData[startStrainIndex: endStrainIndex+1]
+        
+        positiveSectionStrainData= [x*-1 for x in sectionStrains]
+        positiveRawStrainData = [x*-1 for x in rawStrainData]
+
+        newStressData = numpy.append(newStressData, interp(positiveSectionStrainData, positiveRawStrainData, rawStressData, right=numpy.NaN))
+        startStrainIndex = endStrainIndex
+    return newStressData
     
+# def interpolateStress(rawStressData, rawStrainData, prescribedStrainData, prescribedTimeData, test=0):
+    # newStressData = []
+    # startStrainIndex = 0
+    # for i in range(len(modelData.velocityTable)):
+        # endStrain = interp(modelData.velocityTable[i], prescribedTimeData, prescribedStrainData)
+        # endStrainIndex = len(prescribedStrainData) - prescribedStrainData[::-1].index(endStrain) - 1
+        # sectionStrains = prescribedStrainData[startStrainIndex: endStrainIndex+1]
+        # positiveSectionStrains = [x*-1 for x in sectionStrains]
+        # positiveRawStrainData = [x*-1 for x in rawStrainData]
+        # newStressData = interp(positiveSectionStrains, positiveRawStrainData, rawStressData, right=numpy.NaN)
+    # return newStressData
+                
 def prescribedStrain(originalLength, velTable, velocity, timeHistory):
 
 
@@ -64,11 +113,16 @@ def prescribedStrain(originalLength, velTable, velocity, timeHistory):
     return strainHistory
     
             
-def main():
+def main(revCentreX=None, revCentreY=None, revRadius=None, interpolate=True):
     os.system('cls')
-    
-    revCentre = {'x':modelData.modelSize/2, 'y':modelData.modelSize/2}
-    revRadius = modelData.modelSize/2-modelData.blockSize*2
+
+    if revCentreX == None:
+        revCentreX = modelData.modelSize/2
+    if revCentreY == None:
+        revCentreY = modelData.modelSize/2
+    if revRadius == None:
+        revRadius = modelData.modelSize/2-modelData.blockSize*2
+    revCentre = {'x':revCentreX, 'y':revCentreY}
 
     for i in range(len(modelData.simulationTime)):
         for j in range(len(modelData.confiningStress)):
@@ -78,7 +132,7 @@ def main():
             strainHistory = H.strain()
             timeHistory = H.time()
             
-            writeToFile(timeHistory, stressHistory, strainHistory, f, i)
+            writeToFile(timeHistory, stressHistory, strainHistory, f, i, interpolate=interpolate)
             print (' ')
             
     # main()
@@ -88,16 +142,26 @@ def importModelData(modelName):
     modelData = importlib.import_module('UDEC.modelData.'+modelName)
     
     
-def run(modelName):
+def run(modelName, revCentreX=None, revCentreY=None, revRadius=None, interpolate=True):
     importModelData(modelName)
-    main()
+    main(revCentreX, revCentreY, revRadius, interpolate=interpolate)
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ostrichHomogenize: Homogenizes the specified DEM data')
     parser.add_argument('-n', '--name', required=True ,help='Name of the file containing the model data without the extension')
+    parser.add_argument('-x', '--revX', type=float ,help='x coordinate of REV centre')
+    parser.add_argument('-y', '--revY', type=float ,help='y coordinate of REV centre')
+    parser.add_argument('-r', '--revRadius', type=float ,help='Radius of REV centre')
+    parser.add_argument('-i', '--interpolate', dest='interpolate', help='Interpolate Stress and strain data', action='store_true')
+    parser.add_argument('-ni', '--no-interpolate', dest='interpolate', help='Dont interpolate Stress and strain data', action='store_false')
+    parser.set_defaults(interpolate=True)
 
     args = parser.parse_args()
     modelName = args.name
+    revCentreX = args.revX
+    revCentreY = args.revY
+    revRadius = args.revRadius
+    interpolate = args.interpolate
     
     importModelData(modelName)
-    main()
+    main(revCentreX, revCentreY, revRadius, interpolate=interpolate)

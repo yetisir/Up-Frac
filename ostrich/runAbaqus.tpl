@@ -1,4 +1,5 @@
 import os
+import math
 from math import *
 from caeModules import *
 from odbAccess import *
@@ -28,70 +29,112 @@ def tabulateVectors(vec1, vec2):
 	for i in range(vecLength):
 		tabulatedData.append((vec1[i], vec2[i]))
 	return tabulatedData
-		
-def concreteDamage(elasticModulus, poissonsRatio, peakYeildStress, peakYeildStrain,  initialCompressiveYeild, compressiveDamageScaling, initialTensileYeild, tLambda, tensileDamageScaling):
+
+def tensilePlasticStrain(n, args):
+    elasticModulus = args['elasticModulus']
+    tLambda = args['tLambda']
+    initialTensileYeild = args['initialTensileYeild']
+
+    return (initialTensileYeild*tLambda*math.exp(approxStrain*tLambda)*(1/(approxStrain + 1)**n - 1)*(approxStrain + 1)**n)/elasticModulus - (initialTensileYeild*n*math.exp(approxStrain*tLambda)*(approxStrain + 1)**n)/(elasticModulus*(approxStrain + 1)**(n + 1)) + (initialTensileYeild*n*math.exp(approxStrain*tLambda)*(1/(approxStrain + 1)**n - 1)*(approxStrain + 1)**(n - 1))/elasticModulus + 1
+
+def compressiveBeta(initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain):
+    peakCompressiveYeild = initialCompressiveYeild+peakCompressiveYeildDiff
+    alpha = compressiveAlpha(initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain)
+    return math.log((2*alpha)/(1+alpha))/peakPlasticStrain
+    
+def compressiveAlpha(initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain):
+    peakCompressiveYeild = initialCompressiveYeild+peakCompressiveYeildDiff
+    return (2*peakCompressiveYeild-initialCompressiveYeild+2*math.sqrt(peakCompressiveYeild*(peakCompressiveYeild-initialCompressiveYeild)))/initialCompressiveYeild
+    
+def compressivePlasticStrain(m, args):
+    elasticModulus = args['elasticModulus']
+    initialCompressiveYeild = args['initialCompressiveYeild']
+    peakCompressiveYeildDiff = args['peakCompressiveYeildDiff']
+    peakPlasticStrain = args['peakPlasticStrain']
+    
+    peakCompressiveYeild = initialCompressiveYeild+peakCompressiveYeildDiff
+    alpha = compressiveAlpha(initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain)
+    beta = compressiveBeta(initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain)
+    
+    return -((initialCompressiveYeild*approxStrain*m*(beta*math.exp(-beta*approxStrain)*(alpha - 1) + 2*alpha*beta*math.exp(-2*beta*approxStrain)))/(elasticModulus*(approxStrain*m - 1)) - (initialCompressiveYeild*m*(alpha*math.exp(-2*beta*approxStrain) + math.exp(-beta*approxStrain)*(alpha - 1)))/(elasticModulus*(approxStrain*m - 1)) + (initialCompressiveYeild*approxStrain*m**2*(alpha*math.exp(-2*beta*approxStrain) + math.exp(-beta*approxStrain)*(alpha - 1)))/(elasticModulus*(approxStrain*m - 1)**2) ) + 1
+
+def root(f, args,  limits=[0.0,1.0], tolerance=0.001, samples=10):
+    dl = (limits[1]-limits[0])/samples
+    n = [limits[0]]
+    for i in range(1, samples+1):
+        n.append(n[i-1]+dl) 
+    i = 1
+    while i < samples+1:
+        val = f(n[i], args)
+        if val < 0 and n[i-1]!=n[i] :
+            nRefined = root(f, args, limits=[n[i-1], n[i]], tolerance=tolerance, samples=samples)
+            n.append(nRefined)
+            break
+        if abs(val) < tolerance:
+            break
+        i += 1
+    if i == samples+1:
+        nRefined = root(f, args, limits=[n[-2], n[-1]*10], tolerance=tolerance, samples=samples)
+        n.append(nRefined)
+    return n[-1]    
+    
+def concreteDamage(elasticModulus, poissonsRatio, dilationAngle, eccentricity, invariantRatio, equibiaxialRatio,  initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, tLambda, initialTensileYeild, tensileDamageScaling, compressiveDamageScaling):
     materialName = 'Material-1'
-    #****Concrete Damage Plasticity
-    #dilationAngle = 10 #this will be same as UDEC****************************
-    eccentricity = 0.1 #default
-    fb0fc0 = 1.16 #default
-    variableK = 6.700000E-01 #default
-    viscousParameter = 0 #default
-    #density = 2700# same as UDEC***************************************
 
-    b = 1e6
-    a = (initialCompressiveYeild - peakYeildStress)/peakYeildStrain**2
-    compressiveYeildStress = add(multiply(a, power(subtract(inelasticStrain, peakYeildStrain), 2)), peakYeildStress)
-    #compressiveYeildStress = [b if x < b else x for x in compressiveYeildStress]
-    E = elasticModulus
-    m = divide(1, add(divide(compressiveYeildStress, elasticModulus), inelasticStrain))
-    m = min(m)*compressiveDamageScaling
-    compressiveDamage = multiply(m, inelasticStrain)
+    peakCompressiveYeild = initialCompressiveYeild+peakCompressiveYeildDiff
+    
+    alpha = compressiveAlpha(initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain)
+    beta = compressiveBeta(initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain)
 
-    tensileYeildStress = multiply(initialTensileYeild, exp(multiply(tLambda, crackingStrain)))
-    n = multiply(tensileDamageScaling, multiply(divide(log(subtract(1.00, divide(crackingStrain, add(divide(tensileYeildStress, elasticModulus), crackingStrain)))), log(add(1, crackingStrain))), -1))
-    n[0] = elasticModulus/initialTensileYeild
-    n = min(n)
-    tensileDamage = subtract(1, divide(1, power(add(1, crackingStrain), n))) 
+    plasticStrain = divide(range(0, 100), 100/approxStrain)
+    
+    compressiveYeildStress = multiply(initialCompressiveYeild, subtract(multiply(1+alpha, exp(multiply(-beta, plasticStrain))), multiply(alpha, exp(multiply(-2*beta, plasticStrain)))))
+    
+    try:
+        m = root(compressivePlasticStrain, {'elasticModulus':elasticModulus, 'initialCompressiveYeild':initialCompressiveYeild, 'peakCompressiveYeildDiff':peakCompressiveYeildDiff, 'peakPlasticStrain':peakPlasticStrain})
+    except (OverflowError, RuntimeError):
+        m = 0.9/approxStrain
+    
+    compressiveDamage = multiply(m*compressiveDamageScaling, plasticStrain)
+
+    tLambda = -tLambda
+    tensileYeildStress = multiply(initialTensileYeild, exp(multiply(tLambda, plasticStrain)))
+    n = root(tensilePlasticStrain, {'elasticModulus':elasticModulus, 'tLambda':tLambda, 'initialTensileYeild':initialTensileYeild})
+    tensileDamage = subtract(0.95, divide(0.95, power(add(1, plasticStrain), n*tensileDamageScaling))) 
             
     mat = mdb.models['Model-1'].Material(name=materialName)
     mat.Density(table=((density, ), ))
     mat.Elastic(table=((elasticModulus, poissonsRatio), ))
 
     mat.ConcreteDamagedPlasticity(table=
-        ((dilationAngle, eccentricity, fb0fc0, variableK, viscousParameter), ))
+        ((dilationAngle, eccentricity, equibiaxialRatio, invariantRatio, 0), ))
     mat.concreteDamagedPlasticity.ConcreteCompressionHardening(
-        table=(tabulateVectors(compressiveYeildStress, inelasticStrain)))
+        table=(tabulateVectors(compressiveYeildStress, plasticStrain)))
     mat.concreteDamagedPlasticity.ConcreteTensionStiffening(
-        table=(tabulateVectors(tensileYeildStress, crackingStrain)))
+        table=(tabulateVectors(tensileYeildStress, plasticStrain)))
         
     mat.concreteDamagedPlasticity.ConcreteCompressionDamage(
-        table=(tabulateVectors(compressiveDamage, inelasticStrain)))
+        table=(tabulateVectors(compressiveDamage, plasticStrain)))
     mat.concreteDamagedPlasticity.ConcreteTensionDamage(
-        table=(tabulateVectors(tensileDamage, crackingStrain)))         
+        table=(tabulateVectors(tensileDamage, plasticStrain)))             
+
 
 def druckerDamage(elasticModulus, poissonsRatio, frictionAngle, flowStressRatio, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, yeildStrain1, yeildStrain2Diff, failureDisplacement):
     materialName = 'Material-1'
     
-    #hardening_n = 0.5
-    #compressiveYeildStress = add(hardening_A, multiply(hardening_B, power(inelasticStrain, hardening_n)))
     peakCompressiveYeild = initialCompressiveYeild+peakCompressiveYeildDiff
     
-    alpha = (2*peakCompressiveYeild-initialCompressiveYeild+2*sqrt(peakCompressiveYeild*(peakCompressiveYeild-initialCompressiveYeild)))/initialCompressiveYeild
-    beta = log((2*alpha)/(1+alpha))[0]/peakPlasticStrain
+    alpha = compressiveAlpha(initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain)
+    beta = compressiveBeta(initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain)
 
-    plasticStrain = divide(range(0, 100), 2000)
+    plasticStrain = divide(range(0, 100), 100/approxStrain)
     compressiveYeildStress = multiply(initialCompressiveYeild, subtract(multiply(1+alpha, exp(multiply(-beta, plasticStrain))), multiply(alpha, exp(multiply(-2*beta, plasticStrain)))))
     
     triaxiality = subtract(divide(range(0, 100), 25), 2)
-    #yeildStrainMinus1 = yeildStrain0+yeildStrainMinus1Diff
-    # johnson_D1 = (yeildStrainMinus1*yeildStrain1-yeildStrain0**2)/(yeildStrainMinus1+yeildStrain1-2*yeildStrain0)
-    # johnson_D2 = -(yeildStrain0-yeildStrain1)*(yeildStrain0-yeildStrainMinus1)/(yeildStrainMinus1+yeildStrain1-2*yeildStrain0)
-    # johnson_D3 = log(-(yeildStrain0-yeildStrain1)/(yeildStrain0-yeildStrainMinus1))[0]
     yeildStrain2 = yeildStrain2Diff+yeildStrain1
     johnson_D1 = 0
     johnson_D2 = yeildStrain1**3/yeildStrain2**2
-    johnson_D3 = 4*log(yeildStrain2/yeildStrain1)[0]
+    johnson_D3 = 4*math.log(yeildStrain2/yeildStrain1)
     damageInitiationStrain = add(johnson_D1, multiply(johnson_D2, exp(multiply(-johnson_D3, triaxiality))))    
             
     mat = mdb.models['Model-1'].Material(name=materialName)
@@ -218,41 +261,15 @@ def buildModel():
 
     sketchPart(partName, gridPoints)
     
-    elasticModulus = $elasticModulus
-    poissonsRatio = $poissonsRatio
-    frictionAngle = $frictionAngle
-    flowStressRatio = $flowStressRatio
-    dilationAngle = $dilationAngle
-    initialCompressiveYeild = $initialCompressiveYeild
-    peakCompressiveYeildDiff = $peakCompressiveYeildDiff
-    peakPlasticStrain = $peakPlasticStrain
-    yeildStrain1 = $yeildStrain1
-    yeildStrain2Diff = $yeildStrain2
-    failureDisplacement = $failureDisplacement
-    
-    
-    druckerDamage(elasticModulus, poissonsRatio, frictionAngle, flowStressRatio, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, yeildStrain1, yeildStrain2Diff, failureDisplacement)
+    $$$materialDef
+        
     assignSection(sectionName, partName, sectionLocation, materialName)
     meshPart(meshSize, partName, sectionLocation, elementType, elementShape)
     createInstance(instanceName, partName)
-
-    # createGeostaticStep(steps[1], steps[0])
     createExplicitDynamicStep(steps[1],steps[0])
-    # createExplicitDynamicStep(steps[1], steps[0])
-    # createExplicitDynamicStep(steps[2],steps[1])
-
-    #applyGravity(gravityMagnitude, stepName)
-    # if confiningStress != 0:
-        # applyConfiningStress('Right', instanceName, steps[1], boundaries['Right'], -confiningStress)
-        # applyConfiningStress('Left', instanceName, steps[1], boundaries['Left'], -confiningStress)
-    # applyGeostaticStress('Geostatic', instanceName, sectionLocation, confiningStress)
    
     applyDisplacementBoundaryCondition('Bottom', instanceName, steps[0], boundaries['Bottom'],
         (UNSET, SET, UNSET))
-    # applyDisplacementBoundaryCondition('Top', instanceName, steps[0], boundaries['Top'], 
-        # (UNSET, SET, UNSET))
-    # mdb.models['Model-1'].boundaryConditions['Top'].setValuesInStep(stepName=steps[2], u2=FREED)
-
     applyVelocityBoundaryCondition('vTop', instanceName, steps[1], boundaries['Top'], (UNSET, v, UNSET))
 
 def getStress(jobName, stepName, instanceName):
@@ -335,6 +352,7 @@ if __name__ == '__main__':
             os.system('jclean.bat')
             fWrite(e)
             attempts -= 1
+                #write Error Report
                 # with open('OstExeOut.txt', 'r') as f:
                     # for i in f.readlines():
                         # fWrite(i)

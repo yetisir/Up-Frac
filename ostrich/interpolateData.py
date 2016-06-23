@@ -17,9 +17,9 @@ def interpolateData(binaryDataFile, sName):
         rawStressHistory = numpy.array(pickle.load(file)).transpose()
         rawStrainHistory = numpy.array(pickle.load(file)).transpose()
     
-    timeHistory = numpy.linspace(0, simulationTime, numberOfSteps+1)
-    stressHistory = numpy.empty([3, numberOfSteps+1]);
-    strainHistory = numpy.empty([3, numberOfSteps+1]);
+    timeHistory = numpy.linspace(0, simulationTime, numberOfSteps+1)[1:]
+    stressHistory = numpy.empty([3, numberOfSteps]);
+    strainHistory = numpy.empty([3, numberOfSteps]);
     for i in range(3):
         stressHistory[i, :] = griddata(rawTimeHistory, rawStressHistory[i], timeHistory)
         strainHistory[i, :] = griddata(rawTimeHistory, rawStrainHistory[i], timeHistory)
@@ -27,7 +27,7 @@ def interpolateData(binaryDataFile, sName):
     strainHistory = strainHistory.transpose()
             
     bundle = [timeHistory, stressHistory, strainHistory]
-    bundleFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'fittedHistory', sName+'_fittedHistory.pkl')
+    bundleFileName = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'fittedHistory', sName+'_'+abaqusMaterial+'_fittedHistory.pkl')
     with open(bundleFileName, 'ab') as fittedFile:
         pickle.dump(bundle, fittedFile)           
        

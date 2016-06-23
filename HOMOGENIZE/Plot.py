@@ -63,9 +63,8 @@ class Plot(object):
     def addLegend(self):
         handles, labels = self.axes.get_legend_handles_labels()
         by_label = OrderedDict(zip(labels, handles))
-        times = sorted(self.blockData)
-        for i in range(len(times)):
-            self.animationImages[i].append(self.axes.legend(by_label.values(), by_label.keys()))
+        for i in range(len(self.animationImages)):
+            self.animationImages[i].append(self.axes.legend(by_label.values(), by_label.keys(), framealpha=0, loc=2))
         
     #Viewing Functions
     def animate(self, interval=50, delay=1000):
@@ -74,34 +73,39 @@ class Plot(object):
         for i in range(delayFrames):
             ai.append(self.animationImages[-1])
         im_ani = animation.ArtistAnimation(self.figure, ai, interval=50, blit=True)
-        print ('Encoding Video File:')
         self.saveVideo(im_ani)
-        print('\tDone')
         self.showPlot()
 
     def firstFrame(self):
         self.axes.cla()
         for i in range(len(self.animationImages[0])):
             self.axes.add_artist(self.animationImages[0][i])
+        self.labelAxis()
+        self.saveFigure()
         self.showPlot()
 
     def lastFrame(self):
         self.axes.cla()
         for i in range(len(self.animationImages[-1])):
             self.axes.add_artist(self.animationImages[-1][i])
+        self.labelAxis()
         self.saveFigure()
         self.showPlot()
         
     def saveFigure(self):
+        print('Saving Figure:')
         fileName = os.path.join('figures', self.fileName+'_'+self.plotName) 
         self.figure.savefig(fileName+'.svg', format='svg')
         self.figure.savefig(fileName+'.png', format='png')
+        print('\tDone')
 
     def saveVideo(self, ani):
+        print ('Encoding Video File:')
         Writer = animation.writers['ffmpeg']
         writer = Writer(fps=15, bitrate=1800)
         fileName = os.path.abspath(os.path.join('figures', self.fileName+'_'+self.plotName) )
         ani.save(fileName+'.mp4', writer=writer)
+        print('\tDone')
 
     def showPlot(self):
         self.labelAxis()

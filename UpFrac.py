@@ -24,7 +24,7 @@ def main():
         print('Cleaning up OSTRICH mess from previous run...')
         os.system('cleanup.bat')
         for j in range(len(modelData.confiningStress)):
-            open(os.path.join('fittedHistory', '{0}({1}.{2})_fittedHistory.pkl'.format(modelData.modelName, i, j)), 'w').close()
+            open(os.path.join('fittedHistory', '{0}({1}.{2})_{3}_fittedHistory.pkl'.format(modelData.modelName, i, j, modelData.abaqusMaterial)), 'w').close()
         print('\tDone')
         print('Initializing OSTRICH...' )
         print('\tDone')
@@ -78,7 +78,7 @@ def main():
         os.chdir(os.pardir)
         
         print('Saving estimated parameter set')
-        shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}.txt'.format(modelData.modelName, parameterizationRun)))
+        shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}_{2}.txt'.format(modelData.modelName, modelData.abaqusMaterial, parameterizationRun)))
         print('\tDone\n')
       
         parameterizationRun +=1
