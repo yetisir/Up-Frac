@@ -19,9 +19,9 @@ class Plot(object):
         
         #TODO: fix this to acocmodate non-colorbar plots
         if colorBar:
-            self.figure = plt.figure(figsize=(6,5))
-            self.axes = self.figure.add_axes([0.1, 0.1, 0.825*5/6, 0.825])
-            self.colorBarAxes = self.figure.add_axes([0.825, 0.1, 0.05, 0.825])
+            self.figure = plt.figure(figsize=(8,5))
+            self.axes = self.figure.add_axes([0.1, 0.1, 0.7, 0.7])
+            self.colorBarAxes = self.figure.add_axes([0.825, 0.1, 0.05, 0.7])
         else:
             self.figure = plt.figure(figsize=(5,5))
             self.axes = self.figure.add_axes([0.15, 0.1, 0.8, 0.85])
@@ -59,12 +59,21 @@ class Plot(object):
         self.axes.set_xlim(xCen - xOff, xCen + xOff)
         self.axes.set_ylim(yCen - yOff, yCen + yOff)
         self.labelAxis()
-
+        
+    def removeAxes(self):
+        self.axes.get_xaxis().set_visible(False)
+        self.axes.get_yaxis().set_visible(False)
+        
+    def removeFrame(self):
+        self.figure.patch.set_visible(False)
+        self.axes.axis('off')
+       
     def addLegend(self):
         handles, labels = self.axes.get_legend_handles_labels()
         by_label = OrderedDict(zip(labels, handles))
-        for i in range(len(self.animationImages)):
-            self.animationImages[i].append(self.axes.legend(by_label.values(), by_label.keys(), framealpha=0, loc=2))
+        times = sorted(self.blockData)
+        for i in range(len(times)):
+            self.animationImages[i].append(self.axes.legend(by_label.values(), by_label.keys()))
         
     #Viewing Functions
     def animate(self, interval=50, delay=1000):
@@ -73,39 +82,34 @@ class Plot(object):
         for i in range(delayFrames):
             ai.append(self.animationImages[-1])
         im_ani = animation.ArtistAnimation(self.figure, ai, interval=50, blit=True)
+        print ('Encoding Video File:')
         self.saveVideo(im_ani)
+        print('\tDone')
         self.showPlot()
 
     def firstFrame(self):
         self.axes.cla()
         for i in range(len(self.animationImages[0])):
             self.axes.add_artist(self.animationImages[0][i])
-        self.labelAxis()
-        self.saveFigure()
         self.showPlot()
 
     def lastFrame(self):
         self.axes.cla()
         for i in range(len(self.animationImages[-1])):
             self.axes.add_artist(self.animationImages[-1][i])
-        self.labelAxis()
         self.saveFigure()
         self.showPlot()
         
     def saveFigure(self):
-        print('Saving Figure:')
         fileName = os.path.join('figures', self.fileName+'_'+self.plotName) 
         self.figure.savefig(fileName+'.svg', format='svg')
         self.figure.savefig(fileName+'.png', format='png')
-        print('\tDone')
 
     def saveVideo(self, ani):
-        print ('Encoding Video File:')
         Writer = animation.writers['ffmpeg']
         writer = Writer(fps=15, bitrate=1800)
         fileName = os.path.abspath(os.path.join('figures', self.fileName+'_'+self.plotName) )
         ani.save(fileName+'.mp4', writer=writer)
-        print('\tDone')
 
     def showPlot(self):
         self.labelAxis()

@@ -34,5 +34,5 @@ velocity = [0.005]
 
 timeStepFraction = 0.01
 
-abaqusMaterial = 'concreteDamage'
+abaqusMaterial = 'druckerDamage'
 

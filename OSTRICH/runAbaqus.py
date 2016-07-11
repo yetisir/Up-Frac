@@ -262,20 +262,18 @@ def buildModel():
     sketchPart(partName, gridPoints)
     
     
-    elasticModulus = 1574861000.0
-    poissonsRatio = 0.3755856
-    dilationAngle = 13.07659
-    eccentricity = 0.4249099
-    invariantRatio = 0.6474719
-    equibiaxialRatio = 1.289982
-    initialCompressiveYeild = 52266.98
-    peakCompressiveYeildDiff = 3276328.0
-    peakPlasticStrain = 0.005485066
-    tLambda = 356.7335
-    initialTensileYeild = 420270.5
-    tensileDamageScaling = 0.6536259
-    compressiveDamageScaling = 0.9474579
-    concreteDamage(elasticModulus, poissonsRatio, dilationAngle, eccentricity, invariantRatio, equibiaxialRatio,  initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, tLambda, initialTensileYeild, tensileDamageScaling, compressiveDamageScaling)
+    elasticModulus = 1735299000.0
+    poissonsRatio = 0.157693
+    frictionAngle = 56.71445
+    flowStressRatio = 0.863174
+    dilationAngle = 7.195244
+    initialCompressiveYeild = 50525.16
+    peakCompressiveYeildDiff = 3781050.0
+    peakPlasticStrain = 0.02621448
+    yeildStrain1 = 0.0001756842
+    yeildStrain2Diff = 0.8033255
+    failureDisplacement = 0.09527388
+    druckerDamage(elasticModulus, poissonsRatio, frictionAngle, flowStressRatio, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, yeildStrain1, yeildStrain2Diff, failureDisplacement)
     
         
     assignSection(sectionName, partName, sectionLocation, materialName)

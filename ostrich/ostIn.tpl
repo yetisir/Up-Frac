@@ -35,11 +35,13 @@ EndLevMar
 
 BeginParticleSwarm
 SwarmSize  24
-NumGenerations  50
+NumGenerations  100
 EndParticleSwarm
 
 BeginMathAndStats
 Default
+Confidence
+Sensitivity
 EndMathAndStats
 
 BeginExtraFiles

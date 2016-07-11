@@ -58,7 +58,7 @@ class StressStrainPlot(Plot):
             strainData = self.femDataList[confiningStress][i][2]
             stress = [(x[1])/-1e6 for x in stressData]
             strain = [x[1]*-100 for x in strainData]
-            self.animationImages[i] += self.axes.plot(strain, stress, '--', linewidth=2, color=modelData.colors[confiningStress], label='FEM - {0}MPa'.format(modelData.confiningStress[confiningStress]/1e6))
+            self.animationImages[i] += self.axes.plot(strain, stress, '--', linewidth=2, color=modelData.colors[confiningStress], label='CDM - {0}MPa'.format(modelData.confiningStress[confiningStress]/1e6))
 
     def plotCurrentFemCurve(self, handle, confiningStress):
         femFileName = os.path.join('OSTRICH', 'fittedHistory', '{0}({1}.{2})_{3}_fittedHistory.pkl'.format(modelData.modelName, self.parameterizationRun, confiningStress, modelData.abaqusMaterial))
@@ -163,7 +163,7 @@ class StressStrainPlot(Plot):
                 self.animationImages[j].append(textArtist)
         solidLine = matplotlib.lines.Line2D([0,1], [0,1], linestyle='-', color='k')
         dashedLine = matplotlib.lines.Line2D([0,1], [0,1], linestyle='--', color='k')
-        leg = matplotlib.legend.Legend(self.axes, [solidLine, dashedLine], ['DEM Response', 'Fitted FEM Response'], loc=2, framealpha=1, fontsize=12, frameon=False)
+        leg = matplotlib.legend.Legend(self.axes, [solidLine, dashedLine], ['DEM Response', 'Fitted CDM Response'], loc=2, framealpha=1, fontsize=12, frameon=False)
         for i in range(len(self.animationImages)):
             self.animationImages[i].append(leg)
         self.addRootMeanSquareError()
@@ -175,7 +175,8 @@ class StressStrainPlot(Plot):
             for j in range(len(self.demData[0][0])):
                 demStress.append(self.demData[i][1][j][(1,1)])
                 femStress.append(self.femDataList[i][-1][1][j][1])
-        rmse = numpy.sqrt(((numpy.array(demStress) - numpy.array(femStress)) ** 2).mean())
+        print(((numpy.array(demStress) - numpy.array(femStress)) ** 2))
+        rmse = numpy.sqrt(numpy.nanmean(((numpy.array(demStress) - numpy.array(femStress)) ** 2)))
         textArtist = matplotlib.text.Text(0.05, 0.82, 'RMSE={0:.2f}MPa'.format(rmse/1e6), transform=self.axes.transAxes)
         for i in range(len(self.animationImages)):
             self.animationImages[i].append(textArtist)
@@ -190,8 +191,7 @@ def main(parameterizationRun=0, mode='lastFrame'):
         P.plotDemCurves()
     except:
         print('\tError Plotting DEM Curves')
-    P.plotAllFemCurves()
-    P.addAnnotations()
+    
     if mode == 'demOnly':
         P.addLegend()
         P.lastFrame()
@@ -209,7 +209,7 @@ def main(parameterizationRun=0, mode='lastFrame'):
                 P.interactivePlot()
             elif mode == 'history':
                 P.plotAllFemCurves()
-                P.addAnnotations()
+                #P.addAnnotations()
                 P.animate()
             else:
                 print('Mode not recognized')

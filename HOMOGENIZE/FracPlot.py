@@ -3,6 +3,8 @@ import numpy as np
 import math
 import sys
 import pickle
+import matplotlib.path as mplPath
+import matplotlib
 from . import common
 from scipy.ndimage.filters import gaussian_filter
 from collections import OrderedDict
@@ -75,7 +77,7 @@ class FracPlot(DataSet, Plot):
     #Plotting Functions
     def labelAxis(self):
         self.axes.set_xlabel('Horizontal (m)')
-        self.axes.set_ylabel('Vertical (m)')     
+        self.axes.set_ylabel('Vertical (m)')
         
     def plotBlocks(self):
         times = sorted(self.blockData)
@@ -102,6 +104,23 @@ class FracPlot(DataSet, Plot):
         times = sorted(self.blockData)
         for i in range(len(times)):
             self.animationImages[i] += self.axes.plot(x, y, linestyle, label=label, linewidth=linewidth, marker=marker, markersize=markersize)
+
+    def plotBorder(self, shape, label='Border', linestyle='k-', linewidth=1):        
+        times = sorted(self.blockData)
+        x = [i[0] for i in shape]
+        y = [i[1] for i in shape]
+        for i in range(len(times)):
+            self.animationImages[i] += self.axes.plot(x, y, linestyle, label=label, linewidth=linewidth)
+            
+            
+    def removeAxes(self):
+        self.axes.get_xaxis().set_visible(False)
+        self.axes.get_yaxis().set_visible(False)
+        
+    def removeFrame(self):
+        self.figure.patch.set_visible(False)
+        self.axes.axis('off')
+             
             
     def plotZoomBox(self, centre=(0.5, 0.5), zoom=4, label=None, linestyle='c-'):        
         axisLimits = self.limits()    
@@ -128,13 +147,17 @@ class FracPlot(DataSet, Plot):
         
         self.plotLine(x, y, linestyle=linestyle, marker=None, label=label)
             
-    def plotStressField(self, stressType, stressLimits='automatic', loadData=True, sigma=1):
+    def plotStressField(self, stressType, stressLimits='automatic', loadData=True, sigma=1, shape='default', numColors=10):
         times = sorted(self.blockData)
         cmap = plt.cm.viridis
         allX = []
         allY = []
         allZ = []
         filePath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'binaryData', self.fileName+'_'+stressType+'.dat')
+        
+        if shape=='default':
+            shape = [(0,0), (10,0), (10,10), (0, 10)]
+            
         calculate = True
         if loadData == True:
             try:
@@ -149,7 +172,6 @@ class FracPlot(DataSet, Plot):
                     print('\tFailed... Binanry data out of date')
             except:
                 print('\tFailed... No binary data found')
-
         if calculate == True:
             print('Interpolating {} stress grid:'.format(stressType))
             print('\tFor Frame #', end='')
@@ -193,7 +215,9 @@ class FracPlot(DataSet, Plot):
                     zoneX.append(gridPointX/len(gridPoints))
                     zoneY.append(gridPointY/len(gridPoints))
                 
-                X, Y, Z = common.grid(zoneX, zoneY, stress)
+                cornersX = [x[0] for x in shape]
+                cornersY = [x[1] for x in shape]
+                X, Y, Z = common.grid(zoneX, zoneY, stress, limits=[min(cornersX), max(cornersX), min(cornersY), max(cornersY)])
                 allX.append(X)
                 allY.append(Y)
                 allZ.append(Z)
@@ -223,13 +247,36 @@ class FracPlot(DataSet, Plot):
             X = allX[i]         
             Y = allY[i]
             Z = allZ[i]
-            #Z = gaussian_filter(Z, sigma)
-            im = self.axes.contourf(X, Y, Z, 10, cmap=cmap, vmin=zmin, vmax=zmax, origin='lower')
+            Z = gaussian_filter(Z, sigma)
+            
+            bbPath = mplPath.Path(np.array(shape))
+            for j in range(len(X)):
+                for k in range(len(X[j])):
+                    if bbPath.contains_point((X[j,k], Y[j,k])) == False:
+                        Z[j,k] = np.NaN
+            for j in range(len(shape)-1):
+                if shape[j][0] - shape[j+1][0] == 0 or shape[j][1] - shape[j+1][1] == 0:
+                    pass
+                else:
+                    
+                    for k in range(len(Y)):
+                        row = list(Z[k])
+                        edgeIndex = len(row)
+                        for l in range(len(row)):
+                            if str(row[l]) == str(np.NaN):
+                                edgeIndex = l+1
+                        if edgeIndex < len(row):
+                            X[k, edgeIndex] = np.interp(Y[k, edgeIndex], [shape[j+1][1], shape[j][1]], [shape[j+1][0], shape[j][0]])
+            
+            im = self.axes.contourf(X, Y, Z, numColors, cmap=cmap, vmin=zmin, vmax=zmax, origin='lower')
             self.animationImages[i] += im.collections
 
         print('\nPlotting {} stress field:'.format(stressType))
-        norm = matcolors.Normalize(vmin=zmin, vmax=zmax)
-        colorBar = colorbar.ColorbarBase(self.colorBarAxes, cmap=cmap, norm=norm)
-        colorBar.set_label('MPa')      
+        bounds = np.linspace(0,numColors,numColors+1)
+        scaleLength = zmax-zmin
+        bounds = bounds * scaleLength / (len(bounds)-1)+ zmin
+        norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+        self.colorBar = colorbar.ColorbarBase(self.colorBarAxes, cmap=cmap, norm=norm)
+        self.colorBar.set_label('MPa')
         print('\tDone')
         

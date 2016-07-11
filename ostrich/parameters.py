@@ -1,7 +1,7 @@
 mName = 'voronoiGraniteReverse'
 sName = ['voronoiGraniteReverse(0.0)', 'voronoiGraniteReverse(0.1)', 'voronoiGraniteReverse(0.2)', 'voronoiGraniteReverse(0.3)']
 
-abaqusMaterial = 'concreteDamage'
+abaqusMaterial = 'druckerDamage'
     
 gridPoints = [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]
 

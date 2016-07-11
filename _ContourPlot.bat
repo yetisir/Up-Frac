@@ -1,1 +1,1 @@
-python fracPlot.py voronoiGranite(0.3)
+python contourPlot.py voronoiGranite(0.3)

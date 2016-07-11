@@ -8,9 +8,9 @@ import importlib
 import argparse
 
 
-def main():
+def main(radius=10):
     os.system('cls')
-    # os.system('python ostrichHomogenize.py' + fileName)
+    os.system('python ostrichHomogenize.py -n {0} -r {1} -i'.format(modelData.modelName, radius))
     parameterizationRun = 1
     for i in range(len(modelData.simulationTime)):
         simulationName = '{0}({1}.'.format(modelData.modelName, i, 0)
@@ -78,7 +78,7 @@ def main():
         os.chdir(os.pardir)
         
         print('Saving estimated parameter set')
-        shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}_{2}.txt'.format(modelData.modelName, modelData.abaqusMaterial, parameterizationRun)))
+        shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}_{2}_radius-{3}.txt'.format(modelData.modelName, modelData.abaqusMaterial, parameterizationRun, radius)))
         print('\tDone\n')
       
         parameterizationRun +=1
@@ -91,17 +91,19 @@ def importModelData(modelName):
     modelData = importlib.import_module('UDEC.modelData.'+modelName)
     
     
-def run(modelName):
+def run(modelName, radius=10):
     importModelData(modelName)
-    main()
+    main(radius)
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='UpFrac: An Up-Scaling Utility for DEM Simulations')
     parser.add_argument('-n', '--name', required=True ,help='Name of the file containing the model data without the extension')
+    parser.add_argument('-r', '--radius', help='REV radius')
 
     args = parser.parse_args()
     modelName = args.name
+    radius = args.radius
     
     importModelData(modelName)
-    main()
+    main(radius)
 
