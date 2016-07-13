@@ -272,8 +272,9 @@ class Homogenize(DataSet):
             self.boundaryBlockCorners = self.cornersOnBlocks(self.boundaryContactBlocks)
             print('\tCalculating boundary corners')
             self.boundaryCorners = common.listIntersection(self.boundaryContactCorners, self.boundaryBlockCorners)
-            print('\tCalculating missing boundary corners')
-            self.allBoundaryCorners = self.duplicateCorners(self.boundaryCorners, self.boundaryContactBlocks)
+            #print('\tCalculating missing boundary corners')
+            #self.allBoundaryCorners = self.duplicateCorners(self.boundaryCorners, self.boundaryContactBlocks)
+            self.allBoundaryCorners = self.boundaryCorners
             print('\tCalculating boundary block order')
             self.boundaryBlocksOrdered = self.orderBlocks(self.boundaryContactBlocks, self.outsideContacts)
             print('\tCalculating boundary corner order')
@@ -290,6 +291,8 @@ class Homogenize(DataSet):
         print('Assessing homogenized stresses:')
         sigmaHistory = []
         print('\tAt time ', end='')
+        time = min(self.blockData.keys())
+        totalArea = common.area(list(zip(self.cornerX(self.boundaryCornersOrdered, time), self.cornerY(self.boundaryCornersOrdered, time))))
         for time in sorted(self.blockData.keys()):
             numString = str(time)+'s'
             print(numString, end='')
@@ -316,7 +319,7 @@ class Homogenize(DataSet):
                 xx = self.cornerX(self.boundaryCornersOrdered, time)
                 yy = self.cornerY(self.boundaryCornersOrdered, time)
 
-                totalArea = common.area(list(zip(self.cornerX(self.boundaryCornersOrdered, time), self.cornerY(self.boundaryCornersOrdered, time))))
+                #totalArea = common.area(list(zip(self.cornerX(self.boundaryCornersOrdered, time), self.cornerY(self.boundaryCornersOrdered, time))))
             sigmaHistory.append(sigma/totalArea)
         print('')
         print('\tDone')

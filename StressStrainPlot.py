@@ -148,8 +148,8 @@ class StressStrainPlot(Plot):
         return [0, maxStrain+strainBuffer, 0, maxStress+stressBuffer]        
     
     def labelAxis(self):
-        self.axes.set_xlabel('Axial Logarithmic Strain (%)')
-        self.axes.set_ylabel('Axial Cauchy Stress (MPa)')
+        self.axes.set_xlabel('Axial Strain ($\%$)')
+        self.axes.set_ylabel('Axial Stress ($MPa$)')
 
     def addAnnotations(self):
         for i in range(len(modelData.confiningStress)):
@@ -158,7 +158,7 @@ class StressStrainPlot(Plot):
             x = max(strains)
             y = stresses[strains.index(x)]
             x+=0.1
-            textArtist = matplotlib.text.Text(x, y, '{0}MPa'.format(modelData.confiningStress[i]/1e6))
+            textArtist = matplotlib.text.Text(x, y, '${0}MPa$'.format(modelData.confiningStress[i]/1e6))
             for j in range(len(self.animationImages)):
                 self.animationImages[j].append(textArtist)
         solidLine = matplotlib.lines.Line2D([0,1], [0,1], linestyle='-', color='k')
@@ -177,7 +177,7 @@ class StressStrainPlot(Plot):
                 femStress.append(self.femDataList[i][-1][1][j][1])
         print(((numpy.array(demStress) - numpy.array(femStress)) ** 2))
         rmse = numpy.sqrt(numpy.nanmean(((numpy.array(demStress) - numpy.array(femStress)) ** 2)))
-        textArtist = matplotlib.text.Text(0.05, 0.82, 'RMSE={0:.2f}MPa'.format(rmse/1e6), transform=self.axes.transAxes)
+        textArtist = matplotlib.text.Text(0.05, 0.82, 'RMSE=${0:.2f}MPa$'.format(rmse/1e6), transform=self.axes.transAxes)
         for i in range(len(self.animationImages)):
             self.animationImages[i].append(textArtist)
             

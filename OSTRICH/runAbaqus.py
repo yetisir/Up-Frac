@@ -262,17 +262,17 @@ def buildModel():
     sketchPart(partName, gridPoints)
     
     
-    elasticModulus = 1735299000.0
-    poissonsRatio = 0.157693
-    frictionAngle = 56.71445
-    flowStressRatio = 0.863174
-    dilationAngle = 7.195244
-    initialCompressiveYeild = 50525.16
-    peakCompressiveYeildDiff = 3781050.0
-    peakPlasticStrain = 0.02621448
-    yeildStrain1 = 0.0001756842
-    yeildStrain2Diff = 0.8033255
-    failureDisplacement = 0.09527388
+    elasticModulus = 1586434000.0
+    poissonsRatio = 0.1816438
+    frictionAngle = 57.01088
+    flowStressRatio = 0.8544342
+    dilationAngle = 14.0741
+    initialCompressiveYeild = 47353.76
+    peakCompressiveYeildDiff = 3730081.0
+    peakPlasticStrain = 0.03307162
+    yeildStrain1 = 0.000124629
+    yeildStrain2Diff = 0.7281718
+    failureDisplacement = 0.0868484
     druckerDamage(elasticModulus, poissonsRatio, frictionAngle, flowStressRatio, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, yeildStrain1, yeildStrain2Diff, failureDisplacement)
     
         

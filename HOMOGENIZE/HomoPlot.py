@@ -1,6 +1,5 @@
 import os
 import sys
-import Homogenize
 
 from .FracPlot import FracPlot
 class HomoPlot(FracPlot):
@@ -45,18 +44,18 @@ class HomoPlot(FracPlot):
     def plotREV(self):
         self.plotCircle(self.radius, self.centre, label='REV Boundary')
 
-    def plotBoundaryEdge(self):
+    def plotBoundaryEdge(self, linewidth=2):
         times = sorted(self.cornerData)
         for i in range(len(times)):
             x = self.cornerX(self.boundaryCornersOrdered, times[i])
             y = self.cornerY(self.boundaryCornersOrdered, times[i])
-            self.animationImages[i] += self.axes.plot(x, y, 'k-', label='Homogenization Boundary', linewidth=2, marker='.', markersize=10)
+            self.animationImages[i] += self.axes.plot(x, y, 'k-', label='Homogenization Boundary', linewidth=linewidth, marker='.', markersize=10)
 
-    def plotBoundaryEdge_Initial(self):
+    def plotBoundaryEdge_Initial(self, linewidth=2):
         time = min(self.cornerData.keys())
         x = self.cornerX(self.boundaryCornersOrdered, time)
         y = self.cornerY(self.boundaryCornersOrdered, time)
-        self.plotLine(x, y, label='Initial Homogenization Boundary', linewidth=1, marker=None)
+        self.plotLine(x, y, label='Initial Homogenization Boundary', linewidth=linewidth, marker=None)
     
     def plotHomogenizationAnimation(self):        
         minTime = min(self.blockData.keys())   
@@ -89,7 +88,7 @@ class HomoPlot(FracPlot):
         plt.plot([7.5,8.5,8.5,7.5,7.5], [7.6,7.6,8.4,8.4,7.6], 'r-')
         fig1.hold(False)
 
-def main()
+def main():
     os.system('cls')
     
     clargs = sys.argv

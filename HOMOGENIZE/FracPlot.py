@@ -113,16 +113,16 @@ class FracPlot(DataSet, Plot):
             self.animationImages[i] += self.axes.plot(x, y, linestyle, label=label, linewidth=linewidth)
             
             
-    def removeAxes(self):
-        self.axes.get_xaxis().set_visible(False)
-        self.axes.get_yaxis().set_visible(False)
+    # def removeAxes(self):
+        # self.axes.get_xaxis().set_visible(False)
+        # self.axes.get_yaxis().set_visible(False)
         
-    def removeFrame(self):
-        self.figure.patch.set_visible(False)
-        self.axes.axis('off')
+    # def removeFrame(self):
+        # self.figure.patch.set_visible(False)
+        # self.axes.axis('off')
              
             
-    def plotZoomBox(self, centre=(0.5, 0.5), zoom=4, label=None, linestyle='c-'):        
+    def plotZoomBox(self, centre=(0.5, 0.5), zoom=4, label=None, linestyle='g-'):        
         axisLimits = self.limits()    
         xMin = axisLimits[0]
         xMax = axisLimits[1]
@@ -133,7 +133,7 @@ class FracPlot(DataSet, Plot):
         yLen = yMax - yMin
         
         xCen = centre[0]*xLen + xMin
-        yCen = centre[0]*yLen + yMin
+        yCen = centre[1]*yLen + yMin
         
         xOff = xLen/2/zoom
         yOff = yLen/2/zoom

@@ -10,7 +10,10 @@ import argparse
 
 def main(radius=10):
     os.system('cls')
-    os.system('python ostrichHomogenize.py -n {0} -r {1} -i'.format(modelData.modelName, radius))
+    if radius:
+        os.system('python ostrichHomogenize.py -n {0} -r {1} -i'.format(modelData.modelName, radius))
+    else:
+        os.system('python ostrichHomogenize.py -n {0} -i'.format(modelData.modelName))
     parameterizationRun = 1
     for i in range(len(modelData.simulationTime)):
         simulationName = '{0}({1}.'.format(modelData.modelName, i, 0)
@@ -78,7 +81,10 @@ def main(radius=10):
         os.chdir(os.pardir)
         
         print('Saving estimated parameter set')
-        shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}_{2}_radius-{3}.txt'.format(modelData.modelName, modelData.abaqusMaterial, parameterizationRun, radius)))
+        if radius:
+            shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}_{2}_radius-{3}.txt'.format(modelData.modelName, modelData.abaqusMaterial, parameterizationRun, radius)))
+        else:
+            shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}_{2}.txt'.format(modelData.modelName, modelData.abaqusMaterial, parameterizationRun)))
         print('\tDone\n')
       
         parameterizationRun +=1

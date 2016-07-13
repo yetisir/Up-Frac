@@ -51,7 +51,7 @@ class Plot(object):
         yLen = yMax - yMin
         
         xCen = centre[0]*xLen + xMin
-        yCen = centre[0]*yLen + yMin
+        yCen = centre[1]*yLen + yMin
         
         xOff = xLen/2/zoom
         yOff = yLen/2/zoom
@@ -68,13 +68,15 @@ class Plot(object):
         self.figure.patch.set_visible(False)
         self.axes.axis('off')
        
-    def addLegend(self):
+    def addLegend(self, location='best'):
         handles, labels = self.axes.get_legend_handles_labels()
         by_label = OrderedDict(zip(labels, handles))
         times = sorted(self.blockData)
         for i in range(len(times)):
-            self.animationImages[i].append(self.axes.legend(by_label.values(), by_label.keys()))
+            self.animationImages[i].append(self.axes.legend(by_label.values(), by_label.keys(), loc=location, fontsize=12))
         
+    def clear(self):
+        self.axes.cla()
     #Viewing Functions
     def animate(self, interval=50, delay=1000):
         delayFrames = int(delay/interval)
@@ -92,13 +94,14 @@ class Plot(object):
         for i in range(len(self.animationImages[0])):
             self.axes.add_artist(self.animationImages[0][i])
         self.showPlot()
+        self.saveFigure()
 
     def lastFrame(self):
         self.axes.cla()
         for i in range(len(self.animationImages[-1])):
             self.axes.add_artist(self.animationImages[-1][i])
-        self.saveFigure()
         self.showPlot()
+        self.saveFigure()
         
     def saveFigure(self):
         fileName = os.path.join('figures', self.fileName+'_'+self.plotName) 

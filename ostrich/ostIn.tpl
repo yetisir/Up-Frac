@@ -34,8 +34,8 @@ MaxIterations    20
 EndLevMar
 
 BeginParticleSwarm
-SwarmSize  24
-NumGenerations  100
+SwarmSize  240
+NumGenerations  10
 EndParticleSwarm
 
 BeginMathAndStats

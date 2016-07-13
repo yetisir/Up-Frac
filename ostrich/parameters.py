@@ -1,5 +1,5 @@
-mName = 'voronoiGraniteReverse'
-sName = ['voronoiGraniteReverse(0.0)', 'voronoiGraniteReverse(0.1)', 'voronoiGraniteReverse(0.2)', 'voronoiGraniteReverse(0.3)']
+mName = 'voronoiGranite'
+sName = ['voronoiGranite(0.0)', 'voronoiGranite(0.1)', 'voronoiGranite(0.2)', 'voronoiGranite(0.3)']
 
 abaqusMaterial = 'druckerDamage'
     
@@ -29,7 +29,7 @@ try:
     # steps = ('Initial', 'Step-1', 'Step-2')
     v = 0.005
     vNames = (('Bottom', ), ('Top', ), ('Left', ), ('Right', ))
-    velocityTable = ((0, -1), (40.0, -1), (60.0, 1), (100, 1))
+    velocityTable = ((0, -1), (100, -1))
 
     largeDef=ON
 except ImportError: pass

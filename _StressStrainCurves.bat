@@ -1,1 +1,1 @@
-python StressStrainPlot.py -n voronoiGraniteReverse -m lastFrame
+python StressStrainPlot.py -n voronoiGranite -m lastFrame
