@@ -25,7 +25,7 @@ confiningStress = [0.5e6, 1e6, 2e6, 4e6]
 colors = ['#1b9e77','#d95f02','#7570b3','#e7298a'] #From colorbrewer2.org
 
 units = ['m', 'Pa', 'kg', 's']
-relevantMeasurements = ['S22']
+relevantMeasurements = ['S11', 'S22']
 
 simulationTime = [100]
 numberOfSteps = 50

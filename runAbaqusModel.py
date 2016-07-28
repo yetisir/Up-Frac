@@ -19,6 +19,40 @@ def getVelocityString(velTable):
     vString += '({0}, {1}))'.format(velTable[-1], amp)
     return vString
     
+def getBoundaryDisplacements(parameterizationRun):
+    displacements = []
+    for k in range(len(modelData.confiningStress)):
+        with open(os.path.join('HOMOGENIZE', 'binaryData', '{0}({1}.{2})_homogenizedData.pkl'.format(modelData.modelName, parameterizationRun, k)), 'rb') as bundleFile:
+            bundle = pickle.load(bundleFile)
+            timeHistory = bundle[0]
+            stressHistory = bundle[1]
+            strainHistory = bundle[2]
+        LE11 = [x[0,0] for x in strainHistory]
+        LE22 = [x[1,1] for x in strainHistory]
+        
+        U1 = [x*modelData.modelSize for x in LE11]
+        U2 = [x*modelData.modelSize for x in LE22]
+
+        v1Tuple = [(timeHistory[i], U1[i]) for i in range(len(timeHistory))]
+        v2Tuple = [(timeHistory[i], U2[i]) for i in range(len(timeHistory))]
+        displacements.append((v1Tuple, v2Tuple))
+    return displacements
+        
+def getBoundaryStresses(parameterizationRun):
+    stresses = []
+    for k in range(len(modelData.confiningStress)):
+        with open(os.path.join('HOMOGENIZE', 'binaryData', '{0}({1}.{2})_homogenizedData.pkl'.format(modelData.modelName, parameterizationRun, k)), 'rb') as bundleFile:
+            bundle = pickle.load(bundleFile)
+            timeHistory = bundle[0]
+            stressHistory = bundle[1]
+            strainHistory = bundle[2]
+        S11 = [-x[0,0] for x in stressHistory]
+        S22 = [-x[1,1] for x in stressHistory]
+        
+        S1Tuple = [(timeHistory[i], S11[i]) for i in range(len(timeHistory))]
+        S2Tuple = [(timeHistory[i], S22[i]) for i in range(len(timeHistory))]
+        stresses.append((S1Tuple, S2Tuple))
+    return stresses
 
 def getModelParameters(parameterizationRun):
 
@@ -32,6 +66,9 @@ def getModelParameters(parameterizationRun):
                             '$$vel':modelData.velocity[parameterizationRun],
                             '$$sTime':modelData.simulationTime[parameterizationRun],
                             '$$vString':getVelocityString(modelData.velocityTable[parameterizationRun]),
+                            '$$boundaryDisplacements': getBoundaryDisplacements(parameterizationRun),
+                            '$$boundaryStresses': getBoundaryStresses(parameterizationRun),
+                            '$$relVars': modelData.relevantMeasurements, 
                             '$$abaqusMaterial':'\''+modelData.abaqusMaterial+'\''}
     return parameters
                                 
@@ -66,7 +103,6 @@ def getModelConstants(fittedName):
                 eolPosition = parameterBlock.find('\n', paramPosition)
                 value = float(parameterBlock[colonPosition+1:eolPosition])
                 parameters['${0}'.format(parameter)] = value
-    print(parameters)
     return parameters
     
     
@@ -86,7 +122,6 @@ def fillTemplate(template, parameters, file):
 def importModelData(modelName):
     global modelData
     modelData = importlib.import_module('UDEC.modelData.'+modelName)
-    print(modelData.abaqusMaterial)
 
 def importMaterialData(materialName):
     global material

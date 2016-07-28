@@ -30,7 +30,7 @@ relevantMeasurements = ['S22']
 simulationTime = [100]
 numberOfSteps = 50
 velocityTable = [[simulationTime[0]]]
-velocity = [0.015]
+velocity = [0.010]
 
 timeStepFraction = 0.01
 

@@ -1,4 +1,4 @@
-python runAbaqusModel.py -f voronoiGranite -n voronoiGraniteReverse -r 1
+python runAbaqusModel.py -f voronoiGranite -n voronoiGraniteVerify -r 1
 CD OSTRICH
 CALL copyTestScripts.bat
 CD model0

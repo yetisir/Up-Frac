@@ -1,1 +1,1 @@
-python contourPlot.py voronoiGranite(0.3)
+python contourPlot.py voronoiGraniteTensile(0.1)

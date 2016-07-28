@@ -15,12 +15,16 @@ confiningStress = $$confStress
 density = $$rho
 approxStrain = $$approxStrain
 
+boundaryDisplacements = $$boundaryDisplacements
+boundaryStresses = $$boundaryStresses
+relevantMeasurements = $$relVars
+
 try:
     from abaqusConstants import *
         
     elementType = CPE4R
     elementShape = QUAD
-    meshSize = 10
+    meshSize = $$mSize
 
     instanceName = 'BLOCK-1'
 
@@ -31,5 +35,5 @@ try:
     vNames = (('Bottom', ), ('Top', ), ('Left', ), ('Right', ))
     velocityTable = $$vString
 
-    largeDef=ON
+    largeDef=OFF
 except ImportError: pass

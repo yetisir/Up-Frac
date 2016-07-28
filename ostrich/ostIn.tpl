@@ -1,7 +1,6 @@
 #Configuration File for Ostrich Program
-#ProgramType Levenberg-Marquardt
-#ProgramType PSO-GM
-ProgramType ParticleSwarm
+
+ProgramType $$pType
 
 BeginFilePairs    
 runAbaqus.temp.tpl	runAbaqus.py
@@ -21,7 +20,6 @@ BeginObservations
 $$ostrichObservations
 EndObservations
 
-#Configuration for Levenberg-Marquardt algorithm
 BeginLevMar
 InitialLambda    10.0
 LambdaScaleFactor    1.1
@@ -34,9 +32,37 @@ MaxIterations    20
 EndLevMar
 
 BeginParticleSwarm
-SwarmSize  240
-NumGenerations  10
+SwarmSize  48
+NumGenerations  25
+ConstrictionFactor  1.00
+CognitiveParam  4.00
+SocialParam  2.00
+InertiaWeight  1.20
+InertiaReductionRate 0.05
 EndParticleSwarm
+
+BeginAPPSO
+SwarmSize  48
+NumGenerations  25
+ConstrictionFactor  1.00
+CognitiveParam  4.00
+SocialParam  2.00
+InertiaWeight  1.20
+InertiaReductionRate 0.1
+EndAPPSO
+
+BeginParallelDDSAlg
+PerturbationValue 0.2
+MaxIterations 1000
+UseRandomParamValues
+UseOpt standard
+EndParallelDDSAlg
+
+BeginDDSAlg
+PerturbationValue 0.2
+MaxIterations 1000
+UseRandomParamValues
+EndDDSAlg
 
 BeginMathAndStats
 Default

@@ -79,7 +79,7 @@ class DataSet(object):
         firstLoop = 1
         while 1:
             record = file.readline()[0:].replace('\n', '').replace('  ', ' ').split(' ')
-            record.remove('')
+            record = list(filter(('').__ne__, record))
             if record == []:
                 try:
                     data[dictTime] = copy.copy(timeData)

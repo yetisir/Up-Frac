@@ -1,2 +1,2 @@
-python UpFrac.py -n voronoiGranite
+python UpFrac.py -n voronoiGranite -o APPSO
 PAUSE

@@ -18,7 +18,7 @@ jks = 1e9
 jkn = 10e9
 jFriction = 32
 jCohesion = 100e3
-jTension = 0
+jTension = 100e3
 jDilation = 5
 
 confiningStress = [0.5e6, 1e6, 2e6, 4e6]

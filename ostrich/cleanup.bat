@@ -1,10 +1,14 @@
 @ECHO OFF
 DEL OstModel*.txt >NUL 2>NUL
+DEL runFileMPI* >NUL 2>NUL
 DEL OstErrors*.txt >NUL 2>NUL
 DEL OstTemp*.txt >NUL 2>NUL
 DEL OstOutput*.txt >NUL 2>NUL
 DEL OstStatus0.txt >NUL 2>NUL
+DEL OstQuit.txt >NUL 2>NUL
 DEL OstArchive.txt >NUL 2>NUL
+DEL OstDDSPn.txt >NUL 2>NUL
+DEL dds_status.out >NUL 2>NUL
 DEL OstrichErrors.log >NUL 2>NUL
 DEL Proc*.stdout >NUL 2>NUL
 DEL *.Barrier.*.* >NUL 2>NUL

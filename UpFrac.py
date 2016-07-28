@@ -8,12 +8,12 @@ import importlib
 import argparse
 
 
-def main(radius=10):
+def main(identity=None, optimizer='ParticleSwarm'):
     os.system('cls')
-    if radius:
-        os.system('python ostrichHomogenize.py -n {0} -r {1} -i'.format(modelData.modelName, radius))
-    else:
-        os.system('python ostrichHomogenize.py -n {0} -i'.format(modelData.modelName))
+#    if radius:
+#        os.system('python ostrichHomogenize.py -n {0} -r {1}'.format(modelData.modelName, radius))
+#    else:
+    os.system('python ostrichHomogenize.py -n {0}'.format(modelData.modelName))
     parameterizationRun = 1
     for i in range(len(modelData.simulationTime)):
         simulationName = '{0}({1}.'.format(modelData.modelName, i, 0)
@@ -21,7 +21,7 @@ def main(radius=10):
         print('OSTRICH file setup for {0} set {1}'.format(modelData.modelName, parameterizationRun))
         print('*'*70)
         print('Filling in model templates...')
-        os.system('python createOstrichInput.py -n {0} -r {1}'.format(modelData.modelName, parameterizationRun))
+        os.system('python createOstrichInput.py -n {0} -r {1} -o {2}'.format(modelData.modelName, parameterizationRun, optimizer))
         print('\tDone')
         os.chdir(os.path.join(os.getcwd(), 'OSTRICH'))
         print('Cleaning up OSTRICH mess from previous run...')
@@ -81,8 +81,10 @@ def main(radius=10):
         os.chdir(os.pardir)
         
         print('Saving estimated parameter set')
-        if radius:
-            shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}_{2}_radius-{3}.txt'.format(modelData.modelName, modelData.abaqusMaterial, parameterizationRun, radius)))
+#        if radius:
+#            shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}_{2}_radius-{3}.txt'.format(modelData.modelName, modelData.abaqusMaterial, parameterizationRun, radius)))
+        if identity:
+            shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}_{2}_{3}_id-{4}.txt'.format(modelData.modelName, modelData.abaqusMaterial, parameterizationRun, optimizer, identity)))            
         else:
             shutil.copy(os.path.join('OSTRICH', 'OstOutput0.txt'), os.path.join('OSTRICH', 'ostOutput', 'OstOutput_{0}_{1}_{2}.txt'.format(modelData.modelName, modelData.abaqusMaterial, parameterizationRun)))
         print('\tDone\n')
@@ -104,12 +106,18 @@ def run(modelName, radius=10):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='UpFrac: An Up-Scaling Utility for DEM Simulations')
     parser.add_argument('-n', '--name', required=True ,help='Name of the file containing the model data without the extension')
-    parser.add_argument('-r', '--radius', help='REV radius')
+    #parser.add_argument('-r', '--radius', help='REV radius')
+    parser.add_argument('-id', '--identity', help='identification Number')
+    parser.add_argument('-o', '--optimizer', default='ParticleSwarm', help='optimization algorithm')
+
 
     args = parser.parse_args()
     modelName = args.name
-    radius = args.radius
+    #radius = args.radius
+    identity = args.identity
+    optimizer = args.optimizer
     
     importModelData(modelName)
-    main(radius)
-
+    #TODO:maybe just pass args instead?
+    main(identity, optimizer)
+    #main(radius, identity, optimizer)

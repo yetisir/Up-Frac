@@ -103,6 +103,13 @@ class Plot(object):
         self.showPlot()
         self.saveFigure()
         
+    def specifyFrame(self, frame):
+        self.axes.cla()
+        for i in range(len(self.animationImages[frame])):
+            self.axes.add_artist(self.animationImages[frame][i])
+        self.showPlot()
+        self.saveFigure()
+        
     def saveFigure(self):
         fileName = os.path.join('figures', self.fileName+'_'+self.plotName) 
         self.figure.savefig(fileName+'.svg', format='svg')

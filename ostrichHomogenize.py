@@ -8,13 +8,11 @@ import math
 import argparse
 import importlib
 
-def writeToFile(timeHistory, stressHistory, strainHistory, fileName, parameterizationRun, interpolate=True):
+def writeToFile(timeHistory, stressHistory, strainHistory, cStressIndex, parameterizationRun, interpolate=True):
     print('Saving homogenization time history:')
+    fileName = '{0}({1}.{2})'.format(modelData.modelName, parameterizationRun, cStressIndex)
     with open(os.path.join('HOMOGENIZE', 'textData', fileName+'_homogenizedData.dat'), 'w') as f:
         f.write('time S11 S22 S12 LE11 LE22 LE12\n')
-        f.write('0.0 '+str(modelData.confiningStress[parameterizationRun])+' 0.0 0.0 0.0 0.0 0.0\n') 
-        #f.write('0.0 0.0 '+str(stressHistory[0][1,1])+' 0.0 0.0 0.0 0.0\n') #fix this line
-        
         #converting data correspond to an expected S22 strain step in order to compare against FEM better
         prescribedStrainHistory = prescribedStrain(modelData.modelSize, modelData.velocityTable[parameterizationRun], -modelData.velocity[parameterizationRun], timeHistory)
         S11History = [x[0,0] for x in stressHistory]
@@ -23,6 +21,7 @@ def writeToFile(timeHistory, stressHistory, strainHistory, fileName, parameteriz
         LE11History = [x[0,0] for x in strainHistory]
         LE22History = [x[1,1] for x in strainHistory]
         LE12History = [x[0,1] for x in strainHistory]
+
         if interpolate:
             S22History = interpolateData(S22History, LE22History, prescribedStrainHistory, timeHistory, parameterizationRun)
             S11History = interpolateData(S11History, LE22History, prescribedStrainHistory, timeHistory, parameterizationRun)
@@ -30,6 +29,8 @@ def writeToFile(timeHistory, stressHistory, strainHistory, fileName, parameteriz
             LE11History = interpolateData(LE11History, LE22History, prescribedStrainHistory, timeHistory, parameterizationRun)
             LE22History = prescribedStrainHistory
             LE12History = interpolateData(LE12History, LE22History, prescribedStrainHistory, timeHistory, parameterizationRun)
+        #stressHistory = [numpy.array([[-modelData.confiningStress[cStressIndex], 0],[0, 0]] )]+stressHistory 
+        #strainHistory = [numpy.array([[0,0],[0,0]])]+strainHistory
         for i in range(len(stressHistory)):
             LE11 = LE11History[i]                 
             LE22 = LE22History[i]
@@ -132,7 +133,7 @@ def main(revCentreX=None, revCentreY=None, revRadius=None, interpolate=True):
             strainHistory = H.strain()
             timeHistory = H.time()
             
-            writeToFile(timeHistory, stressHistory, strainHistory, f, i, interpolate=interpolate)
+            writeToFile(timeHistory, stressHistory, strainHistory, j, i, interpolate=interpolate)
             print (' ')
             
     # main()
@@ -154,7 +155,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--revRadius', type=float ,help='Radius of REV centre')
     parser.add_argument('-i', '--interpolate', dest='interpolate', help='Interpolate Stress and strain data', action='store_true')
     parser.add_argument('-ni', '--no-interpolate', dest='interpolate', help='Dont interpolate Stress and strain data', action='store_false')
-    parser.set_defaults(interpolate=True)
+    parser.set_defaults(interpolate=False)
 
     args = parser.parse_args()
     modelName = args.name

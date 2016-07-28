@@ -1,13 +1,17 @@
 from numpy import linspace, meshgrid
-from matplotlib.mlab import griddata
+from scipy.interpolate import griddata
 import math
 
-def grid(x, y, z, resX=100, resY=100):
+def grid(x, y, z, resX=100, resY=100, limits='default'):
     "Convert 3 column data to matplotlib grid"
-    xi = linspace(min(x), max(x), resX)
-    yi = linspace(min(y), max(y), resY)
-    Z = griddata(x, y, z, xi, yi)
+    if limits == 'default':
+        xi = linspace(min(x), max(x), resX)
+        yi = linspace(min(y), max(y), resY)
+    else:
+        xi = linspace(limits[0], limits[1], resX)
+        yi = linspace(limits[2], limits[3], resY)
     X, Y = meshgrid(xi, yi)
+    Z = griddata((x, y), z, (X, Y), method='nearest')
     return X, Y, Z     
 
 def triangleArea(gp):

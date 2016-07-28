@@ -17,9 +17,9 @@ def interpolateData(binaryDataFile, sName):
         rawStressHistory = numpy.array(pickle.load(file)).transpose()
         rawStrainHistory = numpy.array(pickle.load(file)).transpose()
     
-    timeHistory = numpy.linspace(0, simulationTime, numberOfSteps+1)[1:]
-    stressHistory = numpy.empty([3, numberOfSteps]);
-    strainHistory = numpy.empty([3, numberOfSteps]);
+    timeHistory = numpy.linspace(0, simulationTime, numberOfSteps+1)
+    stressHistory = numpy.empty([3, numberOfSteps+1]);
+    strainHistory = numpy.empty([3, numberOfSteps+1]);
     for i in range(3):
         stressHistory[i, :] = griddata(rawTimeHistory, rawStressHistory[i], timeHistory)
         strainHistory[i, :] = griddata(rawTimeHistory, rawStrainHistory[i], timeHistory)
