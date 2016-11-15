@@ -20,7 +20,7 @@ def getModelConstants(parameterizationRun, fileName):
             startIndex = ostOutput.find('Optimal Parameter Set')
             endIndex = ostOutput.find('\n\n', startIndex)
             parameterBlock = ostOutput[startIndex:endIndex+1]
-            for parameter in material.ostrichParameters:
+            for parameter in list(material.ostrichParameters.keys())+['Objective Function']:
                 paramPosition = parameterBlock.find(parameter)
                 colonPosition = parameterBlock.find(':', paramPosition)
                 eolPosition = parameterBlock.find('\n', paramPosition)

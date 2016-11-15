@@ -289,16 +289,18 @@ def buildModel():
     
     elasticModulus = $elasticModulus
     poissonsRatio = $poissonsRatio
-    frictionAngle = $frictionAngle
-    flowStressRatio = $flowStressRatio
     dilationAngle = $dilationAngle
+    eccentricity = $eccentricity
+    invariantRatio = $invariantRatio
+    equibiaxialRatio = $equibiaxialRatio
     initialCompressiveYeild = $initialCompressiveYeild
     peakCompressiveYeildDiff = $peakCompressiveYeildDiff
     peakPlasticStrain = $peakPlasticStrain
-    yeildStrain1 = $yeildStrain1
-    yeildStrain2Diff = $yeildStrain2
-    failureDisplacement = $failureDisplacement
-    druckerDamage(elasticModulus, poissonsRatio, frictionAngle, flowStressRatio, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, yeildStrain1, yeildStrain2Diff, failureDisplacement)
+    tLambda = $tLambda
+    initialTensileYeild = $initialTensileYeild
+    tensileDamageScaling = $tensileDamageScaling
+    compressiveDamageScaling = $compressiveDamageScaling
+    concreteDamage(elasticModulus, poissonsRatio, dilationAngle, eccentricity, invariantRatio, equibiaxialRatio,  initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, tLambda, initialTensileYeild, tensileDamageScaling, compressiveDamageScaling)
     
         
     assignSection(sectionName, partName, sectionLocation, materialName)

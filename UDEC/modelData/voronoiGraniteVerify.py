@@ -36,5 +36,5 @@ lateralVelocityPercentage = [3e6, 6e6, 8e6, 10e6]
 
 timeStepFraction = 0.01
 
-abaqusMaterial = 'druckerDamage'
+abaqusMaterial = 'concreteDamage'
 

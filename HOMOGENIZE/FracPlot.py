@@ -55,6 +55,27 @@ class FracPlot(DataSet, Plot):
             xEdge.append(None)
             yEdge.append(None)
         return (xEdge, yEdge)
+
+    def contactPoints(self, contacts, time = 0):
+        if time == 0:
+            time = min(self.blockData.keys())
+        contactX = []
+        contactY = []
+        for contact in contacts:
+            contactX.append(self.contactData[time][contact]['x'])
+            contactY.append(self.contactData[time][contact]['y'])
+        return (contactX, contactY)
+        
+    def cornerPoints(self, corners, time = 0):
+        if time == 0:
+            time = min(self.blockData.keys())
+        cornerX = []
+        cornerY = []
+        for corner in corners:
+            gp = self.cornerData[time][corner]['gridPoint']
+            cornerX.append(self.gridPointData[time][gp]['x'])
+            cornerY.append(self.gridPointData[time][gp]['y'])
+        return (cornerX, cornerY)
         
     def zoneEdges(self, zones, time = 0):
         if time == 0:
@@ -85,6 +106,22 @@ class FracPlot(DataSet, Plot):
         for i in range(len(times)):
             blockEdges = self.blockEdges(self.blocks, time=times[i])
             self.animationImages[i] += self.axes.plot(blockEdges[0], blockEdges[1], 'b-', label='Block Boundaries')
+        print('\tDone')
+
+    def plotContacts(self):
+        times = sorted(self.contactData)
+        print('Plotting contacts:')
+        for i in range(len(times)):
+            contactPoints = self.contactPoints(self.contacts, time=times[i])
+            self.animationImages[i] += self.axes.plot(contactPoints[0], contactPoints[1], 'k*', label='Boundary Contacts')
+        print('\tDone')
+        
+    def plotCorners(self):
+        times = sorted(self.cornerData)
+        print('Plotting contacts:')
+        for i in range(len(times)):
+            cornerPoints = self.cornerPoints(self.corners, time=times[i])
+            self.animationImages[i] += self.axes.plot(cornerPoints[0], cornerPoints[1], 'r*', label='Boundary Contacts')
         print('\tDone')
         
     def plotZones(self):        

@@ -1,2 +1,2 @@
-python parameterStatistics.py -n voronoiGranite -r 1 -o ParticleSwarm
+python parameterStatistics.py -n voronoiGranite -r 1 -o APPSO
 PAUSE

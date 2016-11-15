@@ -29,6 +29,39 @@ class HomoPlot(FracPlot):
         self.zones = self.zonesInBlocks(self.blocks)
         self.plotBlocks()
 
+    def plotOutsideBlocks(self):
+        self.blocks = self.outsideBlocks
+        self.zones = self.zonesInBlocks(self.blocks)
+        self.plotBlocks()
+
+    def plotBoundaryContacts(self):
+        self.contacts = self.boundaryContacts
+        self.plotContacts()
+
+    def plotBoundaryContactCorners(self):
+        self.corners = self.boundaryContactCorners
+        self.plotCorners()
+
+    def plotBoundaryBlockContacts(self):
+        self.contacts = self.contactsOnBlocks(self.boundaryBlocks)
+        self.plotContacts()
+
+    def plotBoundaryBlockContacts(self):
+        self.contacts = self.contactsOnBlocks(self.boundaryBlocks)
+        self.plotContacts()
+
+    def plotBoundaryContactBlocks(self):
+        self.blocks = self.boundaryContactBlocks
+        self.plotBlocks()
+
+    def plotBoundaryBlockCorners(self):
+        self.corners = self.boundaryBlockCorners
+        self.plotCorners()
+
+    def plotBoundaryCorners(self):
+        self.corners = self.allBoundaryCorners
+        self.plotCorners()
+
     def plotHomogenizationBlocks(self):
         self.blocks = self.insideBoundaryBlocks
         self.plotBlocks()

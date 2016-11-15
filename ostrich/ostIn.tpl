@@ -32,20 +32,20 @@ MaxIterations    20
 EndLevMar
 
 BeginParticleSwarm
-SwarmSize  48
-NumGenerations  25
+SwarmSize  24
+NumGenerations  100
 ConstrictionFactor  1.00
-CognitiveParam  4.00
+CognitiveParam  2.00
 SocialParam  2.00
 InertiaWeight  1.20
-InertiaReductionRate 0.05
+InertiaReductionRate 0.1
 EndParticleSwarm
 
 BeginAPPSO
-SwarmSize  48
-NumGenerations  25
+SwarmSize  24
+NumGenerations  100
 ConstrictionFactor  1.00
-CognitiveParam  4.00
+CognitiveParam  2.00
 SocialParam  2.00
 InertiaWeight  1.20
 InertiaReductionRate 0.1

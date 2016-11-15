@@ -39,3 +39,4 @@ def angle(x1, y1, x2, y2):
     if abs(cosine) > 1:
         cosine = math.copysign(1, cosine)
     return math.acos(cosine)
+

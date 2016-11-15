@@ -272,9 +272,9 @@ class Homogenize(DataSet):
             self.boundaryBlockCorners = self.cornersOnBlocks(self.boundaryContactBlocks)
             print('\tCalculating boundary corners')
             self.boundaryCorners = common.listIntersection(self.boundaryContactCorners, self.boundaryBlockCorners)
-            #print('\tCalculating missing boundary corners')
-            #self.allBoundaryCorners = self.duplicateCorners(self.boundaryCorners, self.boundaryContactBlocks)
-            self.allBoundaryCorners = self.boundaryCorners
+            print('\tCalculating missing boundary corners')
+            self.allBoundaryCorners = self.duplicateCorners(self.boundaryCorners, self.boundaryContactBlocks)
+            #self.allBoundaryCorners = self.boundaryCorners
             print('\tCalculating boundary block order')
             self.boundaryBlocksOrdered = self.orderBlocks(self.boundaryContactBlocks, self.outsideContacts)
             print('\tCalculating boundary corner order')

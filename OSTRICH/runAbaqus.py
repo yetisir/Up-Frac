@@ -241,7 +241,7 @@ def applyInitialStress(name, instance, location, cStress):
     a = mdb.models['Model-1'].rootAssembly
     faces1 = a.instances[instance].faces.findAt((location, ))
     region = a.Set(faces=faces1, name=name)
-    #pr = 0.1527086
+    #pr = 0.3755856
     aStress = -cStress/2#*pr/(1-pr)
     mdb.models['Model-1'].Stress(name=name, region=region, 
         distributionType=UNIFORM, sigma11=-cStress, sigma22=aStress, sigma33=aStress, 
@@ -287,18 +287,20 @@ def buildModel():
     sketchPart(partName, gridPoints)
     
     
-    elasticModulus = 1787473000.0
-    poissonsRatio = 0.1527086
-    frictionAngle = 55.98208
-    flowStressRatio = 0.8133132
-    dilationAngle = 22.40882
-    initialCompressiveYeild = 29851.3
-    peakCompressiveYeildDiff = 3079512.0
-    peakPlasticStrain = 0.01652767
-    yeildStrain1 = 7.839071e-05
-    yeildStrain2Diff = 0.7096724
-    failureDisplacement = 0.1172562
-    druckerDamage(elasticModulus, poissonsRatio, frictionAngle, flowStressRatio, dilationAngle, initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, yeildStrain1, yeildStrain2Diff, failureDisplacement)
+    elasticModulus = 1574861000.0
+    poissonsRatio = 0.3755856
+    dilationAngle = 13.07659
+    eccentricity = 0.4249099
+    invariantRatio = 0.6474719
+    equibiaxialRatio = 1.289982
+    initialCompressiveYeild = 52266.98
+    peakCompressiveYeildDiff = 3276328.0
+    peakPlasticStrain = 0.005485066
+    tLambda = 356.7335
+    initialTensileYeild = 420270.5
+    tensileDamageScaling = 0.6536259
+    compressiveDamageScaling = 0.9474579
+    concreteDamage(elasticModulus, poissonsRatio, dilationAngle, eccentricity, invariantRatio, equibiaxialRatio,  initialCompressiveYeild, peakCompressiveYeildDiff, peakPlasticStrain, tLambda, initialTensileYeild, tensileDamageScaling, compressiveDamageScaling)
     
         
     assignSection(sectionName, partName, sectionLocation, materialName)

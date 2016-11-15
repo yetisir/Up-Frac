@@ -180,9 +180,8 @@ class StressStrainPlot(Plot):
             #stresses = [x[self.direction]/-1e6 for x in self.femDataList[i][-1][1]]
             stresses = [x[(self.direction, self.direction)]/-1e6 for x in self.demData[i][1]]
             if self.direction == 1:
-                x = max(strains)
+                x = max(strains)*1.1
                 y = stresses[strains.index(x)]
-                x+=0.1
             elif self.direction == 0:
                 x = min(strains)
                 y = stresses[strains.index(x)]
@@ -195,9 +194,10 @@ class StressStrainPlot(Plot):
         leg = matplotlib.legend.Legend(self.axes, [solidLine, dashedLine], ['DEM Response', 'Fitted CDM Response'], loc=2, framealpha=1, fontsize=12, frameon=False)
         for i in range(len(self.animationImages)):
             self.animationImages[i].append(leg)
-        self.addRootMeanSquareError()
+        self.addRootMeanSquareErrorStrain()
+        # self.addRootMeanSquareErrorStress()
         
-    def addRootMeanSquareError(self):
+    def addRootMeanSquareErrorStress(self):
         demStress = []
         femStress = []
         for i in range(len(modelData.confiningStress)):
@@ -206,6 +206,18 @@ class StressStrainPlot(Plot):
                 femStress.append(self.femDataList[i][-1][1][j][self.direction])
         rmse = numpy.sqrt(numpy.nanmean(((numpy.array(demStress) - numpy.array(femStress)) ** 2)))
         textArtist = matplotlib.text.Text(0.05, 0.82, 'RMSE=${0:.2f}MPa$'.format(rmse/1e6), transform=self.axes.transAxes)
+        for i in range(len(self.animationImages)):
+            self.animationImages[i].append(textArtist)
+            
+    def addRootMeanSquareErrorStrain(self):
+        demStrain = []
+        femStrain = []
+        for i in range(len(modelData.confiningStress)):
+            for j in range(len(self.demData[0][0])):
+                demStrain.append(self.demData[i][2][j][(self.direction,self.direction)])
+                femStrain.append(self.femDataList[i][-1][2][j][self.direction])
+        rmse = numpy.sqrt(numpy.nanmean(((numpy.array(demStrain) - numpy.array(femStrain)) ** 2)))
+        textArtist = matplotlib.text.Text(0.05, 0.82, 'RMSE=${0:.2f}$'.format(rmse), transform=self.axes.transAxes)
         for i in range(len(self.animationImages)):
             self.animationImages[i].append(textArtist)
             
